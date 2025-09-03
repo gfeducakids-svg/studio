@@ -64,7 +64,7 @@ const statusConfig = {
     }
 }
 
-const getProgressStatus = (progress: any, progressKey: string) => {
+const getProgressStatus = (progress: any, progressKey: string): 'locked' | 'active' | 'completed' => {
     if (!progress || !progressKey) return 'locked';
 
     const keys = progressKey.split('.');
@@ -79,7 +79,10 @@ const getProgressStatus = (progress: any, progressKey: string) => {
     }
     
     if (typeof currentProgress === 'object' && currentProgress !== null && 'status' in currentProgress) {
-        return currentProgress.status;
+        const status = currentProgress.status;
+        if (status === 'locked' || status === 'active' || status === 'completed') {
+            return status;
+        }
     }
 
     return 'locked';
@@ -135,24 +138,24 @@ export default function ProgressTrail() {
               <CarouselContent>
                 {allItems.map((item, index) => {
                     const isSecondary = 'icon' in item;
-                    let configKey = item.status as keyof typeof statusConfig;
+                    let configKey = item.status;
 
                     if (item.status === 'completed' && isSecondary) {
                         configKey = 'completedSecondary';
                     }
                     
-                    const config = statusConfig[configKey];
+                    const config = statusConfig[configKey as keyof typeof statusConfig];
                     const Icon = isSecondary ? item.icon : config.icon;
                     const isLast = index === allItems.length - 1;
                     const isNextStep = activeIndex !== -1 && index === activeIndex + 1;
 
                     return (
-                        <CarouselItem key={item.id} className="basis-1/4 md:basis-1/5 lg:basis-1/6">
+                        <CarouselItem key={item.id} className="basis-auto">
                            <div className="flex items-start justify-center">
                              <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <div className="flex flex-col items-center text-center gap-2 group w-[60px] md:w-[80px] shrink-0">
+                                        <div className="flex flex-col items-center text-center gap-2 group shrink-0">
                                             <div className={cn(
                                                 "w-12 h-12 rounded-full flex items-center justify-center border transition-all duration-300",
                                                 config.node,
@@ -160,7 +163,7 @@ export default function ProgressTrail() {
                                             )}>
                                                 <Icon className="w-6 h-6" />
                                             </div>
-                                            <p className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors leading-tight">{item.title}</p>
+                                            <p className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors leading-tight px-2">{item.title}</p>
                                         </div>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -170,7 +173,7 @@ export default function ProgressTrail() {
                             </TooltipProvider>
 
                             {!isLast && (
-                              <div className="flex-1 h-1.5 bg-border rounded-full mx-2 mt-5 relative overflow-hidden w-full">
+                              <div className="flex-1 h-1.5 bg-border rounded-full mx-2 mt-5 relative overflow-hidden min-w-12">
                                 <div 
                                   className={cn("absolute top-0 left-0 h-full rounded-full transition-all duration-700 ease-out", config.line)}
                                   style={{ width: item.status === 'completed' ? '100%' : '0%' }}

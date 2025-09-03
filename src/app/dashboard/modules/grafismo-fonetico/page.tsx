@@ -89,7 +89,7 @@ export default function GrafismoFoneticoPage() {
                 setActiveModuleId(activeSubmodule.id);
             } else if (firstLocked) {
                  setActiveModuleId(firstLocked.id);
-            } else {
+            } else if(orderedProgress.length > 0) {
                 setActiveModuleId(orderedProgress[0].id);
             }
         }
@@ -145,7 +145,10 @@ export default function GrafismoFoneticoPage() {
 
         if (currentModuleIndex + 1 < orderedProgress.length) {
             const nextModuleId = orderedProgress[currentModuleIndex + 1].id;
-            updates[`progress.grafismo-fonetico.submodules.${nextModuleId}.status`] = 'active';
+            // Only update next module to active if it's currently locked
+            if (progress[nextModuleId]?.status === 'locked') {
+              updates[`progress.grafismo-fonetico.submodules.${nextModuleId}.status`] = 'active';
+            }
         }
 
         try {
@@ -156,14 +159,17 @@ export default function GrafismoFoneticoPage() {
                 title: (
                     <div className="flex items-center gap-2">
                         <Sparkles className="text-yellow-400" />
-                        <span className="font-bold">Conquista Desbloqueada!</span>
+                        <span className="font-bold">Progresso Salvo!</span>
                     </div>
                 ),
-                description: `Você concluiu "${activeModule.title}" e desbloqueou o próximo desafio!`,
+                description: `Você concluiu "${activeModule.title}"!`,
             });
 
              if (currentModuleIndex + 1 < orderedProgress.length) {
-                setActiveModuleId(orderedProgress[currentModuleIndex + 1].id);
+                const nextModule = orderedProgress.find(m => m.id === orderedProgress[currentModuleIndex + 1].id);
+                if (nextModule && nextModule.status === 'locked') {
+                    setActiveModuleId(nextModule.id);
+                }
             }
 
         } catch (error) {
@@ -230,7 +236,7 @@ export default function GrafismoFoneticoPage() {
       <div className="flex-1">
         <Card className="min-h-full">
             <CardHeader>
-                <Button variant="ghost" className="self-start mb-4" asChild>
+                <Button variant="ghost" className="self-start mb-4 -ml-4" asChild>
                     <Link href="/dashboard">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Voltar para os Cursos
