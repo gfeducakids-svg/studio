@@ -1,24 +1,43 @@
 'use client'
 
 import React from 'react';
-import { Check, Lock, Play } from 'lucide-react';
+import { Check, Lock, Play, Paperclip, FileText, Link as LinkIcon, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 
 const submodules = [
-  { id: 'intro', title: 'Introdução', completed: true },
-  { id: 'pre-alf', title: 'Pré-Alfabetização', completed: true },
-  { id: 'alfabeto', title: 'Apresentando o Alfabeto', completed: false, active: true },
-  { id: 'silabas', title: 'Sílabas Simples', completed: false },
-  { id: 'fonico', title: 'Método Fônico', completed: false },
-  { id: 'palavras', title: 'Formação de Palavras e Frases', completed: false },
-  { id: 'escrita', title: 'Escrita e Compreensão Leitora', completed: false },
-  { id: 'bonus', title: 'Bônus', completed: false },
+  { id: 'intro', title: 'Introdução', completed: true, materials: [{ id: 1, type: 'video', title: 'Boas-vindas'}] },
+  { id: 'pre-alf', title: 'Pré-Alfabetização', completed: true, materials: [{ id: 1, type: 'video', title: 'Aula 1'}, {id: 2, type: 'pdf', title: 'Exercício de Traços'}] },
+  { id: 'alfabeto', title: 'Apresentando o Alfabeto', completed: false, active: true, materials: [{ id: 1, type: 'video', title: 'As Vogais'}, {id: 2, type: 'pdf', title: 'Cartilha do Alfabeto'}, {id: 3, type: 'download', title: 'Áudios das Letras'}] },
+  { id: 'silabas', title: 'Sílabas Simples', completed: false, materials: [{ id: 1, type: 'video', title: 'BA-BE-BI-BO-BU'}, {id: 2, type: 'pdf', title: 'Tabela de Sílabas'}] },
+  { id: 'fonico', title: 'Método Fônico', completed: false, materials: [] },
+  { id: 'palavras', title: 'Formação de Palavras e Frases', completed: false, materials: [] },
+  { id: 'escrita', title: 'Escrita e Compreensão Leitora', completed: false, materials: [] },
+  { id: 'bonus', title: 'Bônus', completed: false, materials: [] },
 ];
 
+const materialIcons = {
+  video: Play,
+  pdf: FileText,
+  link: LinkIcon,
+  download: Download,
+  atividade: Paperclip
+};
+
+const materialActions = {
+  video: "Assistir",
+  pdf: "Abrir PDF",
+  link: "Acessar Link",
+  download: "Baixar",
+  atividade: "Iniciar Atividade"
+};
+
+
 export default function GrafismoFoneticoPage() {
-    const activeModule = submodules.find(s => s.active);
+    const activeModule = submodules.find(s => s.active) ?? submodules[0];
+    const isModuleUnlocked = activeModule.completed || activeModule.active;
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">
@@ -31,23 +50,30 @@ export default function GrafismoFoneticoPage() {
           {/* Linha vertical da trilha */}
           <div className="absolute left-9 top-0 bottom-0 w-0.5 bg-border -z-10"></div>
           
-          {submodules.map((submodule, index) => (
-            <div key={submodule.id} className="flex items-center gap-4 mb-4">
-              <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center border-4 shrink-0 transition-colors cursor-pointer",
+          {submodules.map((submodule) => (
+            <div key={submodule.id} className="flex items-start gap-4 mb-4">
+               <div className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center border-4 shrink-0 transition-colors cursor-pointer z-10",
                 submodule.completed ? 'bg-green-500 border-green-200 text-white' : 
                 submodule.active ? 'bg-primary border-blue-200 text-white' : 
                 'bg-muted border-gray-200 text-muted-foreground'
               )}>
                 {submodule.completed ? <Check /> : <Lock size={20}/>}
               </div>
-              <p className={cn(
-                  "font-semibold",
-                  submodule.active ? "text-primary-foreground" :
-                  !submodule.completed && !submodule.active ? "text-muted-foreground" : ""
-              )}>
-                {submodule.title}
-              </p>
+              <div className="flex-1">
+                <p className={cn(
+                    "font-semibold",
+                    submodule.active ? "text-primary" :
+                    !submodule.completed && !submodule.active ? "text-muted-foreground" : ""
+                )}>
+                  {submodule.title}
+                </p>
+                 <p className="text-xs text-muted-foreground">
+                  {submodule.materials.length > 0 
+                    ? `${submodule.materials.length} material${submodule.materials.length > 1 ? 's' : ''}` 
+                    : "Nenhum material"}
+                </p>
+              </div>
             </div>
           ))}
         </div>
@@ -60,25 +86,49 @@ export default function GrafismoFoneticoPage() {
             <CardTitle className="text-2xl font-bold font-headline">
               {activeModule ? activeModule.title : "Selecione um módulo"}
             </CardTitle>
+            {!isModuleUnlocked && <CardDescription className="text-destructive font-semibold">Conteúdo bloqueado — conclua a etapa anterior para liberar.</CardDescription>}
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="aula">
+            <Tabs defaultValue="aula" className={!isModuleUnlocked ? 'opacity-50 pointer-events-none' : ''}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="aula">Aula</TabsTrigger>
-                <TabsTrigger value="exercicios">Exercícios</TabsTrigger>
+                <TabsTrigger value="materiais">Materiais</TabsTrigger>
               </TabsList>
               <TabsContent value="aula" className="mt-6">
                 <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
                     <div className="text-center text-muted-foreground">
                         <Play size={48} className="mx-auto mb-2"/>
-                        <p>Vídeo da aula em breve.</p>
+                        <p>Vídeo da aula principal.</p>
                     </div>
                 </div>
               </TabsContent>
-              <TabsContent value="exercicios" className="mt-6">
-                <div className="p-8 bg-muted rounded-lg flex items-center justify-center">
-                    <p className="text-muted-foreground">Exercícios interativos em breve.</p>
-                </div>
+              <TabsContent value="materiais" className="mt-6">
+                 <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                  {activeModule.materials.length > 0 ? activeModule.materials.map(material => {
+                      const Icon = materialIcons[material.type as keyof typeof materialIcons] || Paperclip;
+                      const actionText = materialActions[material.type as keyof typeof materialActions] || "Acessar";
+                      return (
+                        <Card key={material.id} className="flex flex-col">
+                           <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
+                            <Icon className="h-6 w-6 text-primary" />
+                            <CardTitle className="text-base font-semibold leading-tight">{material.title}</CardTitle>
+                          </CardHeader>
+                          <CardContent className="flex-grow pt-2">
+                             <p className="text-sm text-muted-foreground capitalize">{material.type}</p>
+                          </CardContent>
+                          <CardFooter>
+                            <Button className="w-full" size="sm">
+                               {actionText}
+                            </Button>
+                          </CardFooter>
+                        </Card>
+                      )
+                  }) : (
+                     <div className="col-span-full p-8 bg-muted rounded-lg flex items-center justify-center">
+                        <p className="text-muted-foreground">Nenhum material adicional para este submódulo.</p>
+                    </div>
+                  )}
+                 </div>
               </TabsContent>
             </Tabs>
           </CardContent>
