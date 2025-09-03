@@ -17,21 +17,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import React from 'react';
-import Link from 'next/link';
 import { auth } from '@/lib/firebase';
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Endereço de e-mail inválido." }),
-  password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres." }),
+  email: z.string().email({ message: "Por favor, insira um e-mail válido." }),
+  password: z.string().min(1, { message: "A senha é obrigatória." }),
 });
 
 export default function LoginForm() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
-  const [emailForPasswordReset, setEmailForPasswordReset] = React.useState("");
-
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,16 +42,12 @@ export default function LoginForm() {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
-      toast({
-        title: "Login bem-sucedido",
-        description: "Bem-vindo de volta!",
-      });
       router.push('/dashboard');
     } catch (error: any) {
       console.error("Erro no login:", error);
       toast({
-        title: "Erro no login",
-        description: "Email ou senha incorretos. Por favor, tente novamente.",
+        title: "Ops! Algo deu errado.",
+        description: "E-mail ou senha incorretos. Por favor, tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -64,25 +57,24 @@ export default function LoginForm() {
 
   const handlePasswordReset = async () => {
     const email = form.getValues("email");
-    if (!email) {
-      toast({
-        title: "Esqueceu a senha?",
-        description: "Por favor, insira seu e-mail no campo correspondente para redefinir sua senha.",
-        variant: "destructive",
+    if (!email || !z.string().email().safeParse(email).success) {
+      form.setError("email", {
+        type: "manual",
+        message: "Por favor, insira um e-mail válido para redefinir a senha."
       });
       return;
     }
     try {
       await sendPasswordResetEmail(auth, email);
       toast({
-        title: "E-mail de redefinição enviado",
-        description: "Verifique sua caixa de entrada para redefinir sua senha.",
+        title: "E-mail de redefinição enviado!",
+        description: "Verifique sua caixa de entrada para criar uma nova senha.",
       });
     } catch (error: any) {
-      console.error("Erro ao enviar e-mail de redefinição de senha:", error);
+      console.error("Erro ao redefinir senha:", error);
       toast({
         title: "Erro",
-        description: "Não foi possível enviar o e-mail de redefinição. Verifique se o e-mail está correto.",
+        description: "Não foi possível enviar o e-mail. Verifique se o e-mail está correto e tente novamente.",
         variant: "destructive",
       });
     }
@@ -96,9 +88,9 @@ export default function LoginForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel className="text-muted-foreground">Seu melhor e-mail</FormLabel>
               <FormControl>
-                <Input placeholder="voce@exemplo.com" {...field} />
+                <Input placeholder="seunome@email.com" {...field} className="py-6 rounded-lg"/>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -109,21 +101,21 @@ export default function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-                <div className="flex items-center justify-between">
-                    <FormLabel>Senha</FormLabel>
-                    <button type="button" onClick={handlePasswordReset} className="text-sm text-primary hover:underline">
-                        Esqueceu a senha?
-                    </button>
-                </div>
+              <div className="flex items-center justify-between">
+                <FormLabel className="text-muted-foreground">Sua senha secreta</FormLabel>
+                <button type="button" onClick={handlePasswordReset} className="text-sm text-primary hover:underline focus:outline-none">
+                  Esqueceu a senha?
+                </button>
+              </div>
               <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
+                <Input type="password" placeholder="••••••••" {...field} className="py-6 rounded-lg"/>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
-          {isLoading ? 'Entrando...' : 'Entrar'}
+        <Button type="submit" className="w-full bg-gradient-to-r from-primary to-blue-400 text-primary-foreground font-bold text-lg shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-full py-6" disabled={isLoading}>
+          {isLoading ? 'Entrando...' : 'Entrar na Trilha'}
         </Button>
       </form>
     </Form>

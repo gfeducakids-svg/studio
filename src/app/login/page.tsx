@@ -1,21 +1,22 @@
 import Link from 'next/link';
-import RegisterForm from '@/components/auth/register-form';
+import LoginForm from '@/components/auth/login-form';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { ArrowRight } from 'lucide-react';
 
-export default function RegisterPage() {
+export default function LoginPage() {
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-background p-4 font-headline">
       <div className="w-full max-w-md">
         <Card className="shadow-2xl rounded-2xl">
           <CardHeader className="space-y-2 text-center">
-            <CardTitle className="text-3xl font-black text-foreground">Criar uma Conta</CardTitle>
-            <CardDescription className="!mt-2 text-muted-foreground">Junte-se à aventura do conhecimento!</CardDescription>
+            <CardTitle className="text-3xl font-black text-foreground">Área de Membros</CardTitle>
+            <CardDescription className="!mt-2 text-muted-foreground">Para os melhores pais do mundo</CardDescription>
           </CardHeader>
           <CardContent>
-            <RegisterForm />
+            <LoginForm />
           </CardContent>
-          <CardFooter className="flex-col gap-4 pt-4">
-             <div className="relative w-full">
+           <CardFooter className="flex-col gap-4 pt-4">
+            <div className="relative w-full">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
               </div>
@@ -26,9 +27,9 @@ export default function RegisterPage() {
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Já tem uma conta?{' '}
-              <Link href="/login" className="font-semibold text-primary hover:underline">
-                Entrar
+              Não tem uma conta?{' '}
+              <Link href="/register" className="font-semibold text-primary hover:underline">
+                Crie uma aqui
               </Link>
             </p>
           </CardFooter>

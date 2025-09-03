@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -25,7 +24,7 @@ import { doc, setDoc } from 'firebase/firestore';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
-  email: z.string().email({ message: "Endereço de e-mail inválido." }),
+  email: z.string().email({ message: "Por favor, insira um e-mail válido." }),
   password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres." }),
   confirmPassword: z.string()
 }).refine(data => data.password === data.confirmPassword, {
@@ -54,16 +53,10 @@ export default function RegisterForm() {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
 
-      // Salva informações adicionais no Firestore
       await setDoc(doc(db, "users", user.uid), {
         name: values.name,
         email: values.email,
-        modules: [] // Nenhum módulo liberado no cadastro inicial
-      });
-
-      toast({
-        title: "Cadastro bem-sucedido",
-        description: "Sua conta foi criada.",
+        modules: []
       });
 
       router.push('/dashboard');
@@ -94,9 +87,9 @@ export default function RegisterForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nome</FormLabel>
+              <FormLabel className="text-muted-foreground">Seu nome completo</FormLabel>
               <FormControl>
-                <Input placeholder="Seu Nome" {...field} />
+                <Input placeholder="Nome do Aventureiro" {...field} className="py-6 rounded-lg"/>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -107,9 +100,9 @@ export default function RegisterForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel className="text-muted-foreground">Seu melhor e-mail</FormLabel>
               <FormControl>
-                <Input placeholder="voce@exemplo.com" {...field} />
+                <Input placeholder="seunome@email.com" {...field} className="py-6 rounded-lg"/>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -120,9 +113,9 @@ export default function RegisterForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Senha</FormLabel>
+              <FormLabel className="text-muted-foreground">Crie uma senha secreta</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
+                <Input type="password" placeholder="••••••••" {...field} className="py-6 rounded-lg"/>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -133,16 +126,16 @@ export default function RegisterForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirmar Senha</FormLabel>
+              <FormLabel className="text-muted-foreground">Confirme a senha secreta</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
+                <Input type="password" placeholder="••••••••" {...field} className="py-6 rounded-lg"/>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
-          {isLoading ? 'Criando conta...' : 'Criar Conta'}
+        <Button type="submit" className="w-full bg-gradient-to-r from-primary to-blue-400 text-primary-foreground font-bold text-lg shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-full py-6" disabled={isLoading}>
+          {isLoading ? 'Criando...' : 'Criar Conta e Iniciar'}
         </Button>
       </form>
     </Form>
