@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -13,18 +14,7 @@ import { useUserData } from '@/hooks/use-user-data';
 import { doc, updateDoc, getFirestore } from 'firebase/firestore';
 import { auth } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
-
-
-const submoduleDetails = [
-  { id: 'intro', title: 'Introdução', pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', materials: [{ id: 1, type: 'video', title: 'Boas-vindas'}] },
-  { id: 'pre-alf', title: 'Pré-Alfabetização', pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', materials: [{ id: 1, type: 'video', title: 'Aula 1'}, {id: 2, type: 'pdf', title: 'Exercício de Traços'}] },
-  { id: 'alfabeto', title: 'Apresentando o Alfabeto', pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', materials: [{ id: 1, type: 'video', title: 'As Vogais'}, {id: 2, type: 'pdf', title: 'Cartilha do Alfabeto'}, {id: 3, type: 'download', title: 'Áudios das Letras'}] },
-  { id: 'silabas', title: 'Sílabas Simples', pdfUrl: null, materials: [{ id: 1, type: 'video', title: 'BA-BE-BI-BO-BU'}, {id: 2, type: 'pdf', title: 'Tabela de Sílabas'}] },
-  { id: 'fonico', title: 'Método Fônico', pdfUrl: null, materials: [] },
-  { id: 'palavras', title: 'Formação de Palavras e Frases', pdfUrl: null, materials: [] },
-  { id: 'escrita', title: 'Escrita e Compreensão Leitora', pdfUrl: null, materials: [] },
-  { id: 'bonus', title: 'Bônus', pdfUrl: null, materials: [] },
-];
+import { getCourseStructure } from '@/lib/course-data';
 
 const materialIcons = {
   video: Play,
@@ -42,14 +32,29 @@ const materialActions = {
   atividade: "Iniciar Atividade"
 };
 
-
 export default function GrafismoFoneticoPage() {
     const { toast } = useToast();
     const { userData, loading: userLoading } = useUserData();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [courseStructure, setCourseStructure] = useState<Awaited<ReturnType<typeof getCourseStructure>> | null>(null);
+    const [loadingStructure, setLoadingStructure] = useState(true);
     
+    useEffect(() => {
+        const fetchCourseData = async () => {
+            try {
+                const structure = await getCourseStructure('grafismo-fonetico');
+                setCourseStructure(structure);
+            } catch (error) {
+                console.error("Failed to load course structure", error);
+            } finally {
+                setLoadingStructure(false);
+            }
+        };
+        fetchCourseData();
+    }, []);
+
     const progress = userData?.progress?.['grafismo-fonetico']?.submodules;
-    const orderedProgress = progress ? submoduleDetails.map(s => ({...s, status: progress[s.id]?.status ?? 'locked' })) : [];
+    const orderedProgress = courseStructure ? courseStructure.submodules.map(s => ({...s, status: progress?.[s.id]?.status ?? 'locked' })) : [];
 
     const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
 
@@ -60,7 +65,7 @@ export default function GrafismoFoneticoPage() {
         }
     }, [JSON.stringify(orderedProgress)]);
 
-    if (userLoading || !activeModuleId) {
+    if (userLoading || loadingStructure || !activeModuleId || !courseStructure) {
         return (
             <div className="flex flex-col lg:flex-row gap-8">
                 <div className="lg:w-1/3 space-y-4">
@@ -134,7 +139,7 @@ export default function GrafismoFoneticoPage() {
   return (
     <div className="flex flex-col lg:flex-row gap-8">
       <aside className="lg:w-1/3">
-        <h1 className="text-3xl font-bold font-headline mb-2">Método de Grafismo Fonético</h1>
+        <h1 className="text-3xl font-bold font-headline mb-2">{courseStructure.title}</h1>
         <p className="text-muted-foreground mb-8">Siga a trilha do conhecimento e desbloqueie novas aventuras!</p>
         
         <div className="relative pl-5">
@@ -202,9 +207,9 @@ export default function GrafismoFoneticoPage() {
               
               <TabsContent value="aula" className="mt-6">
                 <div className="bg-muted rounded-lg w-full min-h-[80vh] flex flex-col">
-                    {activeModule.pdfUrl ? (
+                    {activeModule.imageUrl ? (
                          <embed
-                            src={activeModule.pdfUrl}
+                            src={activeModule.imageUrl}
                             type="application/pdf"
                             className="w-full h-full min-h-[80vh] rounded-md shadow-inner"
                         />
@@ -277,4 +282,3 @@ export default function GrafismoFoneticoPage() {
     </div>
   );
 }
-
