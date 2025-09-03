@@ -136,6 +136,7 @@ export default function ProgressTrail() {
                 opts={{
                     align: "start",
                     slidesToScroll: "auto",
+                    dragFree: true,
                 }}
                 className="w-full"
                 >
