@@ -21,10 +21,10 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
       <Card className={cn(
         "flex flex-col h-full transition-all duration-300 ease-out group",
         isUnlocked 
-          ? 'hover:shadow-2xl hover:-translate-y-1 hover:border-primary' 
+          ? 'hover:shadow-xl hover:-translate-y-1' 
           : 'cursor-default'
       )}>
-        <CardHeader className="p-0 relative aspect-[4/3] w-full max-h-40">
+        <CardHeader className="p-0 relative aspect-[4/3] w-full">
          <Link href={linkHref} className={cn(!isUnlocked && "pointer-events-none", "relative block w-full h-full")}>
              <Image
                 src={imageUrl}
@@ -41,7 +41,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
         </CardHeader>
         <div className="flex flex-col flex-grow p-4">
           <CardTitle className="font-headline text-lg leading-tight">{title}</CardTitle>
-          <CardDescription className="mt-2 text-xs flex-grow">{description}</CardDescription>
+          <CardDescription className="mt-2 text-sm flex-grow">{description}</CardDescription>
         </div>
         <CardFooter className="p-4 pt-0">
           <Button 
