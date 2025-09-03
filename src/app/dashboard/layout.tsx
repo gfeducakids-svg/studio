@@ -13,7 +13,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
               <BookOpen className="h-8 w-8 text-primary" />
               <span className="text-xl font-headline group-data-[collapsible=icon]:hidden">
-                Pinyin Mastery
+                M.C.G.F
               </span>
             </Link>
           </SidebarHeader>

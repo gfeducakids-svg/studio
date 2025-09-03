@@ -2,16 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Award, MessageSquare, BookText } from 'lucide-react';
+import { Home, Award, MessageSquare, BookText, LifeBuoy } from 'lucide-react';
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
 
 export function DashboardNav() {
     const pathname = usePathname();
     const navItems = [
-        { href: '/dashboard', label: 'Home', icon: Home, exact: true },
-        { href: '/dashboard/achievements', label: 'Achievements', icon: Award },
-        { href: '/dashboard/feedback', label: 'Feedback', icon: MessageSquare },
-        { href: '/dashboard/materials', label: 'Materials', icon: BookText },
+        { href: '/dashboard', label: 'Início', icon: Home, exact: true },
+        { href: '/dashboard/materials', label: 'Cursos', icon: BookText },
+        { href: '/dashboard/achievements', label: 'Conquistas', icon: Award },
+        { href: '/dashboard/feedback', label: 'Comentários', icon: MessageSquare },
+        { href: '/dashboard/support', label: 'Suporte', icon: LifeBuoy },
     ];
 
     return (

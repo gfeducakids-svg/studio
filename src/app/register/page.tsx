@@ -12,8 +12,8 @@ export default function RegisterPage() {
             <div className="flex justify-center pb-4">
               <BookOpen className="h-12 w-12 text-primary" />
             </div>
-            <CardTitle className="text-3xl font-headline">Create an Account</CardTitle>
-            <CardDescription>Join Pinyin Mastery today</CardDescription>
+            <CardTitle className="text-3xl font-headline">Criar uma Conta</CardTitle>
+            <CardDescription>Junte-se ao Método Chinês de Grafismo Fonético</CardDescription>
           </CardHeader>
           <CardContent>
             <RegisterForm />
@@ -25,14 +25,14 @@ export default function RegisterPage() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-card px-2 text-muted-foreground">
-                  Or
+                  Ou
                 </span>
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Already have an account?{' '}
+              Já tem uma conta?{' '}
               <Link href="/" className="font-semibold text-primary hover:underline">
-                Sign In
+                Entrar
               </Link>
             </p>
           </CardFooter>

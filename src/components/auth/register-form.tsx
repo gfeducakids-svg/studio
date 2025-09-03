@@ -19,9 +19,13 @@ import { useToast } from "@/hooks/use-toast";
 import React from 'react';
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
+  email: z.string().email({ message: "Endereço de e-mail inválido." }),
+  password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres." }),
+  confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
 });
 
 export default function RegisterForm() {
@@ -35,6 +39,7 @@ export default function RegisterForm() {
       name: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
@@ -47,8 +52,8 @@ export default function RegisterForm() {
     console.log(values);
 
     toast({
-      title: "Registration Successful",
-      description: "Your account has been created.",
+      title: "Cadastro bem-sucedido",
+      description: "Sua conta foi criada.",
     });
 
     router.push('/dashboard');
@@ -63,9 +68,9 @@ export default function RegisterForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Nome</FormLabel>
               <FormControl>
-                <Input placeholder="Your Name" {...field} />
+                <Input placeholder="Seu Nome" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -78,7 +83,7 @@ export default function RegisterForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="you@example.com" {...field} />
+                <Input placeholder="voce@exemplo.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,7 +94,20 @@ export default function RegisterForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>Senha</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="••••••••" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+         <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirmar Senha</FormLabel>
               <FormControl>
                 <Input type="password" placeholder="••••••••" {...field} />
               </FormControl>
@@ -98,7 +116,7 @@ export default function RegisterForm() {
           )}
         />
         <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
-          {isLoading ? 'Creating account...' : 'Create Account'}
+          {isLoading ? 'Criando conta...' : 'Criar Conta'}
         </Button>
       </form>
     </Form>

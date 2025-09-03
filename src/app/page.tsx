@@ -12,8 +12,8 @@ export default function Home() {
             <div className="flex justify-center pb-4">
               <BookOpen className="h-12 w-12 text-primary" />
             </div>
-            <CardTitle className="text-3xl font-headline">Pinyin Mastery</CardTitle>
-            <CardDescription>Sign in to your account to continue</CardDescription>
+            <CardTitle className="text-3xl font-headline">Método Chinês de Grafismo Fonético</CardTitle>
+            <CardDescription>Faça login para continuar</CardDescription>
           </CardHeader>
           <CardContent>
             <LoginForm />
@@ -25,14 +25,14 @@ export default function Home() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-card px-2 text-muted-foreground">
-                  Or
+                  Ou
                 </span>
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Don&apos;t have an account?{' '}
+              Não tem uma conta?{' '}
               <Link href="/register" className="font-semibold text-primary hover:underline">
-                Register
+                Cadastre-se
               </Link>
             </p>
           </CardFooter>

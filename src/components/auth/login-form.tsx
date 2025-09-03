@@ -17,10 +17,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import React from 'react';
+import Link from 'next/link';
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  email: z.string().email({ message: "Endereço de e-mail inválido." }),
+  password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres." }),
 });
 
 export default function LoginForm() {
@@ -45,8 +46,8 @@ export default function LoginForm() {
     console.log(values);
 
     toast({
-      title: "Login Successful",
-      description: "Welcome back!",
+      title: "Login bem-sucedido",
+      description: "Bem-vindo de volta!",
     });
 
     router.push('/dashboard');
@@ -63,7 +64,7 @@ export default function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="you@example.com" {...field} />
+                <Input placeholder="voce@exemplo.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -74,7 +75,12 @@ export default function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+                <div className="flex items-center justify-between">
+                    <FormLabel>Senha</FormLabel>
+                    <Link href="#" className="text-sm text-primary hover:underline">
+                        Esqueceu a senha?
+                    </Link>
+                </div>
               <FormControl>
                 <Input type="password" placeholder="••••••••" {...field} />
               </FormControl>
@@ -83,7 +89,7 @@ export default function LoginForm() {
           )}
         />
         <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
-          {isLoading ? 'Signing in...' : 'Sign In'}
+          {isLoading ? 'Entrando...' : 'Entrar'}
         </Button>
       </form>
     </Form>
