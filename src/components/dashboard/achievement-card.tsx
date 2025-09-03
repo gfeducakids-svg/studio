@@ -28,7 +28,7 @@ const rarityNames = {
 export default function AchievementCard({ title, description, icon: Icon, rarity, isUnlocked }: AchievementCardProps) {
   return (
     <Card className={cn(
-      'text-center transition-all duration-300 ease-out relative overflow-hidden group',
+      'flex flex-col text-center transition-all duration-300 ease-out relative overflow-hidden group h-full',
       isUnlocked 
         ? `${rarityStyles[rarity]} transform hover:scale-105 hover:-translate-y-1`
         : 'bg-card/50 opacity-60 grayscale'
@@ -36,14 +36,14 @@ export default function AchievementCard({ title, description, icon: Icon, rarity
        {isUnlocked && rarity === 'legendary' && (
          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/20 via-transparent to-amber-500/20 opacity-50 group-hover:opacity-100 transition-opacity"></div>
        )}
-       <CardHeader className="items-center pb-2 z-10">
+       <CardHeader className="flex-1 flex flex-col items-center justify-center pb-2 z-10">
         <div className={cn('flex h-16 w-16 items-center justify-center rounded-full mb-2 transition-colors', isUnlocked ? 'bg-primary/10' : 'bg-muted')}>
           <Icon className={cn('h-8 w-8 transition-colors', isUnlocked ? 'text-primary' : 'text-muted-foreground')} />
         </div>
         <CardTitle className="font-headline text-md leading-tight">{title}</CardTitle>
       </CardHeader>
       <CardContent className="pt-0 z-10">
-        <CardDescription className="text-xs mb-3">{description}</CardDescription>
+        <CardDescription className="text-xs mb-3 h-8">{description}</CardDescription>
         <Badge variant="outline" className={cn(
           "font-semibold transition-colors", 
           isUnlocked ? rarityStyles[rarity] : 'bg-muted text-muted-foreground'

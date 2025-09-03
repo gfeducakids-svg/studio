@@ -19,12 +19,6 @@ const modules = [
     icon: BookCheck,
   },
   {
-    id: 'checklist-alfabetizacao',
-    title: 'CheckList de Alfabetização',
-    description: 'Acompanhe o progresso e identifique pontos de melhoria.',
-    icon: Gem,
-  },
-  {
     id: 'historias-curtas',
     title: 'Histórias Curtas',
     description: 'Pratique a leitura com histórias divertidas e envolventes.',
@@ -34,7 +28,7 @@ const modules = [
 
 const ModuleSkeleton = () => (
     <div className="flex flex-col gap-4">
-        <Skeleton className="h-40 w-full rounded-lg" />
+        <div className="aspect-[4/3] w-full rounded-lg bg-muted"></div>
         <Skeleton className="h-6 w-3/4" />
         <Skeleton className="h-10 w-full rounded-lg" />
     </div>
@@ -48,7 +42,7 @@ export default function DashboardPage() {
     <div className="animate-in">
       <h1 className="text-3xl font-bold font-headline mb-2">Cursos e Atividades</h1>
       <p className="text-muted-foreground mb-8">Continue sua jornada para dominar a leitura e a escrita.</p>
-      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {loading ? (
             Array.from({ length: 4 }).map((_, index) => <ModuleSkeleton key={index} />)
         ) : (

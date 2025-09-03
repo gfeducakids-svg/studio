@@ -24,7 +24,7 @@ export default function ModuleCard({ id, title, description, icon: Icon, isUnloc
           ? 'cursor-pointer hover:shadow-2xl hover:scale-105 hover:-translate-y-1 hover:border-primary' 
           : 'cursor-default'
       )}>
-        <CardHeader className="p-0 relative h-40">
+        <CardHeader className="p-0 relative aspect-[4/3] w-full">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-blue-300/20 rounded-t-lg flex items-center justify-center overflow-hidden transition-transform duration-500 group-hover:scale-110">
              <Icon className="h-16 w-16 text-primary/50 transition-all duration-500 group-hover:text-primary/80 group-hover:scale-125" />
              {!isUnlocked && (
@@ -37,7 +37,7 @@ export default function ModuleCard({ id, title, description, icon: Icon, isUnloc
         </CardHeader>
         <div className="flex flex-col flex-grow p-4">
           <CardTitle className="font-headline text-lg leading-tight flex-grow">{title}</CardTitle>
-          <CardDescription className="mt-2 text-xs">{description}</CardDescription>
+          <CardDescription className="mt-2 text-xs h-10">{description}</CardDescription>
         </div>
         <CardFooter className="p-4 pt-0">
           <Button 
