@@ -133,7 +133,7 @@ export default function GrafismoFoneticoPage() {
             <Tabs defaultValue="aula" className={!isModuleUnlocked ? 'opacity-50 pointer-events-none' : ''}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="aula">Aula</TabsTrigger>
-                <TabsTrigger value="materiais">Materiais Extras</TabsTrigger>
+                <TabsTrigger value="atividades">Atividades</TabsTrigger>
               </TabsList>
               <TabsContent value="aula" className="mt-6">
                 <div className="bg-muted rounded-lg w-full h-[80vh] md:h-[100vh] lg:h-[80vh]">
@@ -168,7 +168,7 @@ export default function GrafismoFoneticoPage() {
                     </div>
                 )}
               </TabsContent>
-              <TabsContent value="materiais" className="mt-6">
+              <TabsContent value="atividades" className="mt-6">
                  <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                   {activeModule.materials.length > 0 ? activeModule.materials.map(material => {
                       const Icon = materialIcons[material.type as keyof typeof materialIcons] || Paperclip;
@@ -191,7 +191,7 @@ export default function GrafismoFoneticoPage() {
                       )
                   }) : (
                      <div className="col-span-full p-8 bg-muted rounded-lg flex items-center justify-center">
-                        <p className="text-muted-foreground">Nenhum material adicional para este submódulo.</p>
+                        <p className="text-muted-foreground">Nenhuma atividade adicional para este submódulo.</p>
                     </div>
                   )}
                  </div>
