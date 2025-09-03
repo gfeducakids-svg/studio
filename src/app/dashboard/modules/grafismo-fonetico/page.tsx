@@ -1,12 +1,14 @@
+
 'use client'
 
 import React, { useState } from 'react';
-import { Check, Lock, Play, Paperclip, FileText, Link as LinkIcon, Download, Sparkles } from 'lucide-react';
+import { Check, Lock, Play, Paperclip, FileText, Link as LinkIcon, Download, Sparkles, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 
 const initialSubmodules = [
   { id: 'intro', title: 'Introdução', completed: false, active: true, pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', materials: [{ id: 1, type: 'video', title: 'Boas-vindas'}] },
@@ -123,20 +125,34 @@ export default function GrafismoFoneticoPage() {
       {/* Conteúdo do Submódulo */}
       <div className="flex-1">
         <Card className="min-h-full">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold font-headline">
-              {activeModule.title}
-            </CardTitle>
-            {!isModuleUnlocked && <CardDescription className="text-destructive font-semibold">Conteúdo bloqueado — conclua a etapa anterior para liberar.</CardDescription>}
-          </CardHeader>
+            <CardHeader>
+                <Button variant="ghost" className="self-start mb-4" asChild>
+                    <Link href="/dashboard">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Voltar para os Cursos
+                    </Link>
+                </Button>
+                <CardTitle className="text-2xl font-bold font-headline">
+                {activeModule.title}
+                </CardTitle>
+                {!isModuleUnlocked && <CardDescription className="text-destructive font-semibold">Conteúdo bloqueado — conclua a etapa anterior para liberar.</CardDescription>}
+            </CardHeader>
           <CardContent>
-            <Tabs defaultValue="aula" className={!isModuleUnlocked ? 'opacity-50 pointer-events-none' : ''}>
+            <Tabs defaultValue="aula" className="relative">
+             {!isModuleUnlocked && <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 rounded-lg flex items-center justify-center">
+                 <div className="flex flex-col items-center gap-2 text-muted-foreground font-bold">
+                    <Lock size={32}/>
+                    <span>Conteúdo bloqueado</span>
+                 </div>
+              </div>}
+
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="aula">Aula</TabsTrigger>
                 <TabsTrigger value="atividades">Atividades</TabsTrigger>
               </TabsList>
+              
               <TabsContent value="aula" className="mt-6">
-                <div className="bg-muted rounded-lg w-full h-[80vh] md:h-[100vh] lg:h-[80vh]">
+                <div className="bg-muted rounded-lg w-full h-[80vh] md:h-[100vh] lg:h-[80vh] flex flex-col">
                     {activeModule.pdfUrl ? (
                          <embed
                             src={activeModule.pdfUrl}
@@ -169,12 +185,12 @@ export default function GrafismoFoneticoPage() {
                 )}
               </TabsContent>
               <TabsContent value="atividades" className="mt-6">
-                 <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {activeModule.materials.length > 0 ? activeModule.materials.map(material => {
                       const Icon = materialIcons[material.type as keyof typeof materialIcons] || Paperclip;
                       const actionText = materialActions[material.type as keyof typeof materialActions] || "Acessar";
                       return (
-                        <Card key={material.id} className="flex flex-col">
+                        <Card key={material.id} className="flex flex-col group/material-card">
                            <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
                             <Icon className="h-6 w-6 text-primary" />
                             <CardTitle className="text-base font-semibold leading-tight">{material.title}</CardTitle>
@@ -190,8 +206,10 @@ export default function GrafismoFoneticoPage() {
                         </Card>
                       )
                   }) : (
-                     <div className="col-span-full p-8 bg-muted rounded-lg flex items-center justify-center">
-                        <p className="text-muted-foreground">Nenhuma atividade adicional para este submódulo.</p>
+                     <div className="col-span-full p-8 bg-muted rounded-lg flex flex-col items-center justify-center text-center">
+                        <Paperclip size={32} className="mb-4 text-muted-foreground"/>
+                        <p className="text-muted-foreground font-semibold">Nenhuma atividade adicional para este submódulo.</p>
+                        <p className="text-xs text-muted-foreground">Volte para a aba "Aula" para ver o conteúdo principal.</p>
                     </div>
                   )}
                  </div>
@@ -203,3 +221,4 @@ export default function GrafismoFoneticoPage() {
     </div>
   );
 }
+
