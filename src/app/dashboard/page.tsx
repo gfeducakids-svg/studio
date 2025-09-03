@@ -56,7 +56,7 @@ export default function DashboardPage() {
       <ProgressTrail />
 
       <div>
-        <h2 className="text-3xl font-bold font-headline mb-2">Cursos e Atividades</h2>
+        <h2 className="text-2xl font-bold font-headline mb-2">Cursos e Atividades</h2>
         <p className="text-muted-foreground mb-8">Continue sua jornada para dominar a leitura e a escrita.</p>
         <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {loading ? (
