@@ -65,7 +65,7 @@ export default function DashboardPage() {
                 <div key={module.id} className="animate-in" style={{ animationDelay: `${index * 100}ms` }}>
                   <ModuleCard 
                     {...module}
-                    isUnlocked={userData?.progress?.[module.id]?.status !== 'locked' ?? false}
+                    isUnlocked={userData?.progress?.[module.id]?.status !== 'locked'}
                   />
                 </div>
               ))
