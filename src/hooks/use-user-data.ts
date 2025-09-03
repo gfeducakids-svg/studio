@@ -3,8 +3,9 @@
 
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { getCourseStructure } from '@/lib/course-data';
 
 interface SubmoduleProgress {
     status: 'locked' | 'active' | 'completed';
@@ -29,7 +30,7 @@ interface UserData {
 }
 
 const initialGrafismoFoneticoProgress: ModuleProgress = {
-    status: 'active', // Alterado de 'unlocked' para 'active'
+    status: 'locked', 
     submodules: {
         'intro': { status: 'active' },
         'pre-alf': { status: 'locked' },
@@ -57,6 +58,16 @@ async function initializeUserProgress(user: User) {
         if (!userData.progress) {
              // Use setDoc with merge:true to avoid overwriting other fields
             await setDoc(userDocRef, { progress: initialProgress }, { merge: true });
+        } else {
+            // This is a failsafe to ensure the first module is active if somehow it's not.
+            const grafismoProgress = userData.progress['grafismo-fonetico'];
+            const allSubmodulesLocked = Object.values(grafismoProgress.submodules).every(s => s.status === 'locked');
+            if (grafismoProgress.status === 'locked' && allSubmodulesLocked) {
+                await updateDoc(userDocRef, {
+                    'progress.grafismo-fonetico.status': 'active',
+                    'progress.grafismo-fonetico.submodules.intro.status': 'active'
+                });
+            }
         }
     }
 }

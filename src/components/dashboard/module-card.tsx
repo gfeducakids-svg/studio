@@ -14,7 +14,7 @@ interface ModuleCardProps {
 }
 
 export default function ModuleCard({ id, title, description, icon: Icon, isUnlocked }: ModuleCardProps) {
-  const linkHref = isUnlocked ? `/dashboard/modules/${id}` : '#';
+  const linkHref = isUnlocked ? `/dashboard/modules/${id}` : undefined;
 
   return (
       <Card className={cn(
@@ -24,14 +24,13 @@ export default function ModuleCard({ id, title, description, icon: Icon, isUnloc
           : 'cursor-default'
       )}>
         <CardHeader className="p-0 relative aspect-[4/3] w-full">
-         <Link href={linkHref} className={cn(!isUnlocked && "pointer-events-none")}>
+         <Link href={linkHref ?? '#'} className={cn(!linkHref && "pointer-events-none")}>
            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-blue-300/20 rounded-t-lg flex items-center justify-center overflow-hidden transition-transform duration-500 group-hover:scale-110">
              <Icon className="h-16 w-16 text-primary/50 transition-all duration-500 group-hover:text-primary/80 group-hover:scale-125" />
              {!isUnlocked && (
-                <>
-                  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-all duration-300"></div>
+                <div className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-all duration-300 flex items-center justify-center">
                   <Lock className="h-12 w-12 text-muted-foreground z-10 transition-transform duration-300 group-hover:scale-110"/>
-                </>
+                </div>
              )}
            </div>
           </Link>
