@@ -23,7 +23,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
           ? 'hover:shadow-2xl hover:-translate-y-1 hover:border-primary' 
           : 'cursor-default'
       )}>
-        <CardHeader className="p-0 relative aspect-[4/3] w-full">
+        <CardHeader className="p-0 relative aspect-[4/3] w-full max-h-40">
          <Link href={linkHref} className={cn(!isUnlocked && "pointer-events-none", "relative block w-full h-full")}>
              <Image
                 src={imageUrl}
