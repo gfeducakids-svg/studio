@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import React from 'react';
 import Link from 'next/link';
+import { auth } from '@/lib/firebase';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Endereço de e-mail inválido." }),
@@ -28,6 +30,8 @@ export default function LoginForm() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
+  const [emailForPasswordReset, setEmailForPasswordReset] = React.useState("");
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -39,20 +43,50 @@ export default function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // This is where you would handle actual Firebase authentication
-    console.log(values);
-
-    toast({
-      title: "Login bem-sucedido",
-      description: "Bem-vindo de volta!",
-    });
-
-    router.push('/dashboard');
-    setIsLoading(false);
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      toast({
+        title: "Login bem-sucedido",
+        description: "Bem-vindo de volta!",
+      });
+      router.push('/dashboard');
+    } catch (error: any) {
+      console.error("Erro no login:", error);
+      toast({
+        title: "Erro no login",
+        description: "Email ou senha incorretos. Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
+
+  const handlePasswordReset = async () => {
+    const email = form.getValues("email");
+    if (!email) {
+      toast({
+        title: "Esqueceu a senha?",
+        description: "Por favor, insira seu e-mail no campo correspondente para redefinir sua senha.",
+        variant: "destructive",
+      });
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast({
+        title: "E-mail de redefinição enviado",
+        description: "Verifique sua caixa de entrada para redefinir sua senha.",
+      });
+    } catch (error: any) {
+      console.error("Erro ao enviar e-mail de redefinição de senha:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível enviar o e-mail de redefinição. Verifique se o e-mail está correto.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <Form {...form}>
@@ -77,9 +111,9 @@ export default function LoginForm() {
             <FormItem>
                 <div className="flex items-center justify-between">
                     <FormLabel>Senha</FormLabel>
-                    <Link href="#" className="text-sm text-primary hover:underline">
+                    <button type="button" onClick={handlePasswordReset} className="text-sm text-primary hover:underline">
                         Esqueceu a senha?
-                    </Link>
+                    </button>
                 </div>
               <FormControl>
                 <Input type="password" placeholder="••••••••" {...field} />

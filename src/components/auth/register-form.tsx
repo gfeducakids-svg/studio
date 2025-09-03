@@ -17,6 +17,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import React from 'react';
+import { auth, db } from '@/lib/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
@@ -45,19 +49,37 @@ export default function RegisterForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      const user = userCredential.user;
 
-    // This is where you would handle actual Firebase registration
-    console.log(values);
+      // Salva informações adicionais no Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        name: values.name,
+        email: values.email,
+        modules: [] // Nenhum módulo liberado no cadastro inicial
+      });
 
-    toast({
-      title: "Cadastro bem-sucedido",
-      description: "Sua conta foi criada.",
-    });
+      toast({
+        title: "Cadastro bem-sucedido",
+        description: "Sua conta foi criada.",
+      });
 
-    router.push('/dashboard');
-    setIsLoading(false);
+      router.push('/dashboard');
+    } catch (error: any) {
+      console.error("Erro no cadastro:", error);
+      let description = "Ocorreu um erro ao criar sua conta. Tente novamente.";
+      if (error.code === 'auth/email-already-in-use') {
+        description = "Este e-mail já está em uso. Tente fazer login ou use outro e-mail.";
+      }
+      toast({
+        title: "Erro no cadastro",
+        description: description,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
