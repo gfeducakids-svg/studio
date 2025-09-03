@@ -30,7 +30,7 @@ interface UserData {
 }
 
 const initialGrafismoFoneticoProgress: ModuleProgress = {
-    status: 'locked', 
+    status: 'active', // O módulo principal começa ativo
     submodules: {
         'intro': { status: 'active' },
         'pre-alf': { status: 'locked' },
@@ -45,30 +45,39 @@ const initialGrafismoFoneticoProgress: ModuleProgress = {
 
 const initialProgress: UserProgress = {
     'grafismo-fonetico': initialGrafismoFoneticoProgress,
-    'desafio-21-dias': { status: 'locked', submodules: {} },
-    'checklist-alfabetizacao': { status: 'locked', submodules: {} },
-    'historias-curtas': { status: 'locked', submodules: {} },
+    'desafio-21-dias': { status: 'active', submodules: {} },
+    'checklist-alfabetizacao': { status: 'active', submodules: {} },
+    'historias-curtas': { status: 'active', submodules: {} },
 };
 
 async function initializeUserProgress(user: User) {
     const userDocRef = doc(db, 'users', user.uid);
     const userDoc = await getDoc(userDocRef);
+    
     if (userDoc.exists()) {
         const userData = userDoc.data() as UserData;
+        
+        let updates: { [key: string]: any } = {};
+        let needsUpdate = false;
+
         if (!userData.progress) {
-             // Use setDoc with merge:true to avoid overwriting other fields
-            await setDoc(userDocRef, { progress: initialProgress }, { merge: true });
+            // Se não houver progresso, inicializa tudo
+            updates['progress'] = initialProgress;
+            needsUpdate = true;
         } else {
-            // This is a failsafe to ensure the first module is active if somehow it's not.
-            const grafismoProgress = userData.progress['grafismo-fonetico'];
-            const allSubmodulesLocked = Object.values(grafismoProgress.submodules).every(s => s.status === 'locked');
-            if (grafismoProgress.status === 'locked' && allSubmodulesLocked) {
-                await updateDoc(userDocRef, {
-                    'progress.grafismo-fonetico.status': 'active',
-                    'progress.grafismo-fonetico.submodules.intro.status': 'active'
-                });
-            }
+            // Verifica cada módulo secundário e o inicializa se não existir
+            Object.keys(initialProgress).forEach(moduleId => {
+                if (!userData.progress?.[moduleId]) {
+                    updates[`progress.${moduleId}`] = initialProgress[moduleId];
+                    needsUpdate = true;
+                }
+            });
         }
+        
+        if (needsUpdate) {
+            await setDoc(userDocRef, updates, { merge: true });
+        }
+
     }
 }
 
