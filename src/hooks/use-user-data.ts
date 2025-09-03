@@ -11,7 +11,7 @@ interface SubmoduleProgress {
 }
 
 interface ModuleProgress {
-    status: 'locked' | 'unlocked' | 'done';
+    status: 'locked' | 'active' | 'completed';
     submodules: {
         [key: string]: SubmoduleProgress;
     };
@@ -29,7 +29,7 @@ interface UserData {
 }
 
 const initialGrafismoFoneticoProgress: ModuleProgress = {
-    status: 'unlocked',
+    status: 'active', // Alterado de 'unlocked' para 'active'
     submodules: {
         'intro': { status: 'active' },
         'pre-alf': { status: 'locked' },
