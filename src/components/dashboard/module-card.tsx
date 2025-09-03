@@ -1,15 +1,17 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { LucideIcon } from 'lucide-react';
+import Link from 'next/link';
 
 interface ModuleCardProps {
+  id: string;
   title: string;
   description: string;
   icon: LucideIcon;
   isUnlocked: boolean;
 }
 
-export default function ModuleCard({ title, description, icon: Icon, isUnlocked }: ModuleCardProps) {
+export default function ModuleCard({ id, title, description, icon: Icon, isUnlocked }: ModuleCardProps) {
   return (
     <Card className="flex flex-col transition-all hover:shadow-lg">
       <CardHeader>
@@ -25,9 +27,13 @@ export default function ModuleCard({ title, description, icon: Icon, isUnlocked 
       </CardContent>
       <CardFooter>
         {isUnlocked ? (
-          <Button className="w-full">Access Module</Button>
+          <Button asChild className="w-full">
+            <Link href={`/dashboard/modules/${id}`}>Acessar Conteúdo</Link>
+          </Button>
         ) : (
-          <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90">Buy Now</Button>
+          <Button variant="secondary" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+            Comprar
+          </Button>
         )}
       </CardFooter>
     </Card>
