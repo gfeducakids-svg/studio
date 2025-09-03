@@ -20,7 +20,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
       <Card className={cn(
         "flex flex-col h-full transition-all duration-300 ease-out group",
         isUnlocked 
-          ? 'hover:shadow-2xl hover:scale-105 hover:-translate-y-1 hover:border-primary' 
+          ? 'hover:shadow-2xl hover:-translate-y-1 hover:border-primary' 
           : 'cursor-default'
       )}>
         <CardHeader className="p-0 relative aspect-[4/3] w-full">
@@ -29,11 +29,11 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
                 src={imageUrl}
                 alt={title}
                 fill
-                className="object-cover rounded-t-lg transition-transform duration-500 group-hover:scale-110"
+                className="object-cover rounded-t-lg transition-transform duration-500"
              />
              {!isUnlocked && (
                 <div className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-all duration-300 flex items-center justify-center rounded-t-lg">
-                  <Lock className="h-12 w-12 text-muted-foreground z-10 transition-transform duration-300 group-hover:scale-110"/>
+                  <Lock className="h-12 w-12 text-muted-foreground z-10 transition-transform duration-300"/>
                 </div>
              )}
           </Link>
@@ -48,11 +48,11 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
             variant={isUnlocked ? 'default' : 'secondary'} 
             className={cn(
               "w-full transition-all duration-200", 
-              !isUnlocked && "bg-accent text-accent-foreground hover:bg-accent/90 cursor-not-allowed"
+              !isUnlocked && "bg-yellow-500 text-black hover:bg-yellow-600 cursor-not-allowed"
             )}
             disabled={!isUnlocked}
           >
-            {isUnlocked ? <Link href={`/dashboard/modules/${id}`}>Acessar Conteúdo</Link> : <span>Comprar</span>}
+            {isUnlocked ? <Link href={`/dashboard/modules/${id}`}>Acessar Conteúdo</Link> : <span>Liberar acesso</span>}
           </Button>
         </CardFooter>
       </Card>
