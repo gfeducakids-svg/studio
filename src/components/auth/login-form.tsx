@@ -45,7 +45,6 @@ export default function LoginForm() {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       router.push('/dashboard');
     } catch (error: any) {
-      console.error("Erro no login:", error.code);
        if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
          toast({
             title: "Credenciais inválidas",
