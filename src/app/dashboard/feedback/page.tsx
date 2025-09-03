@@ -1,3 +1,4 @@
+
 'use client'
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -46,12 +47,14 @@ export default function FeedbackPage() {
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-3">
+    <div className="grid gap-8 md:grid-cols-3 animate-in">
         <div className="md:col-span-1">
-            <h1 className="text-3xl font-bold font-headline mb-2">Hub de Comentários</h1>
-            <p className="text-muted-foreground">
-                Tem uma sugestão ou encontrou um problema? Deixe-nos saber. Lemos todos os comentários.
-            </p>
+             <div className="mb-8">
+                <h1 className="text-3xl font-bold font-headline mb-2">Hub de Comentários</h1>
+                <p className="text-muted-foreground">
+                    Tem uma sugestão ou encontrou um problema? Deixe-nos saber. Lemos todos os comentários.
+                </p>
+            </div>
         </div>
         <div className="md:col-span-2 space-y-8">
             <Card>
@@ -65,8 +68,9 @@ export default function FeedbackPage() {
                           value={feedback}
                           onChange={(e) => setFeedback(e.target.value)}
                           rows={5}
+                          className="rounded-lg"
                         />
-                        <Button type="submit" className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90" disabled={isSubmitting}>
+                        <Button type="submit" className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90 rounded-full" disabled={isSubmitting}>
                           {isSubmitting ? 'Enviando...' : 'Enviar Comentário'}
                         </Button>
                     </form>

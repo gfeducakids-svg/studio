@@ -144,8 +144,10 @@ export default function AchievementsPage() {
   if (loading) {
      return (
         <div className="animate-in">
-          <h1 className="text-3xl font-bold font-headline mb-2">Suas Conquistas</h1>
-          <p className="text-muted-foreground mb-8">Cada passo na jornada do conhecimento é uma vitória! Continue assim.</p>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold font-headline mb-2">Suas Conquistas</h1>
+            <p className="text-muted-foreground">Cada passo na jornada do conhecimento é uma vitória! Continue assim.</p>
+          </div>
           <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 8 }).map((_, index) => <AchievementSkeleton key={index} />)}
           </div>
@@ -155,8 +157,10 @@ export default function AchievementsPage() {
 
   return (
     <div className="animate-in">
-      <h1 className="text-3xl font-bold font-headline mb-2">Suas Conquistas</h1>
-      <p className="text-muted-foreground mb-8">Cada passo na jornada do conhecimento é uma vitória! Continue assim.</p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold font-headline mb-2">Suas Conquistas</h1>
+        <p className="text-muted-foreground">Cada passo na jornada do conhecimento é uma vitória! Continue assim.</p>
+      </div>
       <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {staticAchievements.map((achievement, index) => (
           <div key={achievement.id} className="animate-in" style={{ animationDelay: `${index * 100}ms` }}>

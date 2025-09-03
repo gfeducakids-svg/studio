@@ -1,3 +1,4 @@
+
 'use client'
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,7 +49,7 @@ export default function SupportPage() {
     }
 
     return (
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col animate-in">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold font-headline mb-2">Central de Ajuda da IA</h1>
                 <p className="text-muted-foreground">
@@ -100,8 +101,9 @@ export default function SupportPage() {
                             onChange={(e) => setMessage(e.target.value)}
                             disabled={isSubmitting}
                             autoFocus
+                            className="rounded-full"
                         />
-                        <Button type="submit" className="bg-accent text-accent-foreground hover:bg-accent/90" disabled={isSubmitting}>
+                        <Button type="submit" className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full" disabled={isSubmitting}>
                             {isSubmitting ? 'Enviando...' : 'Enviar'}
                         </Button>
                     </form>

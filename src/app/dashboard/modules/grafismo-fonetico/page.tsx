@@ -60,7 +60,6 @@ export default function GrafismoFoneticoPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [courseStructure, setCourseStructure] = useState<Awaited<ReturnType<typeof getCourseStructure>> | null>(null);
     const [loadingStructure, setLoadingStructure] = useState(true);
-    const trailRef = useRef<HTMLDivElement>(null);
     
     useEffect(() => {
         const fetchCourseData = async () => {
@@ -90,25 +89,10 @@ export default function GrafismoFoneticoPage() {
             } else if (firstLocked) {
                  setActiveModuleId(firstLocked.id);
             } else if(orderedProgress.length > 0) {
-                setActiveModuleId(orderedProgress[0].id);
+                setActiveModuleId(orderedProgress[orderedProgress.length - 1].id);
             }
         }
     }, [JSON.stringify(orderedProgress)]);
-
-     useEffect(() => {
-        if (trailRef.current && activeModuleId) {
-            const activeNode = trailRef.current.querySelector(`[data-module-id="${activeModuleId}"]`) as HTMLElement;
-            if (activeNode) {
-                const scrollContainer = trailRef.current;
-                const scrollLeft = activeNode.offsetLeft - (scrollContainer.offsetWidth / 2) + (activeNode.offsetWidth / 2);
-                scrollContainer.scrollTo({
-                    left: scrollLeft,
-                    behavior: 'smooth'
-                });
-            }
-        }
-    }, [activeModuleId]);
-
 
     if (userLoading || loadingStructure || !activeModuleId || !courseStructure) {
         return (
@@ -189,11 +173,10 @@ export default function GrafismoFoneticoPage() {
         <div className="w-full">
             <h1 className="text-3xl font-bold font-headline mb-2">{courseStructure.title}</h1>
             <p className="text-muted-foreground mb-6">Siga a trilha do conhecimento e desbloqueie novas aventuras!</p>
-             <div ref={trailRef} className="flex items-center justify-start gap-x-4 pb-4 overflow-x-auto no-scrollbar flex-nowrap">
+             <div className="flex items-center justify-center sm:justify-start gap-4 flex-wrap">
                 {orderedProgress.map((submodule, index) => {
                     const config = statusConfig[submodule.status as keyof typeof statusConfig];
                     const Icon = config.icon;
-                    const isLast = index === orderedProgress.length - 1;
                     return (
                         <React.Fragment key={submodule.id}>
                             <TooltipProvider>
@@ -203,7 +186,7 @@ export default function GrafismoFoneticoPage() {
                                             onClick={() => setActiveModuleId(submodule.id)}
                                             disabled={submodule.status === 'locked'}
                                             data-module-id={submodule.id}
-                                            className="flex flex-col items-center gap-2 group shrink-0 focus:outline-none"
+                                            className="flex flex-col items-center gap-2 group focus:outline-none w-28"
                                         >
                                             <div className={cn(
                                                 "w-16 h-16 rounded-full flex items-center justify-center border-4 shrink-0 transition-all duration-300",
@@ -211,7 +194,7 @@ export default function GrafismoFoneticoPage() {
                                             )}>
                                                 <Icon className="w-8 h-8" />
                                             </div>
-                                            <p className="text-xs font-semibold text-center text-muted-foreground group-hover:text-primary transition-colors leading-tight px-2">
+                                            <p className="text-xs font-semibold text-center text-muted-foreground group-hover:text-primary transition-colors leading-tight px-1">
                                                 {submodule.title}
                                             </p>
                                         </button>
@@ -221,12 +204,6 @@ export default function GrafismoFoneticoPage() {
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
-
-                            {!isLast && (
-                                <div className="flex-1 h-1 bg-border rounded-full min-w-12">
-                                    <div className={cn("h-full rounded-full transition-all duration-500", submodule.status === 'completed' ? 'bg-green-500' : 'bg-border')} style={{width: submodule.status === 'completed' ? '100%' : '0%'}}></div>
-                                </div>
-                            )}
                         </React.Fragment>
                     );
                 })}
