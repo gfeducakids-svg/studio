@@ -139,6 +139,7 @@ export default function ProgressTrail() {
                 {allItems.map((item, index) => {
                     const isSecondary = 'icon' in item;
                     let configKey = item.status;
+                    if (!configKey) configKey = 'locked';
 
                     if (item.status === 'completed' && isSecondary) {
                         configKey = 'completedSecondary';
@@ -150,7 +151,7 @@ export default function ProgressTrail() {
                     const isNextStep = activeIndex !== -1 && index === activeIndex + 1;
 
                     return (
-                        <CarouselItem key={item.id} className="basis-auto">
+                        <CarouselItem key={item.id} className="basis-1/4 md:basis-1/5 lg:basis-1/8">
                            <div className="flex items-start justify-center">
                              <TooltipProvider>
                                 <Tooltip>
