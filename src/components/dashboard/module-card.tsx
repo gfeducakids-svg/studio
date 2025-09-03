@@ -24,8 +24,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
           : 'cursor-default'
       )}>
         <CardHeader className="p-0 relative aspect-[4/3] w-full">
-         <Link href={linkHref} className={cn(!isUnlocked && "pointer-events-none")}>
-           <div className="relative w-full h-full">
+         <Link href={linkHref} className={cn(!isUnlocked && "pointer-events-none", "relative block w-full h-full")}>
              <Image
                 src={imageUrl}
                 alt={title}
@@ -37,7 +36,6 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
                   <Lock className="h-12 w-12 text-muted-foreground z-10 transition-transform duration-300 group-hover:scale-110"/>
                 </div>
              )}
-           </div>
           </Link>
         </CardHeader>
         <div className="flex flex-col flex-grow p-4">
