@@ -21,7 +21,7 @@ const achievements = [
     description: 'Apresentado a todas as formas e sons.',
     icon: Book,
     rarity: 'uncommon',
-    isUnlocked: false,
+    isUnlocked: true,
   },
   {
     title: 'Sussurrador de Sílabas',
@@ -48,12 +48,14 @@ const achievements = [
 
 export default function AchievementsPage() {
   return (
-    <div>
+    <div className="animate-in">
       <h1 className="text-3xl font-bold font-headline mb-2">Suas Conquistas</h1>
       <p className="text-muted-foreground mb-8">Cada passo na jornada do conhecimento é uma vitória!</p>
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {achievements.map((achievement, index) => (
-          <AchievementCard key={index} {...achievement} />
+          <div key={index} className="animate-in" style={{ animationDelay: `${index * 100}ms` }}>
+            <AchievementCard {...achievement} />
+          </div>
         ))}
       </div>
     </div>

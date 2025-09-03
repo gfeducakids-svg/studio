@@ -11,11 +11,11 @@ interface AchievementCardProps {
   isUnlocked: boolean;
 }
 
-const rarityColors = {
-  common: 'bg-gray-200 text-gray-800 border-gray-300',
-  uncommon: 'bg-green-200 text-green-800 border-green-300',
-  epic: 'bg-purple-200 text-purple-800 border-purple-300',
-  legendary: 'bg-yellow-200 text-yellow-800 border-yellow-300',
+const rarityStyles = {
+  common: 'border-gray-300 bg-gray-100 text-gray-800 shadow-sm',
+  uncommon: 'border-green-300 bg-green-100 text-green-800 shadow-green-500/20 shadow-md',
+  epic: 'border-purple-300 bg-purple-100 text-purple-800 shadow-purple-500/30 shadow-lg',
+  legendary: 'border-amber-300 bg-amber-100 text-amber-800 shadow-amber-500/40 shadow-xl animate-pulse',
 };
 
 const rarityNames = {
@@ -28,18 +28,26 @@ const rarityNames = {
 export default function AchievementCard({ title, description, icon: Icon, rarity, isUnlocked }: AchievementCardProps) {
   return (
     <Card className={cn(
-      'text-center transition-transform hover:scale-105 hover:shadow-lg relative overflow-hidden',
-      !isUnlocked && 'bg-card/50 opacity-60'
+      'text-center transition-all duration-300 ease-out relative overflow-hidden group',
+      isUnlocked 
+        ? `${rarityStyles[rarity]} transform hover:scale-105 hover:-translate-y-1`
+        : 'bg-card/50 opacity-60 grayscale'
     )}>
-       <CardHeader className="items-center pb-2">
-        <div className={cn('flex h-16 w-16 items-center justify-center rounded-full mb-2', isUnlocked ? 'bg-primary/10' : 'bg-muted')}>
-          <Icon className={cn('h-8 w-8', isUnlocked ? 'text-primary' : 'text-muted-foreground')} />
+       {isUnlocked && rarity === 'legendary' && (
+         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/20 via-transparent to-amber-500/20 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+       )}
+       <CardHeader className="items-center pb-2 z-10">
+        <div className={cn('flex h-16 w-16 items-center justify-center rounded-full mb-2 transition-colors', isUnlocked ? 'bg-primary/10' : 'bg-muted')}>
+          <Icon className={cn('h-8 w-8 transition-colors', isUnlocked ? 'text-primary' : 'text-muted-foreground')} />
         </div>
         <CardTitle className="font-headline text-md leading-tight">{title}</CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 z-10">
         <CardDescription className="text-xs mb-3">{description}</CardDescription>
-        <Badge variant="outline" className={cn("font-semibold", isUnlocked ? rarityColors[rarity] : 'bg-muted text-muted-foreground')}>
+        <Badge variant="outline" className={cn(
+          "font-semibold transition-colors", 
+          isUnlocked ? rarityStyles[rarity] : 'bg-muted text-muted-foreground'
+        )}>
             {rarityNames[rarity]}
         </Badge>
       </CardContent>

@@ -8,31 +8,46 @@ body {
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* Cor de fundo pastel suave */
+    --background: 210 40% 98%;
     --foreground: 224 76% 15%; /* #04123C */
+
     --card: 0 0% 100%;
     --card-foreground: 224 76% 15%;
+
     --popover: 0 0% 100%;
     --popover-foreground: 224 76% 15%;
+
     --primary: 204 90% 58%; /* #24A9F4 */
     --primary-foreground: 0 0% 100%;
+
     --secondary: 215 28% 93%;
     --secondary-foreground: 224 76% 15%;
+
     --muted: 215 28% 93%;
     --muted-foreground: 224 40% 30%;
-    --accent: 120 73% 75%; /* #88e788 */
+
+    --accent: 142 76% 56%; /* #34D399 - Verde vibrante */
     --accent-foreground: 224 76% 15%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
+    
+    --warning: 43 98% 58%; /* #FACC15 - Amarelo */
+    
+    --info: 262 84% 60%; /* #8B5CF6 - Roxo */
+
     --border: 215 20% 87%;
     --input: 215 28% 93%;
     --ring: 204 90% 58%;
+
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
     --radius: 0.8rem;
+
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 224 76% 15%;
     --sidebar-primary: 204 90% 58%;
@@ -56,13 +71,16 @@ body {
     --secondary-foreground: 0 0% 100%;
     --muted: 224 50% 25%;
     --muted-foreground: 215 20% 70%;
-    --accent: 120 73% 75%; /* #88e788 */
+    --accent: 142 76% 56%; /* #34D399 */
     --accent-foreground: 224 76% 15%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
+    --warning: 43 98% 58%;
+    --info: 262 84% 60%;
     --border: 224 50% 25%;
     --input: 224 50% 25%;
     --ring: 204 90% 58%;
+    
     --sidebar-background: 224 76% 15%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 204 90% 58%;
@@ -80,5 +98,43 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .animate-in {
+    animation-name: enter;
+    animation-duration: 200ms;
+    animation-fill-mode: both;
+    animation-timing-function: ease-out;
+  }
+
+  .animate-out {
+    animation-name: exit;
+    animation-duration: 150ms;
+    animation-fill-mode: both;
+    animation-timing-function: ease-in;
+  }
+
+  @keyframes enter {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 0.5rem, 0) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  @keyframes exit {
+    from {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translate3d(0, 0.5rem, 0) scale(0.98);
+    }
   }
 }

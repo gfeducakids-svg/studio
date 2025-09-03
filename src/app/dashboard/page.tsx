@@ -45,19 +45,20 @@ export default function DashboardPage() {
   const { userData, loading } = useUserData();
 
   return (
-    <div>
+    <div className="animate-in">
       <h1 className="text-3xl font-bold font-headline mb-2">Cursos e Atividades</h1>
       <p className="text-muted-foreground mb-8">Continue sua jornada para dominar a leitura e a escrita.</p>
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {loading ? (
             Array.from({ length: 4 }).map((_, index) => <ModuleSkeleton key={index} />)
         ) : (
-            modules.map((module) => (
-              <ModuleCard 
-                key={module.id} 
-                {...module}
-                isUnlocked={userData?.modules?.includes(module.id) ?? false}
-              />
+            modules.map((module, index) => (
+              <div key={module.id} className="animate-in" style={{ animationDelay: `${index * 100}ms` }}>
+                <ModuleCard 
+                  {...module}
+                  isUnlocked={userData?.modules?.includes(module.id) ?? false}
+                />
+              </div>
             ))
         )}
       </div>
