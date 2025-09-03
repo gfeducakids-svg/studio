@@ -31,7 +31,7 @@ const statusConfig = {
     },
     active: {
         label: 'Ativo',
-        node: 'bg-background border-primary border-2 ring-4 ring-primary/20 text-primary animate-pulse',
+        node: 'bg-background border-primary border-2 ring-4 ring-primary/20 text-primary',
         line: 'bg-border',
         icon: Book,
     },
@@ -71,6 +71,8 @@ export default function ProgressTrail() {
         status: progress?.[sub.id]?.status ?? 'locked'
     }));
 
+    const activeIndex = trailSubmodules.findIndex(s => s.status === 'active');
+
     return (
         <div className="p-4 md:p-6">
             <h2 className="text-xl font-bold font-headline mb-6 text-center md:text-left">Progresso na Trilha Principal</h2>
@@ -80,6 +82,7 @@ export default function ProgressTrail() {
                         const config = statusConfig[submodule.status as keyof typeof statusConfig];
                         const Icon = config.icon;
                         const isLast = index === trailSubmodules.length - 1;
+                        const isNextStep = activeIndex !== -1 && index === activeIndex + 1;
 
                         return (
                             <React.Fragment key={submodule.id}>
@@ -89,7 +92,8 @@ export default function ProgressTrail() {
                                             <div className="flex flex-col items-center text-center gap-2 group w-[60px] md:w-[80px] shrink-0">
                                                 <div className={cn(
                                                     "w-12 h-12 rounded-full flex items-center justify-center border transition-all duration-300",
-                                                    config.node
+                                                    config.node,
+                                                    isNextStep && 'shadow-lg shadow-primary/40'
                                                 )}>
                                                     <Icon className="w-6 h-6" />
                                                 </div>
@@ -97,7 +101,7 @@ export default function ProgressTrail() {
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent>
-                                            <p>{config.label}</p>
+                                            <p>{isNextStep ? "Próximo desafio!" : config.label}</p>
                                         </TooltipContent>
                                     </Tooltip>
                                 </TooltipProvider>
