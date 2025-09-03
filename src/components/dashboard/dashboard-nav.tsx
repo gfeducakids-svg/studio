@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -15,7 +16,7 @@ export function DashboardNav() {
     ];
 
     return (
-        <SidebarMenu>
+        <SidebarMenu className="p-2">
             {navItems.map((item) => {
                 const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
                 return (
