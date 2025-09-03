@@ -1,5 +1,5 @@
 
-'use client'
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { Check, Lock, Play, Paperclip, FileText, Link as LinkIcon, Download, Sparkles, ArrowLeft } from 'lucide-react';
@@ -133,7 +133,7 @@ export default function GrafismoFoneticoPage() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">
-      <div className="lg:w-1/3">
+      <aside className="lg:w-1/3">
         <h1 className="text-3xl font-bold font-headline mb-2">Método de Grafismo Fonético</h1>
         <p className="text-muted-foreground mb-8">Siga a trilha do conhecimento e desbloqueie novas aventuras!</p>
         
@@ -170,7 +170,7 @@ export default function GrafismoFoneticoPage() {
             </div>
           ))}
         </div>
-      </div>
+      </aside>
 
       <div className="flex-1">
         <Card className="min-h-full">
@@ -201,12 +201,12 @@ export default function GrafismoFoneticoPage() {
               </TabsList>
               
               <TabsContent value="aula" className="mt-6">
-                <div className="bg-muted rounded-lg w-full h-[80vh] md:h-[100vh] lg:h-[80vh] flex flex-col">
+                <div className="bg-muted rounded-lg w-full min-h-[80vh] flex flex-col">
                     {activeModule.pdfUrl ? (
                          <embed
                             src={activeModule.pdfUrl}
                             type="application/pdf"
-                            className="w-full h-full rounded-md shadow-inner"
+                            className="w-full h-full min-h-[80vh] rounded-md shadow-inner"
                         />
                     ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center text-center text-muted-foreground p-4">
@@ -216,19 +216,26 @@ export default function GrafismoFoneticoPage() {
                         </div>
                     )}
                 </div>
-                 {isModuleUnlocked && (
+                 {isModuleUnlocked && activeModule.status !== 'completed' && (
                     <div className="mt-6 flex justify-center">
                         <Button 
                             onClick={() => handleMarkAsCompleted(activeModule.id)}
-                            disabled={activeModule.status === 'completed' || isSubmitting}
+                            disabled={isSubmitting}
                             size="lg"
                             className="font-bold text-lg shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-full px-10 py-6"
                         >
-                            {isSubmitting ? 'Salvando...' : activeModule.status === 'completed' ? (
-                                <>Concluído <Check className="ml-2 h-5 w-5"/></>
-                            ) : (
-                                "Marcar como concluído"
-                            )}
+                            {isSubmitting ? 'Salvando...' : "Marcar como concluído"}
+                        </Button>
+                    </div>
+                )}
+                 {activeModule.status === 'completed' && (
+                     <div className="mt-6 flex justify-center">
+                        <Button
+                            disabled={true}
+                            size="lg"
+                            className="font-bold text-lg shadow-lg rounded-full px-10 py-6 bg-green-500 hover:bg-green-500 cursor-not-allowed"
+                        >
+                            Concluído <Check className="ml-2 h-5 w-5"/>
                         </Button>
                     </div>
                 )}
@@ -270,3 +277,4 @@ export default function GrafismoFoneticoPage() {
     </div>
   );
 }
+
