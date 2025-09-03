@@ -14,7 +14,7 @@ interface ModuleCardProps {
 }
 
 export default function ModuleCard({ id, title, description, imageUrl, isUnlocked }: ModuleCardProps) {
-  const linkHref = isUnlocked ? `/dashboard/modules/${id}` : undefined;
+  const linkHref = isUnlocked ? `/dashboard/modules/${id}` : '#';
 
   return (
       <Card className={cn(
@@ -24,7 +24,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
           : 'cursor-default'
       )}>
         <CardHeader className="p-0 relative aspect-[4/3] w-full">
-         <Link href={linkHref ?? '#'} className={cn(!linkHref && "pointer-events-none")}>
+         <Link href={linkHref} className={cn(!isUnlocked && "pointer-events-none")}>
            <div className="relative w-full h-full">
              <Image
                 src={imageUrl}
