@@ -197,7 +197,7 @@ export default function GrafismoFoneticoPage() {
                                             onClick={() => setActiveModuleId(submodule.id)}
                                             disabled={submodule.status === 'locked'}
                                             data-module-id={submodule.id}
-                                            className="flex flex-col items-center gap-2 group w-24 shrink-0 focus:outline-none"
+                                            className="flex flex-col items-center gap-2 group shrink-0 focus:outline-none"
                                         >
                                             <div className={cn(
                                                 "w-16 h-16 rounded-full flex items-center justify-center border-4 shrink-0 transition-all duration-300",
@@ -205,7 +205,7 @@ export default function GrafismoFoneticoPage() {
                                             )}>
                                                 <Icon className="w-8 h-8" />
                                             </div>
-                                            <p className="text-xs font-semibold text-center text-muted-foreground group-hover:text-primary transition-colors leading-tight line-clamp-2">
+                                            <p className="text-xs font-semibold text-center text-muted-foreground group-hover:text-primary transition-colors leading-tight px-2">
                                                 {submodule.title}
                                             </p>
                                         </button>
