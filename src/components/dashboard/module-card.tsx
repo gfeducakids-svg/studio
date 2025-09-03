@@ -14,10 +14,7 @@ interface ModuleCardProps {
 }
 
 export default function ModuleCard({ id, title, description, icon: Icon, isUnlocked }: ModuleCardProps) {
-  const CardContainer = isUnlocked ? 'div' : 'div'; // Apenas para manter a estrutura, não será um Link
-
   return (
-    <CardContainer>
       <Card className={cn(
         "flex flex-col h-full transition-all duration-300 ease-out group",
         isUnlocked 
@@ -38,8 +35,8 @@ export default function ModuleCard({ id, title, description, icon: Icon, isUnloc
           </Link>
         </CardHeader>
         <div className="flex flex-col flex-grow p-4">
-          <CardTitle className="font-headline text-lg leading-tight flex-grow">{title}</CardTitle>
-          <CardDescription className="mt-2 text-xs h-10">{description}</CardDescription>
+          <CardTitle className="font-headline text-lg leading-tight">{title}</CardTitle>
+          <CardDescription className="mt-2 text-xs h-10 flex-grow">{description}</CardDescription>
         </div>
         <CardFooter className="p-4 pt-0">
           <Button 
@@ -59,6 +56,5 @@ export default function ModuleCard({ id, title, description, icon: Icon, isUnloc
           </Button>
         </CardFooter>
       </Card>
-    </CardContainer>
   );
 }
