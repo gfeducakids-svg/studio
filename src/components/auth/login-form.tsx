@@ -29,6 +29,7 @@ export default function LoginForm() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
+  const emailInputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,12 +45,25 @@ export default function LoginForm() {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       router.push('/dashboard');
     } catch (error: any) {
-      console.error("Erro no login:", error);
-      toast({
-        title: "Ops! Algo deu errado.",
-        description: "E-mail ou senha incorretos. Por favor, tente novamente.",
-        variant: "destructive",
-      });
+      console.error("Erro no login:", error.code);
+       if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+         toast({
+            title: "Credenciais inválidas",
+            description: "O e-mail ou a senha estão incorretos. Por favor, tente novamente.",
+            variant: "destructive",
+          });
+          form.setValue("password", "");
+          if (emailInputRef.current) {
+            emailInputRef.current.focus();
+            emailInputRef.current.select();
+          }
+       } else {
+         toast({
+            title: "Ops! Algo deu errado.",
+            description: "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.",
+            variant: "destructive",
+         });
+       }
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +104,12 @@ export default function LoginForm() {
             <FormItem>
               <FormLabel className="text-muted-foreground">Seu melhor e-mail</FormLabel>
               <FormControl>
-                <Input placeholder="seunome@email.com" {...field} className="py-6 rounded-lg"/>
+                <Input 
+                    placeholder="seunome@email.com" 
+                    {...field} 
+                    ref={emailInputRef}
+                    className="py-6 rounded-lg"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
