@@ -10,6 +10,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 import { useUserData } from "@/hooks/use-user-data";
 import { Skeleton } from "../ui/skeleton";
 
@@ -19,6 +26,9 @@ const submoduleDetails = [
     { id: 'alfabeto', title: 'O Alfabeto' },
     { id: 'silabas', title: 'Sílabas Simples' },
     { id: 'fonico', title: 'Método Fônico' },
+    { id: 'palavras', title: 'Formação de Palavras' },
+    { id: 'escrita', title: 'Escrita e Leitura' },
+    { id: 'bonus', title: 'Bônus' },
 ];
 
 
@@ -31,7 +41,7 @@ const statusConfig = {
     },
     active: {
         label: 'Ativo',
-        node: 'bg-background border-primary border-2 ring-4 ring-primary/20 text-primary',
+        node: 'bg-background border-primary border-2 ring-4 ring-primary/20 text-primary animate-pulse',
         line: 'bg-border',
         icon: Book,
     },
@@ -74,51 +84,61 @@ export default function ProgressTrail() {
     const activeIndex = trailSubmodules.findIndex(s => s.status === 'active');
 
     return (
-        <div className="p-4 md:p-6">
+        <div className="py-6">
             <h2 className="text-xl font-bold font-headline mb-6 text-center md:text-left">Progresso na Trilha Principal</h2>
-            <div className="w-full">
-                <div className="flex items-start justify-between">
-                    {trailSubmodules.map((submodule, index) => {
-                        const config = statusConfig[submodule.status as keyof typeof statusConfig];
-                        const Icon = config.icon;
-                        const isLast = index === trailSubmodules.length - 1;
-                        const isNextStep = activeIndex !== -1 && index === activeIndex + 1;
+            <Carousel
+              opts={{
+                align: "start",
+                slidesToScroll: "auto",
+              }}
+              className="w-full"
+            >
+              <CarouselContent>
+                {trailSubmodules.map((submodule, index) => {
+                    const config = statusConfig[submodule.status as keyof typeof statusConfig];
+                    const Icon = config.icon;
+                    const isLast = index === trailSubmodules.length - 1;
+                    const isNextStep = activeIndex !== -1 && index === activeIndex + 1;
 
-                        return (
-                            <React.Fragment key={submodule.id}>
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <div className="flex flex-col items-center text-center gap-2 group w-[60px] md:w-[80px] shrink-0">
-                                                <div className={cn(
-                                                    "w-12 h-12 rounded-full flex items-center justify-center border transition-all duration-300",
-                                                    config.node,
-                                                    isNextStep && 'shadow-lg shadow-primary/40'
-                                                )}>
-                                                    <Icon className="w-6 h-6" />
-                                                </div>
-                                                <p className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors leading-tight">{submodule.title}</p>
+                    return (
+                        <CarouselItem key={submodule.id} className="basis-1/4 md:basis-1/5 lg:basis-1/6">
+                           <div className="flex items-start justify-center">
+                             <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <div className="flex flex-col items-center text-center gap-2 group w-[60px] md:w-[80px] shrink-0">
+                                            <div className={cn(
+                                                "w-12 h-12 rounded-full flex items-center justify-center border transition-all duration-300",
+                                                config.node,
+                                                isNextStep && 'shadow-lg shadow-primary/40'
+                                            )}>
+                                                <Icon className="w-6 h-6" />
                                             </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>{isNextStep ? "Próximo desafio!" : config.label}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
+                                            <p className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors leading-tight">{submodule.title}</p>
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{isNextStep ? "Próximo desafio!" : config.label}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
 
-                                {!isLast && (
-                                  <div className="flex-1 h-1.5 bg-border rounded-full mx-2 mt-5 relative overflow-hidden">
-                                    <div 
-                                      className={cn("absolute top-0 left-0 h-full rounded-full transition-all duration-700 ease-out", config.line)}
-                                      style={{ width: submodule.status === 'completed' ? '100%' : '0%' }}
-                                    ></div>
-                                  </div>
-                                )}
-                            </React.Fragment>
-                        );
-                    })}
-                </div>
-            </div>
+                            {!isLast && (
+                              <div className="flex-1 h-1.5 bg-border rounded-full mx-2 mt-5 relative overflow-hidden w-full">
+                                <div 
+                                  className={cn("absolute top-0 left-0 h-full rounded-full transition-all duration-700 ease-out", config.line)}
+                                  style={{ width: submodule.status === 'completed' ? '100%' : '0%' }}
+                                ></div>
+                              </div>
+                            )}
+                           </div>
+                        </CarouselItem>
+                    );
+                })}
+              </CarouselContent>
+              <CarouselPrevious className="hidden md:flex" />
+              <CarouselNext className="hidden md:flex" />
+            </Carousel>
         </div>
     );
 }
