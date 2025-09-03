@@ -17,7 +17,7 @@ export default function ModuleCard({ id, title, description, icon: Icon, isUnloc
   const CardWrapper = isUnlocked ? Link : 'div';
 
   return (
-    <CardWrapper href={isUnlocked ? `/dashboard/modules/${id}` : ''}>
+    <CardWrapper href={isUnlocked ? `/dashboard/modules/${id}` : undefined}>
       <Card className={cn(
         "flex flex-col h-full transition-all group",
         isUnlocked ? 'cursor-pointer hover:shadow-lg hover:scale-105 hover:border-primary' : 'cursor-default'
@@ -42,6 +42,14 @@ export default function ModuleCard({ id, title, description, icon: Icon, isUnloc
             asChild={isUnlocked}
             variant={isUnlocked ? 'default' : 'secondary'} 
             className={cn("w-full", !isUnlocked && "bg-accent text-accent-foreground hover:bg-accent/90")}
+            onClick={(e) => {
+              if (!isUnlocked) {
+                e.preventDefault();
+                // Aqui você pode adicionar a lógica para o botão "Comprar",
+                // como abrir um modal ou redirecionar para uma página de vendas.
+                console.log("Ação de compra para o módulo:", id);
+              }
+            }}
           >
             {isUnlocked ? <p>Acessar Conteúdo</p> : <p>Comprar</p>}
           </Button>
