@@ -47,16 +47,10 @@ export default function DashboardPage() {
 
   return (
     <div className="animate-in flex flex-col gap-8">
-      <div>
-        <h1 className="text-3xl font-bold font-headline mb-2">Sua Jornada de Aprendizado</h1>
-        <p className="text-muted-foreground">Continue de onde parou e explore novas aventuras!</p>
-      </div>
-
       <ProgressTrail />
 
       <div>
-        <h2 className="text-2xl font-bold font-headline mb-2">Cursos e Atividades</h2>
-        <p className="text-muted-foreground mb-8">Continue sua jornada para dominar a leitura e a escrita.</p>
+        <h2 className="text-2xl font-bold font-headline mb-4 text-center">Cursos e Atividades</h2>
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
           {loading ? (
               Array.from({ length: 4 }).map((_, index) => <ModuleSkeleton key={index} />)
