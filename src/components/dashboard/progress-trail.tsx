@@ -155,7 +155,7 @@ export default function ProgressTrail() {
                              <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <div className="flex flex-col items-center text-center gap-2 group shrink-0">
+                                        <div className="flex flex-col items-center text-center gap-2 group shrink-0 w-24">
                                             <div className={cn(
                                                 "w-12 h-12 rounded-full flex items-center justify-center border transition-all duration-300",
                                                 config.node,
@@ -163,7 +163,7 @@ export default function ProgressTrail() {
                                             )}>
                                                 <Icon className="w-6 h-6" />
                                             </div>
-                                            <p className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors leading-tight px-2">{item.title}</p>
+                                            <p className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors leading-tight px-1">{item.title}</p>
                                         </div>
                                     </TooltipTrigger>
                                     <TooltipContent>

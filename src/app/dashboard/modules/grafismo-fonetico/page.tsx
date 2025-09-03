@@ -15,6 +15,7 @@ import { auth } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getCourseStructure } from '@/lib/course-data';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const materialIcons = {
   video: Play,
@@ -173,41 +174,51 @@ export default function GrafismoFoneticoPage() {
         <div className="w-full">
             <h1 className="text-3xl font-bold font-headline mb-2">{courseStructure.title}</h1>
             <p className="text-muted-foreground mb-6">Siga a trilha do conhecimento e desbloqueie novas aventuras!</p>
-             <div className="flex items-center justify-center sm:justify-start gap-4 flex-wrap">
-                {orderedProgress.map((submodule, index) => {
-                    const config = statusConfig[submodule.status as keyof typeof statusConfig];
-                    const Icon = config.icon;
-                    return (
-                        <React.Fragment key={submodule.id}>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <button 
-                                            onClick={() => setActiveModuleId(submodule.id)}
-                                            disabled={submodule.status === 'locked'}
-                                            data-module-id={submodule.id}
-                                            className="flex flex-col items-center gap-2 group focus:outline-none w-28"
-                                        >
-                                            <div className={cn(
-                                                "w-16 h-16 rounded-full flex items-center justify-center border-4 shrink-0 transition-all duration-300",
-                                                config.node
-                                            )}>
-                                                <Icon className="w-8 h-8" />
-                                            </div>
-                                            <p className="text-xs font-semibold text-center text-muted-foreground group-hover:text-primary transition-colors leading-tight px-1">
-                                                {submodule.title}
-                                            </p>
-                                        </button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>{config.label}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        </React.Fragment>
-                    );
-                })}
-            </div>
+            <Carousel 
+                opts={{
+                    align: "start",
+                    slidesToScroll: "auto",
+                }}
+                className="w-full"
+            >
+                <CarouselContent>
+                    {orderedProgress.map((submodule, index) => {
+                        const config = statusConfig[submodule.status as keyof typeof statusConfig];
+                        const Icon = config.icon;
+                        return (
+                            <CarouselItem key={submodule.id} className="basis-auto">
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button 
+                                                onClick={() => setActiveModuleId(submodule.id)}
+                                                disabled={submodule.status === 'locked'}
+                                                data-module-id={submodule.id}
+                                                className="flex flex-col items-center gap-2 group focus:outline-none"
+                                            >
+                                                <div className={cn(
+                                                    "w-16 h-16 rounded-full flex items-center justify-center border-4 shrink-0 transition-all duration-300",
+                                                    config.node
+                                                )}>
+                                                    <Icon className="w-8 h-8" />
+                                                </div>
+                                                <p className="text-xs font-semibold text-center text-muted-foreground group-hover:text-primary transition-colors leading-tight px-1">
+                                                    {submodule.title}
+                                                </p>
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>{config.label}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </CarouselItem>
+                        );
+                    })}
+                </CarouselContent>
+                 <CarouselPrevious className="hidden md:flex" />
+                 <CarouselNext className="hidden md:flex" />
+            </Carousel>
         </div>
       
       <div className="flex-1">
