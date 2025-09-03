@@ -1,9 +1,11 @@
+
 'use client';
 import React from 'react';
 import ModuleCard from '@/components/dashboard/module-card';
 import { useUserData } from '@/hooks/use-user-data';
-import { BookCheck, Gem, Rocket, Star } from 'lucide-react';
+import { BookCheck, Gem, Rocket, Star, CheckSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import ProgressTrail from '@/components/dashboard/progress-trail';
 
 const modules = [
   {
@@ -17,6 +19,12 @@ const modules = [
     title: 'Desafio 21 Dias de Pronúncia',
     description: 'Aperfeiçoe a pronúncia e a fluidez em 3 semanas.',
     icon: BookCheck,
+  },
+   {
+    id: 'checklist-alfabetizacao',
+    title: 'Checklist de Alfabetização',
+    description: 'Acompanhe cada etapa do desenvolvimento da criança.',
+    icon: CheckSquare,
   },
   {
     id: 'historias-curtas',
@@ -39,22 +47,31 @@ export default function DashboardPage() {
   const { userData, loading } = useUserData();
 
   return (
-    <div className="animate-in">
-      <h1 className="text-3xl font-bold font-headline mb-2">Cursos e Atividades</h1>
-      <p className="text-muted-foreground mb-8">Continue sua jornada para dominar a leitura e a escrita.</p>
-      <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {loading ? (
-            Array.from({ length: 4 }).map((_, index) => <ModuleSkeleton key={index} />)
-        ) : (
-            modules.map((module, index) => (
-              <div key={module.id} className="animate-in" style={{ animationDelay: `${index * 100}ms` }}>
-                <ModuleCard 
-                  {...module}
-                  isUnlocked={userData?.modules?.includes(module.id) ?? false}
-                />
-              </div>
-            ))
-        )}
+    <div className="animate-in flex flex-col gap-8">
+      <div>
+        <h1 className="text-3xl font-bold font-headline mb-2">Sua Jornada de Aprendizado</h1>
+        <p className="text-muted-foreground">Continue de onde parou e explore novas aventuras!</p>
+      </div>
+
+      <ProgressTrail />
+
+      <div>
+        <h2 className="text-3xl font-bold font-headline mb-2">Cursos e Atividades</h2>
+        <p className="text-muted-foreground mb-8">Continue sua jornada para dominar a leitura e a escrita.</p>
+        <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {loading ? (
+              Array.from({ length: 4 }).map((_, index) => <ModuleSkeleton key={index} />)
+          ) : (
+              modules.map((module, index) => (
+                <div key={module.id} className="animate-in" style={{ animationDelay: `${index * 100}ms` }}>
+                  <ModuleCard 
+                    {...module}
+                    isUnlocked={userData?.modules?.includes(module.id) ?? true} // Para teste, deixar tudo desbloqueado
+                  />
+                </div>
+              ))
+          )}
+        </div>
       </div>
     </div>
   );

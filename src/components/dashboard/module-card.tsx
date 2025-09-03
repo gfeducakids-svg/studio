@@ -54,7 +54,7 @@ export default function ModuleCard({ id, title, description, icon: Icon, isUnloc
               }
             }}
           >
-            {isUnlocked ? <p>Acessar Conteúdo</p> : <p>Comprar</p>}
+            {isUnlocked ? <Link href={`/dashboard/modules/${id}`}>Acessar Conteúdo</Link> : <p>Comprar</p>}
           </Button>
         </CardFooter>
       </Card>
