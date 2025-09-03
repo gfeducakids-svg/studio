@@ -1,41 +1,47 @@
 import AchievementCard from '@/components/dashboard/achievement-card';
-import { Medal, Star, Trophy, Zap } from 'lucide-react';
+import { Book, Feather, PenTool, Sparkles, Star, Trophy } from 'lucide-react';
 
 const achievements = [
   {
-    title: 'First Steps',
-    description: 'Complete your first module.',
+    title: 'Pequeno Explorador',
+    description: 'Concluiu a Introdução.',
     icon: Star,
+    rarity: 'common',
     isUnlocked: true,
   },
   {
-    title: 'Tone Deaf No More',
-    description: 'Master the four main tones.',
-    icon: Medal,
+    title: 'Mestre dos Traços',
+    description: 'Completou a Pré-Alfabetização.',
+    icon: PenTool,
+    rarity: 'common',
     isUnlocked: true,
   },
   {
-    title: 'Pinyin Pioneer',
-    description: 'Complete all introductory modules.',
+    title: 'Guardião do Alfabeto',
+    description: 'Apresentado a todas as formas e sons.',
+    icon: Book,
+    rarity: 'uncommon',
+    isUnlocked: false,
+  },
+  {
+    title: 'Sussurrador de Sílabas',
+    description: 'Dominou as Sílabas Simples.',
+    icon: Feather,
+    rarity: 'uncommon',
+    isUnlocked: false,
+  },
+  {
+    title: 'Arquiteto de Palavras',
+    description: 'Tornou-se um mestre na Formação de Palavras.',
     icon: Trophy,
+    rarity: 'epic',
     isUnlocked: false,
   },
   {
-    title: 'Speed Demon',
-    description: 'Complete a submodule in under 5 minutes.',
-    icon: Zap,
-    isUnlocked: false,
-  },
-  {
-    title: 'Perfect Pitch',
-    description: 'Get 100% on a tone quiz.',
-    icon: Star,
-    isUnlocked: true,
-  },
-  {
-    title: 'The Specialist',
-    description: 'Master a complex final sound.',
-    icon: Medal,
+    title: 'Lenda do Grafismo Fonético',
+    description: 'Completou todos os módulos e se tornou um mestre.',
+    icon: Sparkles,
+    rarity: 'legendary',
     isUnlocked: false,
   },
 ];
@@ -43,8 +49,8 @@ const achievements = [
 export default function AchievementsPage() {
   return (
     <div>
-      <h1 className="text-3xl font-bold font-headline mb-2">Your Achievements</h1>
-      <p className="text-muted-foreground mb-8">Track your progress and celebrate your milestones.</p>
+      <h1 className="text-3xl font-bold font-headline mb-2">Suas Conquistas</h1>
+      <p className="text-muted-foreground mb-8">Cada passo na jornada do conhecimento é uma vitória!</p>
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {achievements.map((achievement, index) => (
           <AchievementCard key={index} {...achievement} />
