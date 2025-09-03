@@ -8,9 +8,9 @@ import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui
 export function DashboardNav() {
     const pathname = usePathname();
     const navItems = [
-        { href: '/dashboard', label: 'Início', icon: Home, exact: true },
-        { href: '/dashboard/materials', label: 'Cursos', icon: BookText },
-        { href: '/dashboard/achievements', label: 'Conquistas', icon: Award },
+        { href: '/dashboard', label: 'Cursos', icon: Home, exact: true },
+        { href: '/dashboard/materials', label: 'Materiais', icon: BookText },
+        { href: 'dashboard/achievements', label: 'Conquistas', icon: Award },
         { href: '/dashboard/feedback', label: 'Comentários', icon: MessageSquare },
         { href: '/dashboard/support', label: 'Suporte', icon: LifeBuoy },
     ];
