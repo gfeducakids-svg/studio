@@ -183,7 +183,7 @@ export default function GrafismoFoneticoPage() {
         <div className="w-full">
             <h1 className="text-3xl font-bold font-headline mb-2">{courseStructure.title}</h1>
             <p className="text-muted-foreground mb-6">Siga a trilha do conhecimento e desbloqueie novas aventuras!</p>
-            <div ref={trailRef} className="flex flex-wrap items-center justify-center gap-y-8 gap-x-4 pb-4">
+             <div ref={trailRef} className="flex items-center justify-start gap-x-4 pb-4 overflow-x-auto no-scrollbar">
                 {orderedProgress.map((submodule, index) => {
                     const config = statusConfig[submodule.status as keyof typeof statusConfig];
                     const Icon = config.icon;
@@ -197,7 +197,7 @@ export default function GrafismoFoneticoPage() {
                                             onClick={() => setActiveModuleId(submodule.id)}
                                             disabled={submodule.status === 'locked'}
                                             data-module-id={submodule.id}
-                                            className="flex flex-col items-center gap-2 group w-20 focus:outline-none"
+                                            className="flex flex-col items-center gap-2 group w-24 shrink-0 focus:outline-none"
                                         >
                                             <div className={cn(
                                                 "w-16 h-16 rounded-full flex items-center justify-center border-4 shrink-0 transition-all duration-300",
@@ -217,7 +217,7 @@ export default function GrafismoFoneticoPage() {
                             </TooltipProvider>
 
                             {!isLast && (
-                                <div className="flex-1 h-1 bg-border rounded-full min-w-8">
+                                <div className="flex-1 h-1 bg-border rounded-full min-w-12">
                                     <div className={cn("h-full rounded-full transition-all duration-500", submodule.status === 'completed' ? 'bg-green-500' : 'bg-border')} style={{width: submodule.status === 'completed' ? '100%' : '0%'}}></div>
                                 </div>
                             )}

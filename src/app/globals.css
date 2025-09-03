@@ -115,6 +115,16 @@ body {
     animation-fill-mode: both;
     animation-timing-function: ease-in;
   }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
 
   @keyframes enter {
     from {
