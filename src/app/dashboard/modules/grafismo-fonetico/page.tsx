@@ -1,21 +1,21 @@
 'use client'
 
 import React from 'react';
-import { Check, Lock, Play, Paperclip, FileText, Link as LinkIcon, Download } from 'lucide-react';
+import { Check, Lock, Play, Paperclip, FileText, Link as LinkIcon, Download, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 
 const submodules = [
-  { id: 'intro', title: 'Introdução', completed: true, materials: [{ id: 1, type: 'video', title: 'Boas-vindas'}] },
-  { id: 'pre-alf', title: 'Pré-Alfabetização', completed: true, materials: [{ id: 1, type: 'video', title: 'Aula 1'}, {id: 2, type: 'pdf', title: 'Exercício de Traços'}] },
-  { id: 'alfabeto', title: 'Apresentando o Alfabeto', completed: false, active: true, materials: [{ id: 1, type: 'video', title: 'As Vogais'}, {id: 2, type: 'pdf', title: 'Cartilha do Alfabeto'}, {id: 3, type: 'download', title: 'Áudios das Letras'}] },
-  { id: 'silabas', title: 'Sílabas Simples', completed: false, materials: [{ id: 1, type: 'video', title: 'BA-BE-BI-BO-BU'}, {id: 2, type: 'pdf', title: 'Tabela de Sílabas'}] },
-  { id: 'fonico', title: 'Método Fônico', completed: false, materials: [] },
-  { id: 'palavras', title: 'Formação de Palavras e Frases', completed: false, materials: [] },
-  { id: 'escrita', title: 'Escrita e Compreensão Leitora', completed: false, materials: [] },
-  { id: 'bonus', title: 'Bônus', completed: false, materials: [] },
+  { id: 'intro', title: 'Introdução', completed: true, pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', materials: [{ id: 1, type: 'video', title: 'Boas-vindas'}] },
+  { id: 'pre-alf', title: 'Pré-Alfabetização', completed: true, pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', materials: [{ id: 1, type: 'video', title: 'Aula 1'}, {id: 2, type: 'pdf', title: 'Exercício de Traços'}] },
+  { id: 'alfabeto', title: 'Apresentando o Alfabeto', completed: false, active: true, pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', materials: [{ id: 1, type: 'video', title: 'As Vogais'}, {id: 2, type: 'pdf', title: 'Cartilha do Alfabeto'}, {id: 3, type: 'download', title: 'Áudios das Letras'}] },
+  { id: 'silabas', title: 'Sílabas Simples', completed: false, pdfUrl: null, materials: [{ id: 1, type: 'video', title: 'BA-BE-BI-BO-BU'}, {id: 2, type: 'pdf', title: 'Tabela de Sílabas'}] },
+  { id: 'fonico', title: 'Método Fônico', completed: false, pdfUrl: null, materials: [] },
+  { id: 'palavras', title: 'Formação de Palavras e Frases', completed: false, pdfUrl: null, materials: [] },
+  { id: 'escrita', title: 'Escrita e Compreensão Leitora', completed: false, pdfUrl: null, materials: [] },
+  { id: 'bonus', title: 'Bônus', completed: false, pdfUrl: null, materials: [] },
 ];
 
 const materialIcons = {
@@ -92,14 +92,23 @@ export default function GrafismoFoneticoPage() {
             <Tabs defaultValue="aula" className={!isModuleUnlocked ? 'opacity-50 pointer-events-none' : ''}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="aula">Aula</TabsTrigger>
-                <TabsTrigger value="materiais">Materiais</TabsTrigger>
+                <TabsTrigger value="materiais">Materiais Extras</TabsTrigger>
               </TabsList>
               <TabsContent value="aula" className="mt-6">
-                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                    <div className="text-center text-muted-foreground">
-                        <Play size={48} className="mx-auto mb-2"/>
-                        <p>Vídeo da aula principal.</p>
-                    </div>
+                <div className="bg-muted rounded-lg w-full h-[80vh] md:h-[100vh] lg:h-[80vh]">
+                    {activeModule.pdfUrl ? (
+                         <embed
+                            src={activeModule.pdfUrl}
+                            type="application/pdf"
+                            className="w-full h-full rounded-md shadow-inner"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-center text-muted-foreground p-4">
+                            <FileText size={48} className="mx-auto mb-4"/>
+                            <h3 className="text-lg font-semibold text-foreground mb-2">Aula em Preparação</h3>
+                            <p>O conteúdo principal para este submódulo ainda não está disponível.</p>
+                        </div>
+                    )}
                 </div>
               </TabsContent>
               <TabsContent value="materiais" className="mt-6">
