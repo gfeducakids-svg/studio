@@ -1,6 +1,7 @@
 
 'use client'
 
+import React from 'react';
 import { Book, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@/components/ui/tooltip"
 import { useUserData } from "@/hooks/use-user-data";
 import { Skeleton } from "../ui/skeleton";
-import { Card } from "@/components/ui/card";
 
 const submoduleDetails = [
     { id: 'intro', title: 'Introdução' },
@@ -48,8 +48,8 @@ export default function ProgressTrail() {
 
     if (loading) {
         return (
-            <div className="p-6">
-                <Skeleton className="h-6 w-1/3 mb-6" />
+            <div className="p-4 md:p-6">
+                <Skeleton className="h-6 w-1/3 mb-6 mx-auto md:mx-0" />
                 <div className="flex items-center">
                     {Array(5).fill(0).map((_, index) => (
                         <React.Fragment key={index}>
