@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -67,16 +68,19 @@ export default function RegisterForm() {
 
       router.push('/dashboard');
     } catch (error: any) {
-      console.error("Erro no cadastro:", error);
-      let description = "Ocorreu um erro ao criar sua conta. Tente novamente.";
       if (error.code === 'auth/email-already-in-use') {
-        description = "Este e-mail já está em uso. Tente fazer login ou use outro e-mail.";
+        form.setError("email", {
+            type: "manual",
+            message: "Este e-mail já está em uso. Tente fazer login.",
+        });
+      } else {
+        console.error("Erro no cadastro:", error);
+        toast({
+            title: "Erro no cadastro",
+            description: "Ocorreu um erro ao criar sua conta. Tente novamente.",
+            variant: "destructive",
+        });
       }
-      toast({
-        title: "Erro no cadastro",
-        description: description,
-        variant: "destructive",
-      });
     } finally {
       setIsLoading(false);
     }
