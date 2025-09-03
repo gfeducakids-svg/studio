@@ -1,9 +1,8 @@
 
-
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Check, Lock, Play, Paperclip, FileText, Link as LinkIcon, Download, Sparkles, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Check, Lock, Play, Paperclip, FileText, Link as LinkIcon, Download, Sparkles, ArrowLeft, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -15,6 +14,7 @@ import { doc, updateDoc, getFirestore } from 'firebase/firestore';
 import { auth } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getCourseStructure } from '@/lib/course-data';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const materialIcons = {
   video: Play,
@@ -32,12 +32,35 @@ const materialActions = {
   atividade: "Iniciar Atividade"
 };
 
+const statusConfig = {
+    completed: {
+        label: 'Concluído',
+        node: 'bg-green-500 border-green-200 text-white',
+        line: 'bg-green-500',
+        icon: Check,
+    },
+    active: {
+        label: 'Ativo',
+        node: 'bg-primary border-blue-200 text-white ring-4 ring-primary/20 scale-110',
+        line: 'bg-border',
+        icon: BookOpen,
+    },
+    locked: {
+        label: 'Bloqueado',
+        node: 'bg-muted border-gray-200 text-muted-foreground cursor-not-allowed',
+        line: 'bg-border',
+        icon: Lock,
+    }
+}
+
+
 export default function GrafismoFoneticoPage() {
     const { toast } = useToast();
     const { userData, loading: userLoading } = useUserData();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [courseStructure, setCourseStructure] = useState<Awaited<ReturnType<typeof getCourseStructure>> | null>(null);
     const [loadingStructure, setLoadingStructure] = useState(true);
+    const trailRef = useRef<HTMLDivElement>(null);
     
     useEffect(() => {
         const fetchCourseData = async () => {
@@ -61,22 +84,41 @@ export default function GrafismoFoneticoPage() {
     useEffect(() => {
         if (orderedProgress.length > 0) {
             const activeSubmodule = orderedProgress.find(s => s.status === 'active');
-            setActiveModuleId(activeSubmodule?.id ?? orderedProgress[0].id);
+            const firstLocked = orderedProgress.find(s => s.status === 'locked');
+            if (activeSubmodule) {
+                setActiveModuleId(activeSubmodule.id);
+            } else if (firstLocked) {
+                 setActiveModuleId(firstLocked.id);
+            } else {
+                setActiveModuleId(orderedProgress[0].id);
+            }
         }
     }, [JSON.stringify(orderedProgress)]);
 
+     useEffect(() => {
+        if (trailRef.current && activeModuleId) {
+            const activeNode = trailRef.current.querySelector(`[data-module-id="${activeModuleId}"]`) as HTMLElement;
+            if (activeNode) {
+                const scrollContainer = trailRef.current;
+                const scrollLeft = activeNode.offsetLeft - (scrollContainer.offsetWidth / 2) + (activeNode.offsetWidth / 2);
+                scrollContainer.scrollTo({
+                    left: scrollLeft,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    }, [activeModuleId]);
+
+
     if (userLoading || loadingStructure || !activeModuleId || !courseStructure) {
         return (
-            <div className="flex flex-col lg:flex-row gap-8">
-                <div className="lg:w-1/3 space-y-4">
-                    <Skeleton className="h-10 w-3/4" />
-                    <Skeleton className="h-6 w-full" />
-                    <div className="space-y-4 mt-8">
-                        {Array(8).fill(0).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
-                    </div>
+            <div className="flex flex-col gap-8">
+                 <div className="w-full">
+                    <Skeleton className="h-10 w-1/3 mb-4" />
+                    <Skeleton className="h-24 w-full" />
                 </div>
                 <div className="flex-1">
-                    <Skeleton className="h-full w-full min-h-[80vh]" />
+                    <Skeleton className="h-full w-full min-h-[70vh]" />
                 </div>
             </div>
         );
@@ -137,46 +179,54 @@ export default function GrafismoFoneticoPage() {
     };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
-      <aside className="lg:w-1/3">
-        <h1 className="text-3xl font-bold font-headline mb-2">{courseStructure.title}</h1>
-        <p className="text-muted-foreground mb-8">Siga a trilha do conhecimento e desbloqueie novas aventuras!</p>
-        
-        <div className="relative pl-5">
-          <div className="absolute left-9 top-0 bottom-0 w-0.5 bg-border -z-10"></div>
-          
-          {orderedProgress.map((submodule) => (
-            <div key={submodule.id} className="flex items-start gap-4 mb-4">
-               <button 
-                onClick={() => setActiveModuleId(submodule.id)} 
-                disabled={submodule.status === 'locked'}
-                className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center border-4 shrink-0 transition-all duration-300 z-10",
-                    submodule.status === 'completed' ? 'bg-green-500 border-green-200 text-white hover:bg-green-600' : 
-                    submodule.status === 'active' ? 'bg-primary border-blue-200 text-white ring-4 ring-primary/20 hover:bg-primary/90' : 
-                    'bg-muted border-gray-200 text-muted-foreground cursor-not-allowed'
-              )}>
-                {submodule.status === 'completed' ? <Check /> : <Lock size={20}/>}
-              </button>
-              <div className="flex-1 pt-1">
-                <p className={cn(
-                    "font-semibold",
-                    submodule.status === 'active' ? "text-primary" :
-                    submodule.status === 'locked' ? "text-muted-foreground" : ""
-                )}>
-                  {submodule.title}
-                </p>
-                 <p className="text-xs text-muted-foreground">
-                  {submodule.materials.length > 0 
-                    ? `${submodule.materials.length} material${submodule.materials.length > 1 ? 's' : ''}` 
-                    : "Nenhum material"}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </aside>
+    <div className="flex flex-col gap-8">
+        <div className="w-full">
+            <h1 className="text-3xl font-bold font-headline mb-2">{courseStructure.title}</h1>
+            <p className="text-muted-foreground mb-6">Siga a trilha do conhecimento e desbloqueie novas aventuras!</p>
+            <div ref={trailRef} className="flex items-center gap-4 pb-4 overflow-x-auto">
+                {orderedProgress.map((submodule, index) => {
+                    const config = statusConfig[submodule.status as keyof typeof statusConfig];
+                    const Icon = config.icon;
+                    const isLast = index === orderedProgress.length - 1;
+                    return (
+                        <React.Fragment key={submodule.id}>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <button 
+                                            onClick={() => setActiveModuleId(submodule.id)}
+                                            disabled={submodule.status === 'locked'}
+                                            data-module-id={submodule.id}
+                                            className="flex flex-col items-center gap-2 group w-24 shrink-0 focus:outline-none"
+                                        >
+                                            <div className={cn(
+                                                "w-16 h-16 rounded-full flex items-center justify-center border-4 shrink-0 transition-all duration-300",
+                                                config.node
+                                            )}>
+                                                <Icon className="w-8 h-8" />
+                                            </div>
+                                            <p className="text-xs font-semibold text-center text-muted-foreground group-hover:text-primary transition-colors leading-tight line-clamp-2">
+                                                {submodule.title}
+                                            </p>
+                                        </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{config.label}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
 
+                            {!isLast && (
+                                <div className="flex-1 h-1 bg-border rounded-full min-w-8">
+                                    <div className={cn("h-full rounded-full transition-all duration-500", submodule.status === 'completed' ? 'bg-green-500' : 'bg-border')} style={{width: submodule.status === 'completed' ? '100%' : '0%'}}></div>
+                                </div>
+                            )}
+                        </React.Fragment>
+                    );
+                })}
+            </div>
+        </div>
+      
       <div className="flex-1">
         <Card className="min-h-full">
             <CardHeader>
