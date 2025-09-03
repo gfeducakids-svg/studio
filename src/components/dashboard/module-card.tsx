@@ -14,10 +14,10 @@ interface ModuleCardProps {
 }
 
 export default function ModuleCard({ id, title, description, icon: Icon, isUnlocked }: ModuleCardProps) {
-  const CardWrapper = isUnlocked ? Link : 'div';
+  const CardContainer = isUnlocked ? 'div' : 'div'; // Apenas para manter a estrutura, não será um Link
 
   return (
-    <CardWrapper href={isUnlocked ? `/dashboard/modules/${id}` : undefined}>
+    <CardContainer>
       <Card className={cn(
         "flex flex-col h-full transition-all duration-300 ease-out group",
         isUnlocked 
@@ -25,7 +25,8 @@ export default function ModuleCard({ id, title, description, icon: Icon, isUnloc
           : 'cursor-default'
       )}>
         <CardHeader className="p-0 relative aspect-[4/3] w-full">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-blue-300/20 rounded-t-lg flex items-center justify-center overflow-hidden transition-transform duration-500 group-hover:scale-110">
+         <Link href={isUnlocked ? `/dashboard/modules/${id}` : '#'}>
+           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-blue-300/20 rounded-t-lg flex items-center justify-center overflow-hidden transition-transform duration-500 group-hover:scale-110">
              <Icon className="h-16 w-16 text-primary/50 transition-all duration-500 group-hover:text-primary/80 group-hover:scale-125" />
              {!isUnlocked && (
                 <>
@@ -33,7 +34,8 @@ export default function ModuleCard({ id, title, description, icon: Icon, isUnloc
                   <Lock className="h-12 w-12 text-muted-foreground z-10 transition-transform duration-300 group-hover:scale-110"/>
                 </>
              )}
-          </div>
+           </div>
+          </Link>
         </CardHeader>
         <div className="flex flex-col flex-grow p-4">
           <CardTitle className="font-headline text-lg leading-tight flex-grow">{title}</CardTitle>
@@ -41,23 +43,22 @@ export default function ModuleCard({ id, title, description, icon: Icon, isUnloc
         </div>
         <CardFooter className="p-4 pt-0">
           <Button 
-            asChild={isUnlocked}
+            asChild
             variant={isUnlocked ? 'default' : 'secondary'} 
             className={cn(
               "w-full transition-all duration-200", 
-              !isUnlocked && "bg-accent text-accent-foreground hover:bg-accent/90"
+              !isUnlocked && "bg-accent text-accent-foreground hover:bg-accent/90 cursor-not-allowed"
             )}
             onClick={(e) => {
               if (!isUnlocked) {
                 e.preventDefault();
-                console.log("Ação de compra para o módulo:", id);
               }
             }}
           >
-            {isUnlocked ? <Link href={`/dashboard/modules/${id}`}>Acessar Conteúdo</Link> : <p>Comprar</p>}
+            {isUnlocked ? <Link href={`/dashboard/modules/${id}`}>Acessar Conteúdo</Link> : <span>Comprar</span>}
           </Button>
         </CardFooter>
       </Card>
-    </CardWrapper>
+    </CardContainer>
   );
 }
