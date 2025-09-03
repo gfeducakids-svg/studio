@@ -1,15 +1,66 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+
+interface SubmoduleProgress {
+    status: 'locked' | 'active' | 'completed';
+}
+
+interface ModuleProgress {
+    status: 'locked' | 'unlocked' | 'done';
+    submodules: {
+        [key: string]: SubmoduleProgress;
+    };
+}
+
+interface UserProgress {
+    [key: string]: ModuleProgress;
+}
 
 interface UserData {
     name: string;
     email: string;
     modules: string[];
+    progress?: UserProgress;
 }
+
+const initialGrafismoFoneticoProgress: ModuleProgress = {
+    status: 'unlocked',
+    submodules: {
+        'intro': { status: 'active' },
+        'pre-alf': { status: 'locked' },
+        'alfabeto': { status: 'locked' },
+        'silabas': { status: 'locked' },
+        'fonico': { status: 'locked' },
+        'palavras': { status: 'locked' },
+        'escrita': { status: 'locked' },
+        'bonus': { status: 'locked' },
+    }
+};
+
+const initialProgress: UserProgress = {
+    'grafismo-fonetico': initialGrafismoFoneticoProgress,
+    'desafio-21-dias': { status: 'locked', submodules: {} },
+    'checklist-alfabetizacao': { status: 'locked', submodules: {} },
+    'historias-curtas': { status: 'locked', submodules: {} },
+};
+
+async function initializeUserProgress(user: User) {
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists()) {
+        const userData = userDoc.data() as UserData;
+        if (!userData.progress) {
+             // Use setDoc with merge:true to avoid overwriting other fields
+            await setDoc(userDocRef, { progress: initialProgress }, { merge: true });
+        }
+    }
+}
+
 
 export function useUserData() {
     const [userData, setUserData] = useState<UserData | null>(null);
@@ -18,12 +69,14 @@ export function useUserData() {
     useEffect(() => {
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
             if (user) {
+                // Initialize progress if it doesn't exist
+                initializeUserProgress(user);
+
                 const userDocRef = doc(db, 'users', user.uid);
                 const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
                     if (doc.exists()) {
                         setUserData(doc.data() as UserData);
                     } else {
-                        // Documento ainda não existe, pode estar sendo criado
                         setUserData(null);
                     }
                     setLoading(false);
@@ -35,7 +88,6 @@ export function useUserData() {
 
                 return () => unsubscribeSnapshot();
             } else {
-                // Usuário não está logado
                 setUserData(null);
                 setLoading(false);
             }

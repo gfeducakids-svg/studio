@@ -20,7 +20,7 @@ const modules = [
     description: 'Aperfeiçoe a pronúncia e a fluidez em 3 semanas.',
     icon: BookCheck,
   },
-   {
+  {
     id: 'checklist-alfabetizacao',
     title: 'Checklist de Alfabetização',
     description: 'Acompanhe cada etapa do desenvolvimento da criança.',
@@ -66,7 +66,7 @@ export default function DashboardPage() {
                 <div key={module.id} className="animate-in" style={{ animationDelay: `${index * 100}ms` }}>
                   <ModuleCard 
                     {...module}
-                    isUnlocked={userData?.modules?.includes(module.id) ?? true} // Para teste, deixar tudo desbloqueado
+                    isUnlocked={userData?.progress?.[module.id]?.status !== 'locked' ?? false}
                   />
                 </div>
               ))
