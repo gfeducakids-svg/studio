@@ -1,21 +1,22 @@
 'use client'
 
-import React from 'react';
-import { Check, Lock, Play, Paperclip, FileText, Link as LinkIcon, Download, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Check, Lock, Play, Paperclip, FileText, Link as LinkIcon, Download, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
-const submodules = [
-  { id: 'intro', title: 'Introdução', completed: true, pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', materials: [{ id: 1, type: 'video', title: 'Boas-vindas'}] },
-  { id: 'pre-alf', title: 'Pré-Alfabetização', completed: true, pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', materials: [{ id: 1, type: 'video', title: 'Aula 1'}, {id: 2, type: 'pdf', title: 'Exercício de Traços'}] },
-  { id: 'alfabeto', title: 'Apresentando o Alfabeto', completed: false, active: true, pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', materials: [{ id: 1, type: 'video', title: 'As Vogais'}, {id: 2, type: 'pdf', title: 'Cartilha do Alfabeto'}, {id: 3, type: 'download', title: 'Áudios das Letras'}] },
-  { id: 'silabas', title: 'Sílabas Simples', completed: false, pdfUrl: null, materials: [{ id: 1, type: 'video', title: 'BA-BE-BI-BO-BU'}, {id: 2, type: 'pdf', title: 'Tabela de Sílabas'}] },
-  { id: 'fonico', title: 'Método Fônico', completed: false, pdfUrl: null, materials: [] },
-  { id: 'palavras', title: 'Formação de Palavras e Frases', completed: false, pdfUrl: null, materials: [] },
-  { id: 'escrita', title: 'Escrita e Compreensão Leitora', completed: false, pdfUrl: null, materials: [] },
-  { id: 'bonus', title: 'Bônus', completed: false, pdfUrl: null, materials: [] },
+const initialSubmodules = [
+  { id: 'intro', title: 'Introdução', completed: false, active: true, pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', materials: [{ id: 1, type: 'video', title: 'Boas-vindas'}] },
+  { id: 'pre-alf', title: 'Pré-Alfabetização', completed: false, active: false, pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', materials: [{ id: 1, type: 'video', title: 'Aula 1'}, {id: 2, type: 'pdf', title: 'Exercício de Traços'}] },
+  { id: 'alfabeto', title: 'Apresentando o Alfabeto', completed: false, active: false, pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', materials: [{ id: 1, type: 'video', title: 'As Vogais'}, {id: 2, type: 'pdf', title: 'Cartilha do Alfabeto'}, {id: 3, type: 'download', title: 'Áudios das Letras'}] },
+  { id: 'silabas', title: 'Sílabas Simples', completed: false, active: false, pdfUrl: null, materials: [{ id: 1, type: 'video', title: 'BA-BE-BI-BO-BU'}, {id: 2, type: 'pdf', title: 'Tabela de Sílabas'}] },
+  { id: 'fonico', title: 'Método Fônico', completed: false, active: false, pdfUrl: null, materials: [] },
+  { id: 'palavras', title: 'Formação de Palavras e Frases', completed: false, active: false, pdfUrl: null, materials: [] },
+  { id: 'escrita', title: 'Escrita e Compreensão Leitora', completed: false, active: false, pdfUrl: null, materials: [] },
+  { id: 'bonus', title: 'Bônus', completed: false, active: false, pdfUrl: null, materials: [] },
 ];
 
 const materialIcons = {
@@ -36,8 +37,48 @@ const materialActions = {
 
 
 export default function GrafismoFoneticoPage() {
-    const activeModule = submodules.find(s => s.active) ?? submodules[0];
+    const { toast } = useToast();
+    const [submodules, setSubmodules] = useState(initialSubmodules);
+    const [activeModuleId, setActiveModuleId] = useState(initialSubmodules.find(s => s.active)?.id ?? initialSubmodules[0].id);
+
+    const activeModule = submodules.find(s => s.id === activeModuleId);
+    if (!activeModule) return null; // ou uma tela de erro/carregamento
+
     const isModuleUnlocked = activeModule.completed || activeModule.active;
+
+    const handleMarkAsCompleted = (moduleId: string) => {
+        const currentModuleIndex = submodules.findIndex(s => s.id === moduleId);
+        if (currentModuleIndex === -1) return;
+
+        // Atualiza a lista de submódulos
+        const updatedSubmodules = submodules.map((submodule, index) => {
+            if (index === currentModuleIndex) {
+                return { ...submodule, completed: true, active: false };
+            }
+            if (index === currentModuleIndex + 1) {
+                return { ...submodule, active: true };
+            }
+            return submodule;
+        });
+
+        setSubmodules(updatedSubmodules);
+
+        // Avança para o próximo módulo
+        if (currentModuleIndex + 1 < updatedSubmodules.length) {
+            setActiveModuleId(updatedSubmodules[currentModuleIndex + 1].id);
+        }
+
+        // Mostra notificação de conquista
+        toast({
+            title: (
+                <div className="flex items-center gap-2">
+                    <Sparkles className="text-yellow-400" />
+                    <span className="font-bold">Conquista Desbloqueada!</span>
+                </div>
+            ),
+            description: `Você concluiu "${submodules[currentModuleIndex].title}" e desbloqueou o próximo desafio!`,
+        });
+    };
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">
@@ -52,15 +93,15 @@ export default function GrafismoFoneticoPage() {
           
           {submodules.map((submodule) => (
             <div key={submodule.id} className="flex items-start gap-4 mb-4">
-               <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center border-4 shrink-0 transition-colors cursor-pointer z-10",
-                submodule.completed ? 'bg-green-500 border-green-200 text-white' : 
-                submodule.active ? 'bg-primary border-blue-200 text-white' : 
-                'bg-muted border-gray-200 text-muted-foreground'
+               <button onClick={() => setActiveModuleId(submodule.id)} className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center border-4 shrink-0 transition-all duration-300 z-10",
+                submodule.completed ? 'bg-green-500 border-green-200 text-white hover:bg-green-600' : 
+                submodule.active ? 'bg-primary border-blue-200 text-white ring-4 ring-primary/20 hover:bg-primary/90' : 
+                'bg-muted border-gray-200 text-muted-foreground cursor-not-allowed'
               )}>
                 {submodule.completed ? <Check /> : <Lock size={20}/>}
-              </div>
-              <div className="flex-1">
+              </button>
+              <div className="flex-1 pt-1">
                 <p className={cn(
                     "font-semibold",
                     submodule.active ? "text-primary" :
@@ -84,7 +125,7 @@ export default function GrafismoFoneticoPage() {
         <Card className="min-h-full">
           <CardHeader>
             <CardTitle className="text-2xl font-bold font-headline">
-              {activeModule ? activeModule.title : "Selecione um módulo"}
+              {activeModule.title}
             </CardTitle>
             {!isModuleUnlocked && <CardDescription className="text-destructive font-semibold">Conteúdo bloqueado — conclua a etapa anterior para liberar.</CardDescription>}
           </CardHeader>
@@ -110,6 +151,22 @@ export default function GrafismoFoneticoPage() {
                         </div>
                     )}
                 </div>
+                 {isModuleUnlocked && (
+                    <div className="mt-6 flex justify-center">
+                        <Button 
+                            onClick={() => handleMarkAsCompleted(activeModule.id)}
+                            disabled={activeModule.completed}
+                            size="lg"
+                            className="font-bold text-lg shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-full px-10 py-6"
+                        >
+                            {activeModule.completed ? (
+                                <>Concluído <Check className="ml-2 h-5 w-5"/></>
+                            ) : (
+                                "Marcar como concluído"
+                            )}
+                        </Button>
+                    </div>
+                )}
               </TabsContent>
               <TabsContent value="materiais" className="mt-6">
                  <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
