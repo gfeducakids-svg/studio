@@ -183,7 +183,7 @@ export default function GrafismoFoneticoPage() {
         <div className="w-full">
             <h1 className="text-3xl font-bold font-headline mb-2">{courseStructure.title}</h1>
             <p className="text-muted-foreground mb-6">Siga a trilha do conhecimento e desbloqueie novas aventuras!</p>
-             <div ref={trailRef} className="flex items-center justify-start gap-x-4 pb-4 overflow-x-auto no-scrollbar">
+             <div ref={trailRef} className="flex items-center justify-start gap-x-4 pb-4 overflow-x-auto no-scrollbar flex-nowrap">
                 {orderedProgress.map((submodule, index) => {
                     const config = statusConfig[submodule.status as keyof typeof statusConfig];
                     const Icon = config.icon;
@@ -301,7 +301,7 @@ export default function GrafismoFoneticoPage() {
                       const Icon = materialIcons[material.type as keyof typeof materialIcons] || Paperclip;
                       const actionText = materialActions[material.type as keyof typeof materialActions] || "Acessar";
                       return (
-                        <Card key={material.id} className="flex flex-col group/material-card">
+                        <Card key={material.id} className="flex flex-col h-full group/material-card">
                            <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
                             <Icon className="h-6 w-6 text-primary" />
                             <CardTitle className="text-base font-semibold leading-tight">{material.title}</CardTitle>
@@ -317,7 +317,7 @@ export default function GrafismoFoneticoPage() {
                         </Card>
                       )
                   }) : (
-                     <div className="col-span-full p-8 bg-muted rounded-lg flex flex-col items-center justify-center text-center">
+                     <div className="col-span-full p-8 bg-muted rounded-lg flex flex-col items-center justify-center text-center min-h-[25vh]">
                         <Paperclip size={32} className="mb-4 text-muted-foreground"/>
                         <p className="text-muted-foreground font-semibold">Nenhuma atividade adicional para este submódulo.</p>
                         <p className="text-xs text-muted-foreground">Volte para a aba "Aula" para ver o conteúdo principal.</p>
@@ -332,5 +332,3 @@ export default function GrafismoFoneticoPage() {
     </div>
   );
 }
-
-    

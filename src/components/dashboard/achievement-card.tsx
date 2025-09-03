@@ -44,7 +44,7 @@ export default function AchievementCard({ title, description, icon: Icon, rarity
         <CardTitle className={cn("font-headline text-md leading-tight", !isUnlocked && "text-muted-foreground")}>{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow flex flex-col justify-between pt-0 z-10">
-        <CardDescription className={cn("text-xs mb-4 h-8", !isUnlocked && "text-muted-foreground/70")}>{description}</CardDescription>
+        <CardDescription className={cn("text-xs mb-4 min-h-8", !isUnlocked && "text-muted-foreground/70")}>{description}</CardDescription>
         <Badge variant="outline" className={cn(
           "font-semibold transition-colors w-min mx-auto", 
           isUnlocked ? rarityStyles[rarity] : 'bg-muted text-muted-foreground border-border'
