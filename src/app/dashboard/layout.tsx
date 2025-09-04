@@ -20,14 +20,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </span>
           </Link>
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent className="p-2">
           <DashboardNav />
         </SidebarContent>
       </Sidebar>
       
       <SidebarInset>
         <Header />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 pb-24 md:pb-8">
+        <main className="flex-1 overflow-y-auto px-4 md:px-6 lg:px-8 py-8 pb-24 md:pb-8">
           {children}
         </main>
         <BottomNav />

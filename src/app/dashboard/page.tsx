@@ -74,7 +74,7 @@ export default function DashboardPage() {
       <ProgressTrail />
 
       <div className="mt-8">
-        <h2 className="text-2xl font-bold font-headline mb-4 px-4 md:px-0">Cursos e Atividades</h2>
+        <h2 className="text-2xl font-bold font-headline mb-4">Cursos e Atividades</h2>
         
         <Carousel 
             opts={{
@@ -84,16 +84,18 @@ export default function DashboardPage() {
             }}
             className="w-full"
         >
-            <CarouselContent className="-ml-4">
+            <CarouselContent>
               {loading ? (
                   Array.from({ length: 4 }).map((_, index) => (
-                    <CarouselItem key={index} className="basis-11/12 sm:basis-1/2 lg:basis-1/4 pl-4">
+                    <CarouselItem key={index} className="basis-11/12 sm:basis-1/2 lg:basis-1/4">
+                       <div className="p-1">
                         <ModuleSkeleton />
+                       </div>
                     </CarouselItem>
                   ))
               ) : (
                   modules.map((module, index) => (
-                    <CarouselItem key={module.id} className="basis-11/12 sm:basis-1/2 lg:basis-1/4 pl-4 animate-in" style={{ animationDelay: `${index * 100}ms` }}>
+                    <CarouselItem key={module.id} className="basis-11/12 sm:basis-1/2 lg:basis-1/4 animate-in" style={{ animationDelay: `${index * 100}ms` }}>
                       <div className="p-1 h-full">
                         <ModuleCard 
                           {...module}
