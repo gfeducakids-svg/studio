@@ -1,4 +1,3 @@
-
 'use client';
 import React from 'react';
 import ModuleCard from '@/components/dashboard/module-card';
@@ -34,44 +33,69 @@ const modules = [
 ];
 
 const ModuleSkeleton = () => (
-    <div className="flex flex-col space-y-3 rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden h-full">
-        <Skeleton className="w-full aspect-[4/3]"/>
-        <div className="p-4 space-y-3 flex-grow flex flex-col">
-            <Skeleton className="h-5 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-5/6" />
-            <div className="flex-grow" />
-            <Skeleton className="h-10 w-full rounded-lg" />
-        </div>
+  <div className="flex h-full flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
+    {/* Mobile mais “raso”; desktop sobe para 4:3 */}
+    <Skeleton className="w-full aspect-video md:aspect-[4/3]" />
+    <div className="flex grow flex-col space-y-3 p-4">
+      <Skeleton className="h-5 w-3/4" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-5/6" />
+      <div className="grow" />
+      <Skeleton className="h-11 w-full rounded-lg" />
     </div>
+  </div>
 );
-
 
 export default function DashboardPage() {
   const { userData, loading } = useUserData();
 
   return (
     <div className="animate-in flex flex-col gap-8">
-      <ProgressTrail />
+      {/* Wrapper rolável para a trilha no mobile */}
+      <div className="-mx-4 w-[calc(100%+2rem)] overflow-x-auto px-4 no-scrollbar md:mx-0 md:w-auto md:overflow-visible">
+        <ProgressTrail />
+      </div>
 
       <div>
-        <h2 className="text-2xl font-bold font-headline mb-6 text-center md:text-left">Cursos e Atividades</h2>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {loading ? (
-                Array.from({ length: 4 }).map((_, index) => (
-                  <ModuleSkeleton key={index} />
-                ))
-            ) : (
-                modules.map((module, index) => (
-                  <div key={module.id} className="animate-in" style={{ animationDelay: `${index * 100}ms` }}>
-                      <ModuleCard 
-                        {...module}
-                        isUnlocked={!!userData?.progress?.[module.id] && userData.progress[module.id].status !== 'locked'}
-                      />
+        <h2 className="mb-6 text-center text-2xl font-headline font-bold md:text-left">
+          Cursos e Atividades
+        </h2>
+
+        {/* Grid:
+            - 1 col no mobile
+            - 2 col em sm
+            - 4 col em lg+
+            - items-stretch + h-full nos cards = alturas alinhadas
+        */}
+        <div
+          className="
+            grid grid-cols-1 items-stretch gap-6
+            sm:grid-cols-2 lg:grid-cols-4
+          "
+        >
+          {loading
+            ? Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="h-full">
+                  <ModuleSkeleton />
+                </div>
+              ))
+            : modules.map((module, index) => (
+                <div
+                  key={module.id}
+                  className="h-full animate-in"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className="h-full">
+                    <ModuleCard
+                      {...module}
+                      isUnlocked={
+                        !!userData?.progress?.[module.id] &&
+                        userData.progress[module.id].status !== 'locked'
+                      }
+                    />
                   </div>
-                ))
-            )}
+                </div>
+              ))}
         </div>
       </div>
     </div>
