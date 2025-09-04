@@ -10,8 +10,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Nunito', 'sans-serif'],
-        headline: ['Nunito', 'sans-serif'],
+        body: ['Poppins', 'sans-serif'],
+        headline: ['Poppins', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
