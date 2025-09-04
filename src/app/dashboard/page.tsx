@@ -35,12 +35,16 @@ const modules = [
 ];
 
 const ModuleSkeleton = () => (
-  <div className="flex flex-col gap-2 w-full">
-      <div className="aspect-[4/3] w-full rounded-md bg-muted"></div>
-      <Skeleton className="h-4 w-2/3" />
-      <Skeleton className="h-4 w-5/6 rounded-md" />
+  <div className="flex flex-col gap-3 w-full max-w-md sm:max-w-lg md:max-w-xl">
+    {/* Imagem / Thumb responsiva */}
+    <div className="aspect-[16/9] w-full rounded-md bg-muted sm:aspect-[4/3] md:aspect-[3/2]"></div>
+    
+    {/* Linhas de skeleton ajustadas */}
+    <Skeleton className="h-3 w-1/2 sm:h-4 sm:w-2/3 md:h-5 md:w-3/4" />
+    <Skeleton className="h-3 w-3/4 rounded-md sm:h-4 sm:w-5/6 md:h-5 md:w-full" />
   </div>
 );
+
 
 export default function DashboardPage() {
   const { userData, loading } = useUserData();
