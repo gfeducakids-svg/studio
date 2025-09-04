@@ -20,7 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </span>
           </Link>
         </SidebarHeader>
-        <SidebarContent className="p-2">
+        <SidebarContent>
           <DashboardNav />
         </SidebarContent>
       </Sidebar>
