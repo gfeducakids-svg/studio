@@ -40,7 +40,7 @@ export default function ModulePage() {
   if (userLoading) {
       return (
           <div className="flex flex-col gap-8 animate-in">
-              <Card>
+              <Card className="overflow-hidden">
                   <CardHeader>
                       <Skeleton className="h-8 w-1/4 mb-4" />
                       <Skeleton className="h-10 w-1/2" />
@@ -94,7 +94,7 @@ export default function ModulePage() {
 
   return (
     <div className="flex flex-col gap-8 animate-in">
-        <Card>
+        <Card className="overflow-hidden">
             <CardHeader>
                  <Button variant="ghost" className="self-start mb-4 -ml-4" asChild>
                     <Link href="/dashboard">

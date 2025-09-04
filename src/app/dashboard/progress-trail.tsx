@@ -93,7 +93,7 @@ export default function ProgressTrail() {
                     <Skeleton className="h-6 w-1/3 mb-2" />
                 </CardHeader>
                 <CardContent>
-                    <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex flex-wrap items-center justify-center gap-4">
                         {Array(8).fill(0).map((_, index) => (
                            <div key={index} className="flex flex-col items-center gap-2 px-2">
                                 <Skeleton className="w-12 h-12 rounded-full" />

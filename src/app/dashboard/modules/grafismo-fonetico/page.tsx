@@ -226,7 +226,7 @@ export default function GrafismoFoneticoPage() {
         </div>
       
       <div className="flex-1">
-        <Card className="min-h-full">
+        <Card className="min-h-full overflow-hidden">
             <CardHeader>
                 <Button variant="ghost" className="self-start mb-4 -ml-4" asChild>
                     <Link href="/dashboard">
