@@ -75,8 +75,7 @@ export default function DashboardPage() {
       <div className="mt-8">
         <h2 className="text-2xl font-bold font-headline mb-4">Cursos e Atividades</h2>
         
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto">
             {loading ? (
                 Array.from({ length: 4 }).map((_, index) => (
                   <ModuleSkeleton key={index} />
@@ -91,7 +90,6 @@ export default function DashboardPage() {
                   </div>
                 ))
             )}
-          </div>
         </div>
       </div>
     </div>
