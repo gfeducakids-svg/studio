@@ -30,7 +30,7 @@ export default function ModuleCard({
         isUnlocked ? 'hover:-translate-y-1 hover:shadow-xl' : 'cursor-default',
       )}
     >
-      <CardHeader className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3]">
+      <CardHeader className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3] max-h-48 md:max-h-none">
         <Link
           href={linkHref}
           className={cn(
@@ -61,9 +61,10 @@ export default function ModuleCard({
       <CardFooter className="p-3 pt-0 sm:p-4">
         <Button
           asChild={isUnlocked}
+          size="sm"
           variant={isUnlocked ? 'default' : 'secondary'}
           className={cn(
-            'w-full h-11 rounded-lg transition-all duration-200',
+            'w-full h-10 rounded-lg transition-all duration-200 text-sm',
             !isUnlocked &&
               'cursor-not-allowed bg-yellow-100 text-yellow-900 hover:bg-yellow-200',
           )}
@@ -79,5 +80,3 @@ export default function ModuleCard({
     </Card>
   );
 }
-
-    
