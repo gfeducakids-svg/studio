@@ -30,10 +30,10 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
                 src={imageUrl}
                 alt={title}
                 fill
-                className="object-cover rounded-t-lg transition-transform duration-500"
+                className="object-cover w-full h-full transition-transform duration-500"
              />
              {!isUnlocked && (
-                <div className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-all duration-300 flex items-center justify-center rounded-t-lg">
+                <div className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-all duration-300 flex items-center justify-center">
                   <Lock className="h-12 w-12 text-muted-foreground z-10 transition-transform duration-300"/>
                 </div>
              )}
