@@ -79,7 +79,6 @@ export default function DashboardPage() {
         <Carousel 
             opts={{
                 align: "start",
-                slidesToScroll: "auto",
                 dragFree: true
             }}
             className="w-full"
