@@ -24,7 +24,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
           ? 'hover:shadow-xl hover:-translate-y-1' 
           : 'cursor-default'
       )}>
-        <CardHeader className="p-0 relative w-full max-w-full overflow-hidden h-[clamp(140px,24vw,256px)] lg:h-auto aspect-[16/10] sm:aspect-[16/9] lg:aspect-[4/3]">
+        <CardHeader className="p-0 relative w-full overflow-hidden aspect-[16/10] max-h-36 sm:max-h-44 md:max-h-56 lg:max-h-none lg:aspect-[4/3]">
          <Link href={linkHref} className={cn(!isUnlocked && "pointer-events-none", "relative block w-full h-full")}>
              <Image
                 src={imageUrl}
@@ -34,16 +34,16 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
              />
              {!isUnlocked && (
                 <div className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-all duration-300 flex items-center justify-center">
-                  <Lock className="h-12 w-12 text-muted-foreground z-10 transition-transform duration-300"/>
+                  <Lock className="h-8 w-8 sm:h-10 sm:w-10 md:h-11 md:w-11 lg:h-12 lg:w-12 text-muted-foreground z-10 transition-transform duration-300"/>
                 </div>
              )}
           </Link>
         </CardHeader>
-        <div className="flex flex-col flex-grow p-4">
-          <CardTitle className="font-headline text-[clamp(1rem,1.6vw,1.25rem)] leading-tight">
+        <div className="flex flex-col flex-grow p-3 sm:p-4 md:p-5">
+          <CardTitle className="font-headline text-sm sm:text-base md:text-lg lg:text-xl leading-tight">
             {title}
           </CardTitle>
-          <CardDescription className="mt-2 text-[clamp(0.85rem,1.3vw,1rem)] flex-grow leading-relaxed line-clamp-2 md:line-clamp-3">
+          <CardDescription className="mt-2 text-xs sm:text-sm md:text-[15px] lg:text-base flex-grow leading-relaxed line-clamp-2 md:line-clamp-3">
             {description}
           </CardDescription>
         </div>
@@ -52,7 +52,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
             asChild={isUnlocked}
             variant={isUnlocked ? 'default' : 'secondary'} 
             className={cn(
-              "w-full transition-all duration-200 h-[clamp(36px,5.5vw,44px)] text-[clamp(0.9rem,1.25vw,1rem)] rounded-lg", 
+              "w-full transition-all duration-200 h-9 sm:h-10 md:h-11 text-sm sm:text-[15px] md:text-base rounded-lg", 
               !isUnlocked && "bg-muted text-muted-foreground cursor-not-allowed"
             )}
             disabled={!isUnlocked}
