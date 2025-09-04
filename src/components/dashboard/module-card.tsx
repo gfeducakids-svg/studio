@@ -30,7 +30,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
                 src={imageUrl}
                 alt={title}
                 fill
-                className="object-cover w-full h-full transition-transform duration-500"
+                className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
              />
              {!isUnlocked && (
                 <div className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-all duration-300 flex items-center justify-center">
@@ -53,7 +53,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
             variant={isUnlocked ? 'default' : 'secondary'} 
             className={cn(
               "w-full transition-all duration-200 h-9 sm:h-10 md:h-11 text-sm sm:text-[15px] md:text-base rounded-lg", 
-              !isUnlocked && "bg-yellow-500 text-black hover:bg-yellow-600 cursor-not-allowed"
+              !isUnlocked && "bg-muted text-muted-foreground cursor-not-allowed"
             )}
             disabled={!isUnlocked}
           >
