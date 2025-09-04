@@ -1,13 +1,25 @@
 import Link from 'next/link';
 import LoginForm from '@/components/auth/login-form';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 
 export default function LoginPage() {
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-background p-4 font-headline">
-      <div className="w-full max-w-md">
-        <Card className="shadow-2xl rounded-2xl">
+      <div className="w-full max-w-md flex flex-col items-center text-center gap-6">
+        
+        <div className="flex flex-col items-center gap-2">
+            <Image 
+                src="https://i.imgur.com/83w4V0j.png"
+                alt="EducaKids Logo"
+                width={80}
+                height={80}
+                data-ai-hint="education logo"
+            />
+            <h2 className="text-4xl font-black text-foreground">EducaKids</h2>
+        </div>
+
+        <Card className="shadow-2xl rounded-2xl w-full">
           <CardHeader className="space-y-2 text-center">
             <CardTitle className="text-3xl font-black text-foreground">Área de Membros</CardTitle>
             <CardDescription className="!mt-2 text-muted-foreground">Para os melhores pais do mundo</CardDescription>
