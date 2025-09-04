@@ -51,7 +51,7 @@ export default function DashboardPage() {
 
       <div>
         <h2 className="text-2xl font-bold font-headline mb-4 text-center">Cursos e Atividades</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 justify-items-center">
           {loading ? (
               Array.from({ length: 4 }).map((_, index) => <ModuleSkeleton key={index} />)
           ) : (
