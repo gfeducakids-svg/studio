@@ -75,21 +75,23 @@ export default function DashboardPage() {
       <div className="mt-8">
         <h2 className="text-2xl font-bold font-headline mb-4">Cursos e Atividades</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {loading ? (
-              Array.from({ length: 4 }).map((_, index) => (
-                <ModuleSkeleton key={index} />
-              ))
-          ) : (
-              modules.map((module, index) => (
-                <div key={module.id} className="animate-in" style={{ animationDelay: `${index * 100}ms` }}>
-                    <ModuleCard 
-                      {...module}
-                      isUnlocked={!!userData?.progress?.[module.id] && userData.progress[module.id].status !== 'locked'}
-                    />
-                </div>
-              ))
-          )}
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {loading ? (
+                Array.from({ length: 4 }).map((_, index) => (
+                  <ModuleSkeleton key={index} />
+                ))
+            ) : (
+                modules.map((module, index) => (
+                  <div key={module.id} className="animate-in" style={{ animationDelay: `${index * 100}ms` }}>
+                      <ModuleCard 
+                        {...module}
+                        isUnlocked={!!userData?.progress?.[module.id] && userData.progress[module.id].status !== 'locked'}
+                      />
+                  </div>
+                ))
+            )}
+          </div>
         </div>
       </div>
     </div>
