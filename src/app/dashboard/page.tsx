@@ -84,16 +84,16 @@ export default function DashboardPage() {
             }}
             className="w-full"
         >
-            <CarouselContent>
+            <CarouselContent className="-ml-4">
               {loading ? (
                   Array.from({ length: 4 }).map((_, index) => (
-                    <CarouselItem key={index} className="basis-11/12 sm:basis-1/2 lg:basis-1/4 p-2">
+                    <CarouselItem key={index} className="basis-11/12 sm:basis-1/2 lg:basis-1/4 pl-4">
                         <ModuleSkeleton />
                     </CarouselItem>
                   ))
               ) : (
                   modules.map((module, index) => (
-                    <CarouselItem key={module.id} className="basis-11/12 sm:basis-1/2 lg:basis-1/4 p-2 animate-in" style={{ animationDelay: `${index * 100}ms` }}>
+                    <CarouselItem key={module.id} className="basis-11/12 sm:basis-1/2 lg:basis-1/4 pl-4 animate-in" style={{ animationDelay: `${index * 100}ms` }}>
                         <ModuleCard 
                           {...module}
                           isUnlocked={!!userData?.progress?.[module.id] && userData.progress[module.id].status !== 'locked'}

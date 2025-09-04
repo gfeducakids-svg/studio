@@ -19,7 +19,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
 
   return (
       <Card className={cn(
-        "flex flex-col h-full transition-all duration-300 ease-out group",
+        "flex flex-col h-full transition-all duration-300 ease-out group overflow-hidden",
         isUnlocked 
           ? 'hover:shadow-xl hover:-translate-y-1' 
           : 'cursor-default'
