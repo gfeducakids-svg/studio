@@ -35,19 +35,18 @@ const modules = [
 ];
 
 const ModuleSkeleton = () => (
-    <div className="flex flex-col gap-4 w-full">
-        <div className="aspect-[4/3] w-full rounded-lg bg-muted"></div>
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-10 w-full rounded-lg" />
-    </div>
+  <div className="flex flex-col gap-2 w-full">
+      <div className="aspect-[4/3] w-full rounded-md bg-muted"></div>
+      <Skeleton className="h-4 w-2/3" />
+      <Skeleton className="h-4 w-5/6 rounded-md" />
+  </div>
 );
-
 
 export default function DashboardPage() {
   const { userData, loading } = useUserData();
 
   return (
-    <div className="animate-in flex flex-col gap-8">
+    <div className="animate-in flex flex-col gap-6">
       <ProgressTrail />
 
       <div className="mt-8">
@@ -64,13 +63,13 @@ export default function DashboardPage() {
             <CarouselContent className="-ml-4">
               {loading ? (
                   Array.from({ length: 4 }).map((_, index) => (
-                    <CarouselItem key={index} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 pl-4">
+                    <CarouselItem key={index} className="basis-11/12 sm:basis-1/2 lg:basis-1/4 pl-4">
                         <ModuleSkeleton />
                     </CarouselItem>
                   ))
               ) : (
                   modules.map((module, index) => (
-                    <CarouselItem key={module.id} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 pl-4 animate-in" style={{ animationDelay: `${index * 100}ms` }}>
+                    <CarouselItem key={module.id} className="basis-11/12 sm:basis-1/2 lg:basis-1/4 pl-4 animate-in" style={{ animationDelay: `${index * 100}ms` }}>
                       <div className="p-1 h-full">
                         <ModuleCard 
                           {...module}
