@@ -1,3 +1,4 @@
+
 import { Card, CardFooter, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -33,7 +34,7 @@ export default function ModuleCard({
         <Link
           href={linkHref}
           className={cn(
-            'relative block',
+            'relative block h-full',
             !isUnlocked && 'pointer-events-none'
           )}
         >
@@ -78,3 +79,5 @@ export default function ModuleCard({
     </Card>
   );
 }
+
+    
