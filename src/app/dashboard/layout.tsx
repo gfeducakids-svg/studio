@@ -12,15 +12,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <SidebarProvider>
       {/* Sidebar para Desktop */}
       <Sidebar className="hidden md:block" collapsible="icon">
-        <SidebarHeader className="p-4">
-          <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
+        <SidebarHeader className="p-2">
+          <Link href="/dashboard" className="flex items-center gap-2 font-semibold h-10 px-2">
             <BookOpen className="h-8 w-8 text-primary" />
             <span className="text-xl font-headline group-data-[collapsible=icon]:hidden">
               EducaKIDS
             </span>
           </Link>
         </SidebarHeader>
-        <SidebarContent className="p-2">
+        <SidebarContent>
           <DashboardNav />
         </SidebarContent>
       </Sidebar>
