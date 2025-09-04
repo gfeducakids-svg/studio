@@ -129,12 +129,11 @@ export default function ProgressTrail() {
             <CardHeader>
                 <CardTitle className="text-xl font-bold font-headline text-center md:text-left">Progresso na Trilha Principal</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="w-full">
                 <Carousel
                     opts={{
                         align: "start",
                         dragFree: true,
-                        containScroll: "trimSnaps",
                     }}
                     className="w-full"
                 >
@@ -193,3 +192,4 @@ export default function ProgressTrail() {
         </Card>
     );
 }
+
