@@ -217,7 +217,7 @@ export default function GrafismoFoneticoPage() {
                     })}
                 </CarouselContent>
                  <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-0 overflow-visible">
-                    <div className="absolute top-1/2 left-0 right-0 h-0 overflow-hidden">
+                    <div className="relative h-full w-full">
                         <CarouselPrevious className="hidden md:flex left-0" />
                         <CarouselNext className="hidden md:flex right-0" />
                     </div>

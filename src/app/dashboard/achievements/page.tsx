@@ -135,7 +135,7 @@ export default function AchievementsPage() {
 
     // Caso especial para o mestre total
     if(progressKey === 'mestre-total') {
-        return Object.values(userData.progress).every(m => m.status === 'completed');
+        return Object.values(userData.progress).every((m: any) => m.status === 'completed');
     }
 
     return false;
@@ -148,7 +148,7 @@ export default function AchievementsPage() {
             <h1 className="text-3xl font-bold font-headline mb-2">Suas Conquistas</h1>
             <p className="text-muted-foreground">Cada passo na jornada do conhecimento é uma vitória! Continue assim.</p>
           </div>
-          <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid gap-4 md:gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 8 }).map((_, index) => <AchievementSkeleton key={index} />)}
           </div>
         </div>
@@ -161,7 +161,7 @@ export default function AchievementsPage() {
         <h1 className="text-3xl font-bold font-headline mb-2">Suas Conquistas</h1>
         <p className="text-muted-foreground">Cada passo na jornada do conhecimento é uma vitória! Continue assim.</p>
       </div>
-      <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid gap-4 md:gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {staticAchievements.map((achievement, index) => (
           <div key={achievement.id} className="animate-in" style={{ animationDelay: `${index * 100}ms` }}>
             <AchievementCard 

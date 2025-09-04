@@ -47,7 +47,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
             {description}
           </CardDescription>
         </div>
-        <CardFooter className="p-4 pt-0">
+        <CardFooter className="p-3 sm:p-4 md:p-5 pt-0">
           <Button 
             asChild={isUnlocked}
             variant={isUnlocked ? 'default' : 'secondary'} 
