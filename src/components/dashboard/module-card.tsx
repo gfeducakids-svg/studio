@@ -1,5 +1,5 @@
 
-import { Card, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardFooter, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -24,7 +24,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
           ? 'hover:shadow-xl hover:-translate-y-1' 
           : 'cursor-default'
       )}>
-        <CardHeader className="p-0 relative w-full overflow-hidden aspect-[16/10] max-h-36 sm:max-h-44 md:max-h-56 lg:max-h-none lg:aspect-[4/3]">
+        <CardHeader className="p-0 relative w-full overflow-hidden aspect-[4/3]">
          <Link href={linkHref} className={cn(!isUnlocked && "pointer-events-none", "relative block w-full h-full")}>
              <Image
                 src={imageUrl}
@@ -33,31 +33,28 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
              />
              {!isUnlocked && (
-                <div className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-all duration-300 flex items-center justify-center">
-                  <Lock className="h-8 w-8 sm:h-10 sm:w-10 md:h-11 md:w-11 lg:h-12 lg:w-12 text-muted-foreground z-10 transition-transform duration-300"/>
+                <div className="absolute inset-0 bg-background/70 backdrop-blur-sm transition-all duration-300 flex items-center justify-center">
+                  <Lock className="h-8 w-8 text-white z-10"/>
                 </div>
              )}
           </Link>
         </CardHeader>
-        <div className="flex flex-col flex-grow p-3 sm:p-4 md:p-5">
-          <CardTitle className="font-headline text-sm sm:text-base md:text-lg lg:text-xl leading-tight">
+        <CardContent className="flex flex-col flex-grow p-4">
+          <CardTitle className="font-headline text-base leading-tight flex-grow">
             {title}
           </CardTitle>
-          <CardDescription className="mt-2 text-xs sm:text-sm md:text-[15px] lg:text-base flex-grow leading-relaxed line-clamp-2 md:line-clamp-3">
-            {description}
-          </CardDescription>
-        </div>
-        <CardFooter className="p-3 sm:p-4 md:p-5 pt-0">
+        </CardContent>
+        <CardFooter className="p-4 pt-0">
           <Button 
             asChild={isUnlocked}
             variant={isUnlocked ? 'default' : 'secondary'} 
             className={cn(
-              "w-full transition-all duration-200 h-9 sm:h-10 md:h-11 text-sm sm:text-[15px] md:text-base rounded-lg", 
-              !isUnlocked && "bg-muted text-muted-foreground cursor-not-allowed"
+              "w-full transition-all duration-200 rounded-lg", 
+              !isUnlocked && "bg-yellow-100 text-yellow-900 hover:bg-yellow-200 cursor-not-allowed"
             )}
             disabled={!isUnlocked}
           >
-            {isUnlocked ? <Link href={`/dashboard/modules/${id}`}>Acessar Conteúdo</Link> : <span>Liberar acesso</span>}
+            {isUnlocked ? <Link href={`/dashboard/modules/${id}`}>Acessar Conteúdo</Link> : <span>Liberar Acesso</span>}
           </Button>
         </CardFooter>
       </Card>
