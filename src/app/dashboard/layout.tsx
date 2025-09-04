@@ -11,7 +11,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <SidebarProvider>
       {/* Sidebar para Desktop */}
-      <Sidebar className="hidden md:block">
+      <Sidebar className="hidden md:block" collapsible="icon">
         <SidebarHeader className="p-4">
           <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
             <BookOpen className="h-8 w-8 text-primary" />
