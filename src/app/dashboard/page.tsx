@@ -34,7 +34,7 @@ const modules = [
 ];
 
 const ModuleSkeleton = () => (
-    <div className="flex flex-col gap-4 w-full max-w-xs">
+    <div className="flex flex-col gap-4 w-full">
         <div className="aspect-[4/3] w-full rounded-lg bg-muted"></div>
         <Skeleton className="h-6 w-3/4" />
         <Skeleton className="h-10 w-full rounded-lg" />
@@ -49,14 +49,14 @@ export default function DashboardPage() {
     <div className="animate-in flex flex-col gap-8">
       <ProgressTrail />
 
-      <div>
+      <div className="mt-8">
         <h2 className="text-2xl font-bold font-headline mb-4 text-center">Cursos e Atividades</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 justify-items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 justify-items-center">
           {loading ? (
               Array.from({ length: 4 }).map((_, index) => <ModuleSkeleton key={index} />)
           ) : (
               modules.map((module, index) => (
-                <div key={module.id} className="animate-in w-full max-w-xs" style={{ animationDelay: `${index * 100}ms` }}>
+                <div key={module.id} className="animate-in w-full" style={{ animationDelay: `${index * 100}ms` }}>
                   <ModuleCard 
                     {...module}
                     isUnlocked={!!userData?.progress?.[module.id] && userData.progress[module.id].status !== 'locked'}
