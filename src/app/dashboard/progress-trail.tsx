@@ -195,8 +195,10 @@ export default function ProgressTrail() {
                         );
                     })}
                 </CarouselContent>
-                <CarouselPrevious className="hidden md:flex left-0" />
-                <CarouselNext className="hidden md:flex right-0" />
+                 <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-0 overflow-visible">
+                    <CarouselPrevious className="hidden md:flex left-0" />
+                    <CarouselNext className="hidden md:flex right-0" />
+                </div>
                 </Carousel>
             </CardContent>
         </Card>
