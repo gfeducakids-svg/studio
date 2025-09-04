@@ -5,7 +5,6 @@ import ModuleCard from '@/components/dashboard/module-card';
 import { useUserData } from '@/hooks/use-user-data';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProgressTrail from '@/components/dashboard/progress-trail';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const modules = [
   {
@@ -76,34 +75,22 @@ export default function DashboardPage() {
       <div className="mt-8">
         <h2 className="text-2xl font-bold font-headline mb-4">Cursos e Atividades</h2>
         
-        <Carousel 
-            opts={{
-                align: "start",
-                dragFree: true
-            }}
-            className="w-full"
-        >
-            <CarouselContent className="-ml-4">
-              {loading ? (
-                  Array.from({ length: 4 }).map((_, index) => (
-                    <CarouselItem key={index} className="basis-11/12 sm:basis-1/2 lg:basis-1/4 pl-4">
-                        <ModuleSkeleton />
-                    </CarouselItem>
-                  ))
-              ) : (
-                  modules.map((module, index) => (
-                    <CarouselItem key={module.id} className="basis-11/12 sm:basis-1/2 lg:basis-1/4 pl-4 animate-in" style={{ animationDelay: `${index * 100}ms` }}>
-                        <ModuleCard 
-                          {...module}
-                          isUnlocked={!!userData?.progress?.[module.id] && userData.progress[module.id].status !== 'locked'}
-                        />
-                    </CarouselItem>
-                  ))
-              )}
-            </CarouselContent>
-            <CarouselPrevious className="hidden md:flex -left-4" />
-            <CarouselNext className="hidden md:flex -right-4" />
-        </Carousel>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {loading ? (
+              Array.from({ length: 4 }).map((_, index) => (
+                <ModuleSkeleton key={index} />
+              ))
+          ) : (
+              modules.map((module, index) => (
+                <div key={module.id} className="animate-in" style={{ animationDelay: `${index * 100}ms` }}>
+                    <ModuleCard 
+                      {...module}
+                      isUnlocked={!!userData?.progress?.[module.id] && userData.progress[module.id].status !== 'locked'}
+                    />
+                </div>
+              ))
+          )}
+        </div>
       </div>
     </div>
   );
