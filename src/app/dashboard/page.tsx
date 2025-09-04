@@ -1,3 +1,4 @@
+
 'use client';
 import React from 'react';
 import ModuleCard from '@/components/dashboard/module-card';
@@ -52,9 +53,7 @@ export default function DashboardPage() {
   return (
     <div className="animate-in flex flex-col gap-8">
       {/* Wrapper rolável para a trilha no mobile */}
-      <div className="-mx-4 w-[calc(100%+2rem)] overflow-x-auto px-4 no-scrollbar md:mx-0 md:w-auto md:overflow-visible">
-        <ProgressTrail />
-      </div>
+      <ProgressTrail />
 
       <div>
         <h2 className="mb-6 text-center text-2xl font-headline font-bold md:text-left">

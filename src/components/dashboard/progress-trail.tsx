@@ -13,6 +13,7 @@ import {
 import { useUserData } from "@/hooks/use-user-data";
 import { Skeleton } from "../ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 
 const mainTrailDetails = [
     { id: 'intro', title: 'Introdução', progressKey: 'grafismo-fonetico.submodules.intro' },
@@ -128,19 +129,15 @@ export default function ProgressTrail() {
             <CardHeader>
                 <CardTitle className="text-xl font-bold font-headline text-center md:text-left">Progresso na Trilha Principal</CardTitle>
             </CardHeader>
-            <CardContent>
-               <div
-                    className="
-                        no-scrollbar -mx-4 w-[calc(100%+2rem)] overflow-x-auto px-4
-                        md:mx-0 md:w-auto md:overflow-visible
-                    "
-                    >
-                    <div
-                        className="
-                        inline-flex min-w-max items-start gap-x-2 gap-y-4 whitespace-nowrap
-                        md:flex md:min-w-0 md:flex-wrap md:justify-center md:whitespace-normal
-                        "
-                    >
+            <CardContent className="w-full p-0">
+                <Carousel
+                    opts={{
+                        align: "start",
+                        dragFree: true,
+                    }}
+                    className="w-full"
+                >
+                    <CarouselContent className="p-6">
                         {allItems.map((item, index) => {
                             const isSecondary = 'icon' in item;
                             let configKey: keyof typeof statusConfig = (item.status as any) || 'locked';
@@ -155,42 +152,43 @@ export default function ProgressTrail() {
                             const isNextStep = activeIndex !== -1 && index === activeIndex + 1;
 
                             return (
-                                <div key={item.id} className="flex items-start justify-center">
-                                <TooltipProvider delayDuration={150}>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <div className="group flex w-24 shrink-0 flex-col items-center gap-2 text-center">
-                                                <div className={cn(
-                                                    "grid h-12 w-12 place-items-center rounded-full border transition-all duration-300",
-                                                    config.node,
-                                                    isNextStep && 'shadow-lg shadow-primary/40'
-                                                )}>
-                                                    <Icon className="h-6 w-6" />
-                                                </div>
-                                                <p className="px-1 text-xs font-semibold leading-tight text-muted-foreground transition-colors group-hover:text-primary">{item.title}</p>
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>{isNextStep ? "Próximo desafio!" : config.label}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
+                                <CarouselItem key={item.id} className="basis-auto pl-2">
+                                    <div className="flex items-start justify-center">
+                                        <TooltipProvider delayDuration={150}>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <div className="group flex w-24 shrink-0 flex-col items-center gap-2 text-center">
+                                                        <div className={cn(
+                                                            "grid h-12 w-12 place-items-center rounded-full border transition-all duration-300",
+                                                            config.node,
+                                                            isNextStep && 'shadow-lg shadow-primary/40'
+                                                        )}>
+                                                            <Icon className="h-6 w-6" />
+                                                        </div>
+                                                        <p className="px-1 text-xs font-semibold leading-tight text-muted-foreground transition-colors group-hover:text-primary">{item.title}</p>
+                                                    </div>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>{isNextStep ? "Próximo desafio!" : config.label}</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
 
-                                {!isLastItem && (
-                                <div className="relative mx-1 mt-5 h-1.5 w-6 overflow-hidden rounded-full bg-border md:w-10">
-                                    <div 
-                                    className={cn("absolute left-0 top-0 h-full rounded-full transition-all duration-700 ease-out", config.line)}
-                                    style={{ width: item.status === 'completed' ? '100%' : '0%' }}
-                                    ></div>
-                                </div>
-                                )}
-                            </div>
+                                        {!isLastItem && (
+                                        <div className="relative mx-1 mt-5 h-1.5 w-6 overflow-hidden rounded-full bg-border md:w-10">
+                                            <div 
+                                            className={cn("absolute left-0 top-0 h-full rounded-full transition-all duration-700 ease-out", config.line)}
+                                            style={{ width: item.status === 'completed' ? '100%' : '0%' }}
+                                            ></div>
+                                        </div>
+                                        )}
+                                    </div>
+                                </CarouselItem>
                             );
                         })}
-                    </div>
-                </div>
+                    </CarouselContent>
+                </Carousel>
             </CardContent>
         </Card>
     );
 }
-
