@@ -35,13 +35,33 @@ const modules = [
 ];
 
 const ModuleSkeleton = () => (
-  <div className="flex flex-col gap-3 w-full max-w-md sm:max-w-lg md:max-w-xl">
-    {/* Imagem / Thumb responsiva */}
-    <div className="aspect-[16/9] w-full rounded-md bg-muted sm:aspect-[4/3] md:aspect-[3/2]"></div>
-    
-    {/* Linhas de skeleton ajustadas */}
-    <Skeleton className="h-3 w-1/2 sm:h-4 sm:w-2/3 md:h-5 md:w-3/4" />
-    <Skeleton className="h-3 w-3/4 rounded-md sm:h-4 sm:w-5/6 md:h-5 md:w-full" />
+  <div className="flex flex-col w-full gap-2 sm:gap-2.5 md:gap-3 lg:gap-3">
+    {/* Thumb: altura controlada em mobile/tablet, normal no desktop */}
+    <div className="
+      w-full rounded-md bg-muted aspect-[16/10]
+      max-h-40 sm:max-h-48 md:max-h-56
+      lg:max-h-none lg:aspect-[4/3]
+    " />
+
+    {/* Linha 1: compacta no mobile/tablet, normal no desktop */}
+    <Skeleton
+      className="
+        h-[10px] w-1/2
+        sm:h-3 sm:w-2/3
+        md:h-[14px] md:w-3/4
+        lg:h-4 lg:w-3/4
+      "
+    />
+
+    {/* Linha 2: idem; mantém largura cheia só no desktop */}
+    <Skeleton
+      className="
+        h-[10px] w-2/3 rounded-md
+        sm:h-3 sm:w-3/4
+        md:h-[14px] md:w-11/12
+        lg:h-4 lg:w-full
+      "
+    />
   </div>
 );
 
