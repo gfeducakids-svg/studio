@@ -10,13 +10,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
 import { useUserData } from "@/hooks/use-user-data";
 import { Skeleton } from "../ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -136,44 +129,45 @@ export default function ProgressTrail() {
                 <CardTitle className="text-xl font-bold font-headline text-center md:text-left">Progresso na Trilha Principal</CardTitle>
             </CardHeader>
             <CardContent>
-                <Carousel
-                opts={{
-                    align: "start",
-                    slidesToScroll: "auto",
-                    dragFree: true,
-                }}
-                className="w-full"
-                >
-                <CarouselContent>
-                    {allItems.map((item, index) => {
-                        const isSecondary = 'icon' in item;
-                        let configKey = item.status;
-                        if (!configKey) configKey = 'locked';
+               <div
+                    className="
+                        no-scrollbar -mx-4 w-[calc(100%+2rem)] overflow-x-auto px-4
+                        md:mx-0 md:w-auto md:overflow-visible
+                    "
+                    >
+                    <div
+                        className="
+                        inline-flex min-w-max items-start gap-x-2 gap-y-4 whitespace-nowrap
+                        md:flex md:min-w-0 md:flex-wrap md:justify-center md:whitespace-normal
+                        "
+                    >
+                        {allItems.map((item, index) => {
+                            const isSecondary = 'icon' in item;
+                            let configKey: keyof typeof statusConfig = (item.status as any) || 'locked';
 
-                        if (item.status === 'completed' && isSecondary) {
-                            configKey = 'completedSecondary';
-                        }
-                        
-                        const config = statusConfig[configKey as keyof typeof statusConfig];
-                        const Icon = isSecondary ? item.icon : config.icon;
-                        const isLast = index === allItems.length - 1;
-                        const isNextStep = activeIndex !== -1 && index === activeIndex + 1;
+                            if (item.status === 'completed' && isSecondary) {
+                                configKey = 'completedSecondary';
+                            }
+                            
+                            const config = statusConfig[configKey];
+                            const Icon = isSecondary ? (item as any).icon : config.icon;
+                            const isLastItem = index === allItems.length - 1;
+                            const isNextStep = activeIndex !== -1 && index === activeIndex + 1;
 
-                        return (
-                            <CarouselItem key={item.id} className="basis-auto">
-                            <div className="flex items-start justify-center">
-                                <TooltipProvider>
+                            return (
+                                <div key={item.id} className="flex items-start justify-center">
+                                <TooltipProvider delayDuration={150}>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <div className="flex flex-col items-center text-center gap-2 group shrink-0 w-24">
+                                            <div className="group flex w-24 shrink-0 flex-col items-center gap-2 text-center">
                                                 <div className={cn(
-                                                    "w-12 h-12 rounded-full flex items-center justify-center border transition-all duration-300",
+                                                    "grid h-12 w-12 place-items-center rounded-full border transition-all duration-300",
                                                     config.node,
                                                     isNextStep && 'shadow-lg shadow-primary/40'
                                                 )}>
-                                                    <Icon className="w-6 h-6" />
+                                                    <Icon className="h-6 w-6" />
                                                 </div>
-                                                <p className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors leading-tight px-1">{item.title}</p>
+                                                <p className="px-1 text-xs font-semibold leading-tight text-muted-foreground transition-colors group-hover:text-primary">{item.title}</p>
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -182,27 +176,21 @@ export default function ProgressTrail() {
                                     </Tooltip>
                                 </TooltipProvider>
 
-                                {!isLast && (
-                                <div className="h-1.5 bg-border rounded-full mx-1 mt-5 relative overflow-hidden w-8">
+                                {!isLastItem && (
+                                <div className="relative mx-1 mt-5 h-1.5 w-6 overflow-hidden rounded-full bg-border md:w-10">
                                     <div 
-                                    className={cn("absolute top-0 left-0 h-full rounded-full transition-all duration-700 ease-out", config.line)}
+                                    className={cn("absolute left-0 top-0 h-full rounded-full transition-all duration-700 ease-out", config.line)}
                                     style={{ width: item.status === 'completed' ? '100%' : '0%' }}
                                     ></div>
                                 </div>
                                 )}
                             </div>
-                            </CarouselItem>
-                        );
-                    })}
-                </CarouselContent>
-                <div className="absolute top-1/2 -translate-y-1/2 -left-4 -right-4 h-0 overflow-visible">
-                    <div className="relative h-full w-full">
-                        <CarouselPrevious className="hidden md:flex left-0" />
-                        <CarouselNext className="hidden md:flex right-0" />
+                            );
+                        })}
                     </div>
                 </div>
-                </Carousel>
             </CardContent>
         </Card>
     );
 }
+

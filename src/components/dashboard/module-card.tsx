@@ -33,8 +33,8 @@ export default function ModuleCard({
         <Link
           href={linkHref}
           className={cn(
-            !isUnlocked && 'pointer-events-none',
-            'relative block h-full w-full',
+            'relative block',
+            !isUnlocked && 'pointer-events-none'
           )}
         >
           <Image
