@@ -24,13 +24,13 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
           ? 'hover:shadow-xl hover:-translate-y-1' 
           : 'cursor-default'
       )}>
-        <CardHeader className="p-0 relative w-full overflow-hidden aspect-[16/10] sm:aspect-[16/9] lg:aspect-[4/3] max-h-36 sm:max-h-40 md:max-h-48 lg:max-h-none">
+        <CardHeader className="p-0 relative w-full max-w-full overflow-hidden h-[clamp(140px,24vw,256px)] lg:h-auto aspect-[16/10] sm:aspect-[16/9] lg:aspect-[4/3]">
          <Link href={linkHref} className={cn(!isUnlocked && "pointer-events-none", "relative block w-full h-full")}>
              <Image
                 src={imageUrl}
                 alt={title}
                 fill
-                className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
              />
              {!isUnlocked && (
                 <div className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-all duration-300 flex items-center justify-center">
@@ -40,10 +40,10 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
           </Link>
         </CardHeader>
         <div className="flex flex-col flex-grow p-4">
-          <CardTitle className="font-headline text-base sm:text-[17px] md:text-lg lg:text-xl leading-tight">
+          <CardTitle className="font-headline text-[clamp(1rem,1.6vw,1.25rem)] leading-tight">
             {title}
           </CardTitle>
-          <CardDescription className="mt-2 text-xs sm:text-sm md:text-[15px] lg:text-base flex-grow leading-relaxed line-clamp-2 md:line-clamp-3">
+          <CardDescription className="mt-2 text-[clamp(0.85rem,1.3vw,1rem)] flex-grow leading-relaxed line-clamp-2 md:line-clamp-3">
             {description}
           </CardDescription>
         </div>
@@ -52,7 +52,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
             asChild={isUnlocked}
             variant={isUnlocked ? 'default' : 'secondary'} 
             className={cn(
-              "w-full transition-all duration-200 h-9 sm:h-10 md:h-11 text-sm sm:text-[15px] md:text-base rounded-lg", 
+              "w-full transition-all duration-200 h-[clamp(36px,5.5vw,44px)] text-[clamp(0.9rem,1.25vw,1rem)] rounded-lg", 
               !isUnlocked && "bg-muted text-muted-foreground cursor-not-allowed"
             )}
             disabled={!isUnlocked}
