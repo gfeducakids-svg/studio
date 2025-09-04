@@ -95,20 +95,24 @@ export default function ProgressTrail() {
 
     if (loading) {
         return (
-            <div className="p-4 md:p-6">
-                <Skeleton className="h-6 w-1/3 mb-6 mx-auto md:mx-0" />
-                <div className="flex items-center">
-                    {Array(5).fill(0).map((_, index) => (
-                        <React.Fragment key={index}>
-                           <div className="flex flex-col items-center gap-2">
-                                <Skeleton className="w-12 h-12 rounded-full" />
-                                <Skeleton className="h-4 w-20" />
-                           </div>
-                           {index < 4 && <Skeleton className="h-1 flex-1 mx-2" />}
-                        </React.Fragment>
-                    ))}
-                </div>
-            </div>
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-6 w-1/3 mb-2" />
+                </CardHeader>
+                <CardContent>
+                    <div className="flex items-center">
+                        {Array(5).fill(0).map((_, index) => (
+                            <React.Fragment key={index}>
+                               <div className="flex flex-col items-center gap-2 px-2">
+                                    <Skeleton className="w-12 h-12 rounded-full" />
+                                    <Skeleton className="h-4 w-20" />
+                               </div>
+                               {index < 4 && <Skeleton className="h-1 flex-1 mx-2" />}
+                            </React.Fragment>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
         )
     }
 
@@ -191,8 +195,8 @@ export default function ProgressTrail() {
                         );
                     })}
                 </CarouselContent>
-                <CarouselPrevious className="hidden md:flex" />
-                <CarouselNext className="hidden md:flex" />
+                <CarouselPrevious className="hidden md:flex -left-4" />
+                <CarouselNext className="hidden md:flex -right-4" />
                 </Carousel>
             </CardContent>
         </Card>
