@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import LoginForm from '@/components/auth/login-form';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -8,7 +9,7 @@ export default function LoginPage() {
     <main className="flex min-h-screen w-full items-center justify-center bg-background p-4 font-headline">
       <div className="w-full max-w-md flex flex-col items-center text-center gap-6">
         
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-row items-center gap-4">
             <Image 
                 src="https://i.imgur.com/3vWDaKx.png"
                 alt="EducaKids Logo"
