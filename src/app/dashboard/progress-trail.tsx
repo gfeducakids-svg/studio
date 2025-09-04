@@ -10,13 +10,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
 import { useUserData } from "@/hooks/use-user-data";
 import { Skeleton } from "../ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -100,15 +93,12 @@ export default function ProgressTrail() {
                     <Skeleton className="h-6 w-1/3 mb-2" />
                 </CardHeader>
                 <CardContent>
-                    <div className="flex items-center">
-                        {Array(5).fill(0).map((_, index) => (
-                            <React.Fragment key={index}>
-                               <div className="flex flex-col items-center gap-2 px-2">
-                                    <Skeleton className="w-12 h-12 rounded-full" />
-                                    <Skeleton className="h-4 w-20" />
-                               </div>
-                               {index < 4 && <Skeleton className="h-1 flex-1 mx-2" />}
-                            </React.Fragment>
+                    <div className="flex flex-wrap items-center gap-4">
+                        {Array(8).fill(0).map((_, index) => (
+                           <div key={index} className="flex flex-col items-center gap-2 px-2">
+                                <Skeleton className="w-12 h-12 rounded-full" />
+                                <Skeleton className="h-4 w-20" />
+                           </div>
                         ))}
                     </div>
                 </CardContent>
@@ -133,18 +123,10 @@ export default function ProgressTrail() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-xl font-bold font-headline text-center md:text-left">Progresso na Trilha Principal</CardTitle>
+                <CardTitle className="text-xl font-bold font-headline text-center md:text-left">Seu Progresso na Trilha</CardTitle>
             </CardHeader>
             <CardContent>
-                <Carousel
-                opts={{
-                    align: "start",
-                    slidesToScroll: "auto",
-                    dragFree: true,
-                }}
-                className="w-full"
-                >
-                <CarouselContent>
+                <div className="flex flex-wrap items-start justify-center gap-x-2 gap-y-4">
                     {allItems.map((item, index) => {
                         const isSecondary = 'icon' in item;
                         let configKey = item.status;
@@ -156,12 +138,11 @@ export default function ProgressTrail() {
                         
                         const config = statusConfig[configKey as keyof typeof statusConfig];
                         const Icon = isSecondary ? item.icon : config.icon;
-                        const isLast = index === allItems.length - 1;
+                        const isLastItem = index === allItems.length - 1;
                         const isNextStep = activeIndex !== -1 && index === activeIndex + 1;
 
                         return (
-                            <CarouselItem key={item.id} className="basis-auto">
-                            <div className="flex items-start justify-center">
+                            <div key={item.id} className="flex items-start justify-center">
                                 <TooltipProvider>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
@@ -182,7 +163,7 @@ export default function ProgressTrail() {
                                     </Tooltip>
                                 </TooltipProvider>
 
-                                {!isLast && (
+                                {!isLastItem && (
                                 <div className="h-1.5 bg-border rounded-full mx-1 mt-5 relative overflow-hidden w-8">
                                     <div 
                                     className={cn("absolute top-0 left-0 h-full rounded-full transition-all duration-700 ease-out", config.line)}
@@ -191,17 +172,9 @@ export default function ProgressTrail() {
                                 </div>
                                 )}
                             </div>
-                            </CarouselItem>
                         );
                     })}
-                </CarouselContent>
-                 <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-0 overflow-visible">
-                    <div className="absolute top-1/2 left-0 right-0 h-0 overflow-hidden">
-                        <CarouselPrevious className="hidden md:flex left-0" />
-                        <CarouselNext className="hidden md:flex right-0" />
-                    </div>
                 </div>
-                </Carousel>
             </CardContent>
         </Card>
     );
