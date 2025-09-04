@@ -10,7 +10,7 @@ export default function LoginPage() {
         
         <div className="flex flex-col items-center gap-2">
             <Image 
-                src="https://i.imgur.com/83w4V0j.png"
+                src="https://i.imgur.com/3vWDaKx.png"
                 alt="EducaKids Logo"
                 width={80}
                 height={80}
