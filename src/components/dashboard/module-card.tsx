@@ -19,7 +19,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
 
   return (
     <Card className="group flex h-full min-w-0 flex-col overflow-hidden transition-all duration-300 ease-out">
-      <CardHeader className="relative w-full overflow-hidden p-0 aspect-[4/5] md:aspect-[4/3]">
+      <CardHeader className="relative w-full overflow-hidden p-0 aspect-square md:aspect-[4/3]">
         <Link href={linkHref} className={cn(!isUnlocked && 'pointer-events-none', 'relative block h-full w-full')}>
           <Image
             src={imageUrl}

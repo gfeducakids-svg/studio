@@ -35,7 +35,7 @@ const modules = [
 
 const ModuleSkeleton = () => (
   <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
-    <div className="relative w-full overflow-hidden p-0 aspect-[4/5] md:aspect-[4/3]">
+    <div className="relative w-full overflow-hidden p-0 aspect-square md:aspect-[4/3]">
       <Skeleton className="h-full w-full" />
     </div>
     <div className="flex grow flex-col p-4">
