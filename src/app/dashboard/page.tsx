@@ -34,8 +34,8 @@ const modules = [
 ];
 
 const ModuleSkeleton = () => (
-  <div className="flex h-full flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
-    <div className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3]">
+  <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
+    <div className="relative w-full overflow-hidden p-0 aspect-[16/9] sm:aspect-[3/2] md:aspect-[4/3]">
       <Skeleton className="h-full w-full" />
     </div>
     <div className="flex grow flex-col space-y-3 p-3 sm:p-4">
@@ -64,31 +64,30 @@ export default function DashboardPage() {
 
         <div
           className="
-            grid grid-cols-1 items-stretch gap-6
-            sm:grid-cols-2 lg:grid-cols-4
+            grid w-full items-stretch gap-4 sm:gap-5 lg:gap-6 
+            grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 
+            [grid-auto-rows:1fr]
           "
         >
           {loading
             ? Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="h-full">
+                <div key={index} className="h-full min-w-0">
                   <ModuleSkeleton />
                 </div>
               ))
             : modules.map((module, index) => (
                 <div
                   key={module.id}
-                  className="h-full animate-in"
+                  className="h-full min-w-0 animate-in"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="h-full">
-                    <ModuleCard
-                      {...module}
-                      isUnlocked={
-                        !!userData?.progress?.[module.id] &&
-                        userData.progress[module.id].status !== 'locked'
-                      }
-                    />
-                  </div>
+                  <ModuleCard
+                    {...module}
+                    isUnlocked={
+                      !!userData?.progress?.[module.id] &&
+                      userData.progress[module.id].status !== 'locked'
+                    }
+                  />
                 </div>
               ))}
         </div>

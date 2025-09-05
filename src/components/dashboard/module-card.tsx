@@ -19,21 +19,18 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
 
   return (
     <Card
-      className={cn(
-        'group flex h-full flex-col overflow-hidden transition-all duration-300 ease-out',
-        isUnlocked ? 'hover:-translate-y-1 hover:shadow-xl' : 'cursor-default'
-      )}
+      className="group flex h-full min-w-0 flex-col overflow-hidden transition-all duration-300 ease-out"
     >
-      <CardHeader className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3]">
+      <CardHeader className="relative w-full overflow-hidden p-0 aspect-[16/9] sm:aspect-[3/2] md:aspect-[4/3]">
         <Link
           href={linkHref}
-          className={cn(!isUnlocked && 'pointer-events-none', 'relative block w-full h-full')}
+          className={cn(!isUnlocked && 'pointer-events-none', 'relative block h-full w-full')}
         >
           <Image
             src={imageUrl}
             alt={title}
             fill
-            className="object-cover h-full w-full transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
           {!isUnlocked && (
@@ -44,8 +41,8 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
         </Link>
       </CardHeader>
 
-      <CardContent className="flex grow flex-col p-3 sm:p-4">
-        <CardTitle className="flex-grow font-headline text-base leading-tight sm:text-lg">
+      <CardContent className="flex grow min-w-0 flex-col p-3 sm:p-4">
+        <CardTitle className="flex-grow min-w-0 font-headline text-sm sm:text-base md:text-lg leading-tight line-clamp-2">
           {title}
         </CardTitle>
       </CardContent>
