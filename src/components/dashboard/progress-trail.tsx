@@ -135,6 +135,7 @@ export default function ProgressTrail() {
                         align: "start",
                         dragFree: true,
                     }}
+                    className="w-full"
                 >
                     <CarouselContent className="p-6">
                         {allItems.map((item, index) => {
