@@ -15,6 +15,7 @@ interface ModuleCardProps {
 }
 
 const purchaseLinks: { [key: string]: string } = {
+  'grafismo-fonetico': 'https://pay.kiwify.com.br/KCqJlXF',
   'desafio-21-dias': 'https://pay.kiwify.com.br/NMxoBd9',
   'historias-curtas': 'https://pay.kiwify.com.br/XK1KQ6v',
   'checklist-alfabetizacao': 'https://pay.kiwify.com.br/OoaIoIT',
