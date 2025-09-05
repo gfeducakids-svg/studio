@@ -82,15 +82,15 @@ const TrailSkeleton = () => {
     return (
         <Carousel
             opts={{ align: 'start', dragFree: true, containScroll: 'trimSnaps', skipSnaps: false }}
-            className="w-full"
+            className="w-full overflow-hidden"
         >
-            <CarouselContent className="-ml-2 sm:-ml-2.5 md:-ml-3 py-4">
+            <CarouselContent className="px-2 sm:px-3 md:px-4 py-4">
                 {allItems.map((item, index) => {
                     const isLastItem = index === allItems.length - 1;
                     return (
                         <CarouselItem
                             key={item.id}
-                            className="basis-auto pl-2 sm:pl-2.5 md:pl-3"
+                            className="basis-auto pl-2 sm:pl-3 md:pl-4"
                         >
                             <div className="flex items-start justify-center">
                                 <div className="group flex w-20 shrink-0 flex-col items-center gap-1.5 text-center">
@@ -150,12 +150,12 @@ export default function ProgressTrail() {
           opts={{
             align: 'start',
             dragFree: true,
-            containScroll: 'trimSnaps',
+            containScroll: 'keepSnaps',
             skipSnaps: false,
           }}
-          className="w-full"
+          className="w-full overflow-hidden"
         >
-          <CarouselContent className="-ml-2 sm:-ml-2.5 md:-ml-3 py-4">
+          <CarouselContent className="px-2 sm:px-3 md:px-4 py-4">
             {allItems.map((item, index) => {
               const isSecondary = 'icon' in item;
               let configKey: keyof typeof statusConfig = (item as any).status || 'locked';
@@ -169,7 +169,7 @@ export default function ProgressTrail() {
               return (
                 <CarouselItem
                   key={item.id}
-                  className="basis-auto pl-2 sm:pl-2.5 md:pl-3"
+                  className="basis-auto pl-2 sm:pl-3 md:pl-4"
                 >
                   <div className="flex items-start justify-center">
                     <TooltipProvider delayDuration={120}>

@@ -34,8 +34,8 @@ const modules = [
 ];
 
 const ModuleSkeleton = () => (
-  <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
-    <div className="relative w-full overflow-hidden p-0 aspect-square md:aspect-[4/3]">
+  <div className="flex h-auto min-w-0 flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
+    <div className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3] max-h-[240px] md:max-h-none">
       <Skeleton className="absolute inset-0 h-full w-full" />
     </div>
     <div className="flex grow flex-col p-4">
@@ -54,8 +54,10 @@ export default function DashboardPage() {
   const { userData, loading } = useUserData();
 
   return (
-    <div className="animate-in flex w-full flex-col gap-8 overflow-hidden">
-      <ProgressTrail />
+    <div className="animate-in flex w-full flex-col gap-8 overflow-x-hidden">
+      <div className="overflow-x-hidden">
+        <ProgressTrail />
+      </div>
 
       <div className="w-full">
         <h2 className="mb-6 text-center text-2xl font-headline font-bold md:text-left">
@@ -74,9 +76,7 @@ export default function DashboardPage() {
               ? Array.from({ length: 4 }).map((_, index) => (
                   <div
                     key={index}
-                    className="
-                      h-full min-w-0 w-full
-                    "
+                    className="h-full min-w-0 w-full max-w-[420px] sm:max-w-none mx-auto sm:mx-0"
                   >
                     <ModuleSkeleton />
                   </div>
@@ -85,7 +85,7 @@ export default function DashboardPage() {
                   <div
                     key={module.id}
                     className="
-                      h-full min-w-0 w-full
+                      h-full min-w-0 w-full max-w-[420px] sm:max-w-none mx-auto sm:mx-0
                       animate-in
                     "
                     style={{ animationDelay: `${index * 100}ms` }}

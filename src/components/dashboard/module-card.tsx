@@ -25,7 +25,7 @@ export default function ModuleCard({
 
   return (
     <Card className="group flex h-full min-w-0 flex-col overflow-hidden transition-all duration-300 ease-out">
-      <CardHeader className="relative w-full overflow-hidden p-0 aspect-square md:aspect-[4/3]">
+      <CardHeader className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3] max-h-[240px] md:max-h-none">
         <Link
           href={linkHref}
           className={cn(!isUnlocked && 'pointer-events-none', 'relative block h-full w-full')}
@@ -46,20 +46,17 @@ export default function ModuleCard({
         </Link>
       </CardHeader>
 
-      <CardContent className="flex grow min-w-0 flex-col p-4">
-        <CardTitle className="min-w-0 flex-grow font-headline text-base leading-tight line-clamp-2 md:text-lg">
+      <CardContent className="flex grow min-w-0 flex-col p-3 sm:p-4">
+        <CardTitle className="flex-grow min-w-0 font-headline text-sm sm:text-base leading-tight line-clamp-2">
           {title}
         </CardTitle>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-3 pt-0 sm:p-4">
         <Button
           asChild={isUnlocked}
           variant={isUnlocked ? 'default' : 'secondary'}
-          className={cn(
-            'h-11 w-full rounded-lg transition-all duration-200',
-            !isUnlocked && 'cursor-not-allowed bg-yellow-100 text-yellow-900 hover:bg-yellow-200'
-          )}
+          className="w-full h-10 sm:h-11 rounded-lg"
           disabled={!isUnlocked}
         >
           {isUnlocked ? (
