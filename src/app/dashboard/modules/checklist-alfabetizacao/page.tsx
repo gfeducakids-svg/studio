@@ -1,6 +1,10 @@
 
 'use client';
 
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+
 // This component renders a full, self-contained HTML page with its own styles and scripts.
 // It's a special case for a highly interactive module.
 
@@ -22,35 +26,7 @@ const checklistHtml = `
             font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: #F8F9FA;
             min-height: 100vh;
-            padding: 20px;
             color: #333;
-        }
-
-        .back-button-container {
-             max-width: 900px;
-             margin: 0 auto;
-             padding-bottom: 1rem;
-             text-align: left;
-        }
-
-        .btn-back {
-            background: transparent;
-            color: #333;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-
-        .btn-back:hover {
-            background-color: rgba(0,0,0,0.05);
         }
 
         .container-inner {
@@ -403,12 +379,6 @@ const checklistHtml = `
 <body>
     <div class="floating-shapes" id="floatingShapes"></div>
     
-    <div class="back-button-container">
-        <a href="/dashboard" class="btn-back" title="Voltar para os Cursos" target="_top">
-            <span style="font-size: 20px;">&#8592;</span> Voltar para os Cursos
-        </a>
-    </div>
-
     <div class="container-inner">
         <div class="header">
             <div>
@@ -1046,16 +1016,23 @@ const checklistHtml = `
 
 export default function ChecklistPage() {
   return (
-    <div className="w-full h-full">
+    <div className="flex flex-col gap-4">
+      <div className="self-start">
+        <Button variant="ghost" asChild>
+          <Link href="/dashboard">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar para os Cursos
+          </Link>
+        </Button>
+      </div>
+      <div className="w-full h-[calc(100vh-10rem)]">
         <iframe 
             srcDoc={checklistHtml}
-            style={{ width: '100%', height: '100vh', border: 'none' }}
+            style={{ width: '100%', height: '100%', border: 'none' }}
             title="Checklist de Alfabetização Interativo"
         />
+      </div>
     </div>
   );
 }
 
-    
-
-    
