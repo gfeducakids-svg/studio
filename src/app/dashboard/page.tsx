@@ -35,7 +35,7 @@ const modules = [
 
 const ModuleSkeleton = () => (
   <div className="flex h-auto min-w-0 flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
-    <div className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3] max-h-[240px] md:max-h-none">
+    <div className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3] max-h-none">
       <Skeleton className="absolute inset-0 h-full w-full" />
     </div>
     <div className="flex grow flex-col p-4">
@@ -64,42 +64,39 @@ export default function DashboardPage() {
           Cursos e Atividades
         </h2>
         
-        <div className="mx-auto max-w-md sm:max-w-none">
-          <div
-            className="
-              grid w-full items-stretch gap-4 sm:gap-5 lg:gap-6
-              grid-cols-1 sm:grid-cols-2 lg:grid-cols-4
-              [grid-auto-rows:1fr]
-            "
-          >
-            {loading
-              ? Array.from({ length: 4 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="h-full min-w-0 w-full max-w-[420px] sm:max-w-none mx-auto sm:mx-0"
-                  >
-                    <ModuleSkeleton />
-                  </div>
-                ))
-              : modules.map((module, index) => (
-                  <div
-                    key={module.id}
-                    className="
-                      h-full min-w-0 w-full max-w-[420px] sm:max-w-none mx-auto sm:mx-0
-                      animate-in
-                    "
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <ModuleCard
-                      {...module}
-                      isUnlocked={
-                        !!userData?.progress?.[module.id] &&
-                        userData.progress[module.id].status !== 'locked'
-                      }
-                    />
-                  </div>
-                ))}
-          </div>
+        <div className="
+          grid w-full items-stretch gap-4 sm:gap-5 lg:gap-6
+          grid-cols-1 sm:grid-cols-2 lg:grid-cols-4
+          [grid-auto-rows:1fr]
+        "
+        >
+          {loading
+            ? Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-full min-w-0"
+                >
+                  <ModuleSkeleton />
+                </div>
+              ))
+            : modules.map((module, index) => (
+                <div
+                  key={module.id}
+                  className="
+                    h-full min-w-0
+                    animate-in
+                  "
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <ModuleCard
+                    {...module}
+                    isUnlocked={
+                      !!userData?.progress?.[module.id] &&
+                      userData.progress[module.id].status !== 'locked'
+                    }
+                  />
+                </div>
+              ))}
         </div>
       </div>
     </div>

@@ -25,7 +25,7 @@ export default function ModuleCard({
 
   return (
     <Card className="group flex h-full min-w-0 flex-col overflow-hidden transition-all duration-300 ease-out">
-      <CardHeader className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3] max-h-[240px] md:max-h-none">
+      <CardHeader className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3]">
         <Link
           href={linkHref}
           className={cn(!isUnlocked && 'pointer-events-none', 'relative block h-full w-full')}
