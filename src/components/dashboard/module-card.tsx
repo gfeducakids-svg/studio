@@ -14,19 +14,29 @@ interface ModuleCardProps {
   isUnlocked: boolean;
 }
 
-export default function ModuleCard({ id, title, description, imageUrl, isUnlocked }: ModuleCardProps) {
+export default function ModuleCard({
+  id,
+  title,
+  description,
+  imageUrl,
+  isUnlocked,
+}: ModuleCardProps) {
   const linkHref = isUnlocked ? `/dashboard/modules/${id}` : '#';
 
   return (
     <Card className="group flex h-full min-w-0 flex-col overflow-hidden transition-all duration-300 ease-out">
       <CardHeader className="relative w-full overflow-hidden p-0 aspect-square md:aspect-[4/3]">
-        <Link href={linkHref} className={cn(!isUnlocked && 'pointer-events-none', 'relative block h-full w-full')}>
+        <Link
+          href={linkHref}
+          className={cn(!isUnlocked && 'pointer-events-none', 'relative block h-full w-full')}
+        >
           <Image
             src={imageUrl}
             alt={title}
             fill
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            priority={false}
           />
           {!isUnlocked && (
             <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-sm transition-all duration-300">

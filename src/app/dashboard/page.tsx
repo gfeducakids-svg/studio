@@ -36,7 +36,7 @@ const modules = [
 const ModuleSkeleton = () => (
   <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
     <div className="relative w-full overflow-hidden p-0 aspect-square md:aspect-[4/3]">
-      <Skeleton className="h-full w-full" />
+      <Skeleton className="absolute inset-0 h-full w-full" />
     </div>
     <div className="flex grow flex-col p-4">
       <Skeleton className="h-5 w-3/4" />
@@ -54,24 +54,39 @@ export default function DashboardPage() {
   const { userData, loading } = useUserData();
 
   return (
-    <div className="animate-in flex flex-col gap-8 w-full overflow-hidden">
+    <div className="animate-in flex w-full flex-col gap-8 overflow-hidden">
       <ProgressTrail />
 
       <div className="w-full">
         <h2 className="mb-6 text-center text-2xl font-headline font-bold md:text-left">
           Cursos e Atividades
         </h2>
-        <div className="grid w-full items-stretch gap-4 sm:gap-5 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 [grid-auto-rows:1fr]">
+
+        <div
+          className="
+            grid w-full items-stretch gap-4 sm:gap-5 lg:gap-6
+            grid-cols-1 sm:grid-cols-2 lg:grid-cols-4
+            [grid-auto-rows:1fr]
+          "
+        >
           {loading
             ? Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="h-full min-w-0">
+                <div
+                  key={index}
+                  className="
+                    h-full min-w-0 w-full
+                  "
+                >
                   <ModuleSkeleton />
                 </div>
               ))
             : modules.map((module, index) => (
                 <div
                   key={module.id}
-                  className="h-full min-w-0 animate-in"
+                  className="
+                    h-full min-w-0 w-full
+                    animate-in
+                  "
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <ModuleCard
