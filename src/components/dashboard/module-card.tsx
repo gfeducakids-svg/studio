@@ -18,20 +18,15 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
   const linkHref = isUnlocked ? `/dashboard/modules/${id}` : '#';
 
   return (
-    <Card
-      className="group flex h-full min-w-0 flex-col overflow-hidden transition-all duration-300 ease-out"
-    >
-      <CardHeader className="relative w-full overflow-hidden p-0 aspect-video max-h-48 md:max-h-none md:aspect-[4/3]">
-        <Link
-          href={linkHref}
-          className={cn(!isUnlocked && 'pointer-events-none', 'relative block h-full w-full')}
-        >
+    <Card className="group flex h-full min-w-0 flex-col overflow-hidden transition-all duration-300 ease-out">
+      <CardHeader className="relative w-full overflow-hidden p-0 aspect-[4/5] md:aspect-[4/3]">
+        <Link href={linkHref} className={cn(!isUnlocked && 'pointer-events-none', 'relative block h-full w-full')}>
           <Image
             src={imageUrl}
             alt={title}
             fill
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
           {!isUnlocked && (
             <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-sm transition-all duration-300">
@@ -42,7 +37,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
       </CardHeader>
 
       <CardContent className="flex grow min-w-0 flex-col p-4">
-        <CardTitle className="min-w-0 font-headline text-base leading-tight line-clamp-2 md:text-lg">
+        <CardTitle className="min-w-0 flex-grow font-headline text-base leading-tight line-clamp-2 md:text-lg">
           {title}
         </CardTitle>
       </CardContent>
