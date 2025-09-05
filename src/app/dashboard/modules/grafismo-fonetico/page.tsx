@@ -254,15 +254,15 @@ export default function GrafismoFoneticoPage() {
               </TabsList>
               
               <TabsContent value="aula" className="mt-6">
-                <div className="bg-muted rounded-lg w-full min-h-[80vh] flex flex-col">
+                <div className="bg-muted rounded-lg w-full">
                     {activeModule.imageUrl ? (
                          <embed
                             src={activeModule.imageUrl}
                             type="application/pdf"
-                            className="w-full h-full min-h-[80vh] rounded-md shadow-inner"
+                            className="w-full h-full aspect-[9/16] md:aspect-video rounded-md shadow-inner"
                         />
                     ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center text-center text-muted-foreground p-4">
+                        <div className="w-full aspect-[9/16] md:aspect-video flex flex-col items-center justify-center text-center text-muted-foreground p-4">
                             <FileText size={48} className="mx-auto mb-4"/>
                             <h3 className="text-lg font-semibold text-foreground mb-2">Aula em Preparação</h3>
                             <p>O conteúdo principal para este submódulo ainda não está disponível.</p>
