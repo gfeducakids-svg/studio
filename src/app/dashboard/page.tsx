@@ -34,8 +34,8 @@ const modules = [
 ];
 
 const ModuleSkeleton = () => (
-  <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
-    <div className="relative w-full overflow-hidden p-0 aspect-video sm:aspect-[3/2] md:aspect-[4/3] max-h-40 sm:max-h-none">
+  <div className="flex h-auto min-w-0 flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
+    <div className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3] max-h-[180px] sm:max-h-[220px] md:max-h-none">
       <Skeleton className="h-full w-full" />
     </div>
     <div className="flex grow flex-col space-y-3 p-3 sm:p-4">
@@ -44,7 +44,7 @@ const ModuleSkeleton = () => (
       <Skeleton className="h-4 w-5/6" />
       <div className="grow" />
       <div className="p-3 pt-0 sm:p-4 -m-3 sm:-m-4 mt-2">
-        <Skeleton className="h-11 w-full rounded-lg" />
+        <Skeleton className="h-10 w-full rounded-lg sm:h-11" />
       </div>
     </div>
   </div>
@@ -61,34 +61,32 @@ export default function DashboardPage() {
         <h2 className="mb-6 text-center text-2xl font-headline font-bold md:text-left">
           Cursos e Atividades
         </h2>
-        {/* Container que limita a largura no mobile e expande em telas maiores */}
         <div className="mx-auto max-w-md sm:max-w-none">
             <div
                 className="
-                grid w-full items-stretch gap-4 sm:gap-5 lg:gap-6 
-                grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 
-                [grid-auto-rows:1fr]
+                grid w-full max-w-full items-stretch gap-4 sm:gap-5 lg:gap-6 
+                grid-cols-1 sm:grid-cols-2 lg:grid-cols-4
                 "
             >
                 {loading
                     ? Array.from({ length: 4 }).map((_, index) => (
-                        <div key={index} className="h-full min-w-0">
-                        <ModuleSkeleton />
+                        <div key={index} className="w-full max-w-full h-full min-w-0">
+                          <ModuleSkeleton />
                         </div>
                     ))
                     : modules.map((module, index) => (
                         <div
-                        key={module.id}
-                        className="h-full min-w-0 animate-in"
-                        style={{ animationDelay: `${index * 100}ms` }}
+                          key={module.id}
+                          className="w-full max-w-full h-full min-w-0 animate-in"
+                          style={{ animationDelay: `${index * 100}ms` }}
                         >
-                        <ModuleCard
-                            {...module}
-                            isUnlocked={
-                            !!userData?.progress?.[module.id] &&
-                            userData.progress[module.id].status !== 'locked'
-                            }
-                        />
+                          <ModuleCard
+                              {...module}
+                              isUnlocked={
+                              !!userData?.progress?.[module.id] &&
+                              userData.progress[module.id].status !== 'locked'
+                              }
+                          />
                         </div>
                     ))}
             </div>
