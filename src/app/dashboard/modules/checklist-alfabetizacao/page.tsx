@@ -404,8 +404,8 @@ const checklistHtml = `
     <div class="floating-shapes" id="floatingShapes"></div>
     
     <div class="back-button-container">
-        <a href="/dashboard" class="btn-back" title="Voltar" target="_top">
-            <span style="font-size: 20px;">&#8592;</span> Voltar
+        <a href="/dashboard" class="btn-back" title="Voltar para os Cursos" target="_top">
+            <span style="font-size: 20px;">&#8592;</span> Voltar para os Cursos
         </a>
     </div>
 
@@ -744,6 +744,7 @@ const checklistHtml = `
             const progressFill = document.getElementById('overallProgress');
             const progressText = document.getElementById('progressText');
             
+            progressFill.style.width = percentage + '%';
             progressText.textContent = \`\${percentage}% Concluído (\${progress.completed} de \${progress.total} itens)\`;
         }
 
