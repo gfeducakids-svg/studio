@@ -38,7 +38,7 @@ const checklistHtml = `
 
         .header {
             background: linear-gradient(45deg, #ff6b6b, #feca57);
-            padding: 30px;
+            padding: 40px 30px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -47,29 +47,29 @@ const checklistHtml = `
             justify-content: center;
         }
         
-        .btn-back {
+         .btn-back {
             position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255,255,255,0.2);
+            left: 15px;
+            top: 15px;
+            background: transparent;
             color: white;
             border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: background-color 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 8px;
+            text-decoration: none;
         }
 
         .btn-back:hover {
-            background: rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.15);
         }
-
 
         .header::before {
             content: '';
@@ -405,9 +405,9 @@ const checklistHtml = `
     
     <div class="container">
         <div class="header">
-            <button onclick="history.back()" class="btn-back" title="Voltar">
-                &#8592;
-            </button>
+            <a href="#" onclick="event.preventDefault(); history.back();" class="btn-back" title="Voltar">
+                <span style="font-size: 20px;">&#8592;</span> Voltar
+            </a>
             <div>
                  <h1>✅ Checklist de Alfabetização</h1>
                  <p class="subtitle">Acompanhe o progresso da alfabetização de forma interativa</p>
@@ -1053,4 +1053,5 @@ export default function ChecklistPage() {
   );
 }
 
+    
     
