@@ -34,6 +34,9 @@ export default function ModulePage() {
   if (moduleId === 'grafismo-fonetico') {
     redirect('/dashboard/modules/grafismo-fonetico');
   }
+   if (moduleId === 'checklist-alfabetizacao') {
+    redirect('/dashboard/modules/checklist-alfabetizacao');
+  }
 
   const moduleTitle = formatModuleId(moduleId);
   
