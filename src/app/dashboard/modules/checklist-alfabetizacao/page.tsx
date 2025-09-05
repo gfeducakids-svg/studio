@@ -26,7 +26,34 @@ const checklistHtml = `
             color: #333;
         }
 
-        .container {
+        .back-button-container {
+             max-width: 900px;
+             margin: 0 auto;
+             padding-bottom: 1rem;
+             text-align: left;
+        }
+
+        .btn-back {
+            background: transparent;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .container-inner {
             max-width: 900px;
             margin: 0 auto;
             background: white;
@@ -42,35 +69,8 @@ const checklistHtml = `
             text-align: center;
             position: relative;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         
-         .btn-back {
-            position: absolute;
-            left: 15px;
-            top: 15px;
-            background: transparent;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-
-        .btn-back:hover {
-            background: rgba(255,255,255,0.15);
-        }
-
         .header::before {
             content: '';
             position: absolute;
@@ -380,7 +380,7 @@ const checklistHtml = `
         }
 
         @media (max-width: 768px) {
-            .container {
+            .container-inner {
                 margin: 10px;
                 border-radius: 15px;
             }
@@ -403,13 +403,16 @@ const checklistHtml = `
 <body>
     <div class="floating-shapes" id="floatingShapes"></div>
     
-    <div class="container">
+    <div class="back-button-container">
+        <a href="#" onclick="event.preventDefault(); history.back();" class="btn-back" title="Voltar">
+            <span style="font-size: 20px;">&#8592;</span> Voltar
+        </a>
+    </div>
+
+    <div class="container-inner">
         <div class="header">
-            <a href="#" onclick="event.preventDefault(); history.back();" class="btn-back" title="Voltar">
-                <span style="font-size: 20px;">&#8592;</span> Voltar
-            </a>
             <div>
-                 <h1>✅ Checklist de Alfabetização</h1>
+                 <h1>Checklist de Alfabetização</h1>
                  <p class="subtitle">Acompanhe o progresso da alfabetização de forma interativa</p>
             </div>
         </div>
@@ -741,7 +744,6 @@ const checklistHtml = `
             const progressFill = document.getElementById('overallProgress');
             const progressText = document.getElementById('progressText');
             
-            progressFill.style.width = percentage + '%';
             progressText.textContent = \`\${percentage}% Concluído (\${progress.completed} de \${progress.total} itens)\`;
         }
 
@@ -862,7 +864,7 @@ const checklistHtml = `
                     margin: 0;
                 }
                 
-                .container {
+                .container-inner {
                     box-shadow: none;
                     border-radius: 0;
                     max-width: none;
@@ -1053,5 +1055,4 @@ export default function ChecklistPage() {
   );
 }
 
-    
     
