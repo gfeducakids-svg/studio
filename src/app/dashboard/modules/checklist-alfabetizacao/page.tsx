@@ -404,7 +404,7 @@ const checklistHtml = `
     <div class="floating-shapes" id="floatingShapes"></div>
     
     <div class="back-button-container">
-        <a href="#" onclick="event.preventDefault(); history.back();" class="btn-back" title="Voltar">
+        <a href="/dashboard" class="btn-back" title="Voltar">
             <span style="font-size: 20px;">&#8592;</span> Voltar
         </a>
     </div>
@@ -1054,5 +1054,7 @@ export default function ChecklistPage() {
     </div>
   );
 }
+
+    
 
     
