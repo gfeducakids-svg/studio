@@ -20,7 +20,7 @@ const checklistHtml = `
 
        body {
             font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #F8F9FA;
             min-height: 100vh;
             padding: 20px;
             color: #333;
@@ -42,7 +42,34 @@ const checklistHtml = `
             text-align: center;
             position: relative;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        
+        .btn-back {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
 
         .header::before {
             content: '';
@@ -378,8 +405,13 @@ const checklistHtml = `
     
     <div class="container">
         <div class="header">
-            <h1>✅ Checklist de Alfabetização</h1>
-            <p class="subtitle">Acompanhe o progresso da alfabetização de forma interativa</p>
+            <button onclick="history.back()" class="btn-back" title="Voltar">
+                &#8592;
+            </button>
+            <div>
+                 <h1>✅ Checklist de Alfabetização</h1>
+                 <p class="subtitle">Acompanhe o progresso da alfabetização de forma interativa</p>
+            </div>
         </div>
         
         <div class="progress-container">
@@ -1021,3 +1053,4 @@ export default function ChecklistPage() {
   );
 }
 
+    
