@@ -61,34 +61,37 @@ export default function DashboardPage() {
         <h2 className="mb-6 text-center text-2xl font-headline font-bold md:text-left">
           Cursos e Atividades
         </h2>
-        <div
-          className="
-            grid w-full items-stretch gap-4 sm:gap-5 lg:gap-6 
-            grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 
-            [grid-auto-rows:1fr]
-          "
-        >
-          {loading
-            ? Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="h-full min-w-0">
-                  <ModuleSkeleton />
-                </div>
-              ))
-            : modules.map((module, index) => (
-                <div
-                  key={module.id}
-                  className="h-full min-w-0 animate-in"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <ModuleCard
-                    {...module}
-                    isUnlocked={
-                      !!userData?.progress?.[module.id] &&
-                      userData.progress[module.id].status !== 'locked'
-                    }
-                  />
-                </div>
-              ))}
+        {/* Container que limita a largura no mobile e expande em telas maiores */}
+        <div className="mx-auto max-w-md sm:max-w-none">
+            <div
+                className="
+                grid w-full items-stretch gap-4 sm:gap-5 lg:gap-6 
+                grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 
+                [grid-auto-rows:1fr]
+                "
+            >
+                {loading
+                    ? Array.from({ length: 4 }).map((_, index) => (
+                        <div key={index} className="h-full min-w-0">
+                        <ModuleSkeleton />
+                        </div>
+                    ))
+                    : modules.map((module, index) => (
+                        <div
+                        key={module.id}
+                        className="h-full min-w-0 animate-in"
+                        style={{ animationDelay: `${index * 100}ms` }}
+                        >
+                        <ModuleCard
+                            {...module}
+                            isUnlocked={
+                            !!userData?.progress?.[module.id] &&
+                            userData.progress[module.id].status !== 'locked'
+                            }
+                        />
+                        </div>
+                    ))}
+            </div>
         </div>
       </div>
     </div>
