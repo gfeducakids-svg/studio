@@ -19,9 +19,9 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
 
   return (
     <Card
-      className="w-full max-w-full min-w-0 h-auto overflow-hidden rounded-lg flex flex-col transition-all duration-300 ease-out group"
+      className="group flex h-full min-w-0 flex-col overflow-hidden transition-all duration-300 ease-out"
     >
-      <CardHeader className="relative w-full p-0 overflow-hidden aspect-video max-h-[180px] sm:max-h-[220px] md:aspect-[4/3] md:max-h-none">
+      <CardHeader className="relative w-full overflow-hidden p-0 aspect-video max-h-48 md:max-h-none md:aspect-[4/3]">
         <Link
           href={linkHref}
           className={cn(!isUnlocked && 'pointer-events-none', 'relative block h-full w-full')}
@@ -30,7 +30,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
             src={imageUrl}
             alt={title}
             fill
-            className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
           {!isUnlocked && (
@@ -41,18 +41,18 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
         </Link>
       </CardHeader>
 
-      <CardContent className="flex grow min-w-0 flex-col p-3 sm:p-4">
-        <CardTitle className="flex-grow min-w-0 font-headline text-sm sm:text-base leading-tight line-clamp-2">
+      <CardContent className="flex grow min-w-0 flex-col p-4">
+        <CardTitle className="min-w-0 font-headline text-base leading-tight line-clamp-2 md:text-lg">
           {title}
         </CardTitle>
       </CardContent>
 
-      <CardFooter className="p-3 pt-0 sm:p-4">
+      <CardFooter className="p-4 pt-0">
         <Button
           asChild={isUnlocked}
           variant={isUnlocked ? 'default' : 'secondary'}
           className={cn(
-            'w-full h-10 sm:h-11 rounded-lg transition-all duration-200',
+            'h-11 w-full rounded-lg transition-all duration-200',
             !isUnlocked && 'cursor-not-allowed bg-yellow-100 text-yellow-900 hover:bg-yellow-200'
           )}
           disabled={!isUnlocked}
