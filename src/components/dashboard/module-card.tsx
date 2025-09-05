@@ -14,35 +14,27 @@ interface ModuleCardProps {
   isUnlocked: boolean;
 }
 
-export default function ModuleCard({
-  id,
-  title,
-  description,
-  imageUrl,
-  isUnlocked,
-}: ModuleCardProps) {
+export default function ModuleCard({ id, title, description, imageUrl, isUnlocked }: ModuleCardProps) {
   const linkHref = isUnlocked ? `/dashboard/modules/${id}` : '#';
 
   return (
     <Card
       className={cn(
         'group flex h-full flex-col overflow-hidden transition-all duration-300 ease-out',
-        isUnlocked ? 'hover:-translate-y-1 hover:shadow-xl' : 'cursor-default',
+        isUnlocked ? 'hover:-translate-y-1 hover:shadow-xl' : 'cursor-default'
       )}
     >
-      <CardHeader className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3] max-h-48 md:max-h-none">
+      <CardHeader className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3]">
         <Link
           href={linkHref}
-          className={cn(
-            'relative block h-full',
-            !isUnlocked && 'pointer-events-none'
-          )}
+          className={cn(!isUnlocked && 'pointer-events-none', 'relative block w-full h-full')}
         >
           <Image
             src={imageUrl}
             alt={title}
             fill
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover h-full w-full transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
           {!isUnlocked && (
             <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-sm transition-all duration-300">
@@ -61,12 +53,10 @@ export default function ModuleCard({
       <CardFooter className="p-3 pt-0 sm:p-4">
         <Button
           asChild={isUnlocked}
-          size="sm"
           variant={isUnlocked ? 'default' : 'secondary'}
           className={cn(
-            'w-full h-10 rounded-lg transition-all duration-200 text-sm',
-            !isUnlocked &&
-              'cursor-not-allowed bg-yellow-100 text-yellow-900 hover:bg-yellow-200',
+            'h-11 w-full rounded-lg transition-all duration-200',
+            !isUnlocked && 'cursor-not-allowed bg-yellow-100 text-yellow-900 hover:bg-yellow-200'
           )}
           disabled={!isUnlocked}
         >

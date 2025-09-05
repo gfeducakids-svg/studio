@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Link from 'next/link';
 import { BookOpen } from 'lucide-react';
@@ -15,7 +16,6 @@ import BottomNav from '@/components/dashboard/bottom-nav';
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      {/* SIDEBAR: desktop somente */}
       <Sidebar className="hidden md:block" collapsible="icon">
         <SidebarHeader className="p-2">
           <Link href="/dashboard" className="flex h-10 items-center gap-2 px-2 font-semibold">
@@ -30,11 +30,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </SidebarContent>
       </Sidebar>
 
-      {/* Inset vira um contêiner de coluna ocupando a viewport inteira */}
       <SidebarInset className="flex min-h-[100dvh] flex-col">
         <Header />
 
-        {/* MAIN com largura máxima e espaço reservado pro BottomNav no mobile */}
         <main
           className="
             mx-auto w-full max-w-screen-xl
@@ -46,7 +44,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </main>
 
-        {/* BottomNav (o componente já controla visibilidade em md+) */}
         <BottomNav />
       </SidebarInset>
     </SidebarProvider>

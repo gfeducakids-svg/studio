@@ -35,14 +35,17 @@ const modules = [
 
 const ModuleSkeleton = () => (
   <div className="flex h-full flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
-    {/* Mobile mais “raso”; desktop sobe para 4:3 */}
-    <Skeleton className="w-full aspect-video md:aspect-[4/3]" />
-    <div className="flex grow flex-col space-y-3 p-4">
+    <div className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3]">
+      <Skeleton className="h-full w-full" />
+    </div>
+    <div className="flex grow flex-col space-y-3 p-3 sm:p-4">
       <Skeleton className="h-5 w-3/4" />
       <Skeleton className="h-4 w-full" />
       <Skeleton className="h-4 w-5/6" />
       <div className="grow" />
-      <Skeleton className="h-11 w-full rounded-lg" />
+      <div className="p-3 pt-0 sm:p-4 -m-3 sm:-m-4 mt-2">
+        <Skeleton className="h-11 w-full rounded-lg" />
+      </div>
     </div>
   </div>
 );
@@ -52,7 +55,6 @@ export default function DashboardPage() {
 
   return (
     <div className="animate-in flex flex-col gap-8">
-      {/* Wrapper rolável para a trilha no mobile */}
       <ProgressTrail />
 
       <div>
@@ -60,12 +62,6 @@ export default function DashboardPage() {
           Cursos e Atividades
         </h2>
 
-        {/* Grid:
-            - 1 col no mobile
-            - 2 col em sm
-            - 4 col em lg+
-            - items-stretch + h-full nos cards = alturas alinhadas
-        */}
         <div
           className="
             grid grid-cols-1 items-stretch gap-6
