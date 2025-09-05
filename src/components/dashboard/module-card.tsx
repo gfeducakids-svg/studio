@@ -14,20 +14,26 @@ interface ModuleCardProps {
   isUnlocked: boolean;
 }
 
-export default function ModuleCard({
-  id,
-  title,
-  description,
-  imageUrl,
-  isUnlocked,
-}: ModuleCardProps) {
-  const linkHref = isUnlocked ? `/dashboard/modules/${id}` : '#';
+const purchaseLinks: { [key: string]: string } = {
+  'desafio-21-dias': 'https://pay.kiwify.com.br/NMxoBd9',
+  'historias-curtas': 'https://pay.kiwify.com.br/XK1KQ6v',
+  'checklist-alfabetizacao': 'https://pay.kiwify.com.br/OoaIoIT',
+};
+
+
+export default function ModuleCard({ id, title, description, imageUrl, isUnlocked }: ModuleCardProps) {
+  const purchaseLink = purchaseLinks[id];
+  const linkHref = isUnlocked ? `/dashboard/modules/${id}` : (purchaseLink || '#');
 
   return (
     <Card className="group flex h-full min-w-0 flex-col overflow-hidden transition-all duration-300 ease-out">
-      <CardHeader className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3]">
+      {/* MÍDIA: aspect-video no mobile, 4:3 em md+ */}
+      <CardHeader className="
+        relative w-full overflow-hidden p-0
+        aspect-video md:aspect-[4/3]
+      ">
         <Link
-          href={linkHref}
+          href={isUnlocked ? `/dashboard/modules/${id}` : '#'}
           className={cn(!isUnlocked && 'pointer-events-none', 'relative block h-full w-full')}
         >
           <Image
@@ -35,7 +41,7 @@ export default function ModuleCard({
             alt={title}
             fill
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
             priority={false}
           />
           {!isUnlocked && (
@@ -47,24 +53,42 @@ export default function ModuleCard({
       </CardHeader>
 
       <CardContent className="flex grow min-w-0 flex-col p-3 sm:p-4">
-        <CardTitle className="flex-grow min-w-0 font-headline text-sm sm:text-base leading-tight line-clamp-2">
+        <CardTitle className="min-w-0 flex-grow font-headline text-[15px] leading-tight line-clamp-2 sm:text-base md:text-lg">
           {title}
         </CardTitle>
+        {/* <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{description}</p> */}
       </CardContent>
 
       <CardFooter className="p-3 pt-0 sm:p-4">
-        <Button
-          asChild={isUnlocked}
-          variant={isUnlocked ? 'default' : 'secondary'}
-          className="w-full h-10 sm:h-11 rounded-lg"
-          disabled={!isUnlocked}
-        >
-          {isUnlocked ? (
+        {isUnlocked ? (
+          <Button
+            asChild
+            variant='default'
+            className="h-11 w-full rounded-lg transition-all duration-200"
+          >
             <Link href={`/dashboard/modules/${id}`}>Acessar Conteúdo</Link>
+          </Button>
+        ) : (
+          purchaseLink ? (
+             <Button
+                asChild
+                className={cn(
+                    'h-11 w-full rounded-lg transition-all duration-200',
+                    'bg-yellow-400 text-yellow-950 font-bold hover:bg-yellow-500'
+                )}
+            >
+                <a href={purchaseLink} target="_blank" rel="noopener noreferrer">Liberar Acesso</a>
+            </Button>
           ) : (
-            <span>Liberar Acesso</span>
-          )}
-        </Button>
+             <Button
+                disabled
+                variant='secondary'
+                className="h-11 w-full rounded-lg cursor-not-allowed"
+            >
+                <span>Liberar Acesso</span>
+            </Button>
+          )
+        )}
       </CardFooter>
     </Card>
   );
