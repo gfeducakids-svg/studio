@@ -36,9 +36,9 @@ const formSchema = z.object({
 // Estrutura de progresso inicial para um novo usuário
 const initialProgress = {
     'grafismo-fonetico': {
-        status: 'active',
+        status: 'locked',
         submodules: {
-            'intro': { status: 'active' },
+            'intro': { status: 'locked' },
             'pre-alf': { status: 'locked' },
             'alfabeto': { status: 'locked' },
             'silabas': { status: 'locked' },

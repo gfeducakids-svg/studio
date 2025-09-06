@@ -30,9 +30,9 @@ interface UserData {
 }
 
 const initialGrafismoFoneticoProgress: ModuleProgress = {
-    status: 'active', // O módulo principal começa ativo
+    status: 'locked', // O módulo principal começa bloqueado
     submodules: {
-        'intro': { status: 'active' },
+        'intro': { status: 'locked' },
         'pre-alf': { status: 'locked' },
         'alfabeto': { status: 'locked' },
         'silabas': { status: 'locked' },
