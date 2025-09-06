@@ -76,24 +76,52 @@ export default function GrafismoFoneticoPage() {
         fetchCourseData();
     }, []);
 
+    const isCourseUnlocked = userData?.progress?.['grafismo-fonetico']?.status !== 'locked';
     const progress = userData?.progress?.['grafismo-fonetico']?.submodules;
-    const orderedProgress = courseStructure ? courseStructure.submodules.map(s => ({...s, status: progress?.[s.id]?.status ?? 'locked' })) : [];
+    const orderedProgress = courseStructure ? courseStructure.submodules.map(s => {
+        const status = progress?.[s.id]?.status ?? 'locked';
+        // Se o curso principal estiver desbloqueado, nenhum submódulo deve permanecer 'locked'.
+        // O primeiro não concluído se torna 'active'.
+        if (isCourseUnlocked && status === 'locked') {
+           const firstLockedIndex = courseStructure.submodules.findIndex(sub => (progress?.[sub.id]?.status ?? 'locked') === 'locked');
+           const currentIndex = courseStructure.submodules.findIndex(sub => sub.id === s.id);
+           return {...s, status: currentIndex === firstLockedIndex ? 'active' : 'locked'}; // Esta lógica será sobrescrita abaixo se isCourseUnlocked for true.
+        }
+        return {...s, status: progress?.[s.id]?.status ?? 'locked' }
+    }) : [];
+
+     // Se o curso está desbloqueado, garantimos que não haja submódulos "locked"
+    if (isCourseUnlocked && orderedProgress.length > 0) {
+        let firstActiveAssigned = false;
+        orderedProgress.forEach(submodule => {
+            if (submodule.status === 'completed') {
+                // mantém como completed
+            } else if (!firstActiveAssigned) {
+                submodule.status = 'active';
+                firstActiveAssigned = true;
+            } else {
+                submodule.status = 'locked'; // Mantém a trilha, mas permite o acesso
+            }
+        });
+    }
 
     const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
 
     useEffect(() => {
         if (orderedProgress.length > 0) {
             const activeSubmodule = orderedProgress.find(s => s.status === 'active');
-            const firstLocked = orderedProgress.find(s => s.status === 'locked');
+            const firstSubmodule = orderedProgress[0];
+            
             if (activeSubmodule) {
                 setActiveModuleId(activeSubmodule.id);
-            } else if (firstLocked) {
-                 setActiveModuleId(firstLocked.id);
-            } else if(orderedProgress.length > 0) {
-                setActiveModuleId(orderedProgress[orderedProgress.length - 1].id);
+            } else if (isCourseUnlocked) {
+                 // Se o curso está liberado mas não há 'active' (todos concluidos), foca no último
+                 setActiveModuleId(orderedProgress[orderedProgress.length - 1].id);
+            } else if (firstSubmodule) {
+                setActiveModuleId(firstSubmodule.id);
             }
         }
-    }, [JSON.stringify(orderedProgress)]);
+    }, [JSON.stringify(orderedProgress), isCourseUnlocked]);
 
     if (userLoading || loadingStructure || !activeModuleId || !courseStructure) {
         return (
@@ -112,7 +140,8 @@ export default function GrafismoFoneticoPage() {
     const activeModule = orderedProgress.find(s => s.id === activeModuleId);
     if (!activeModule) return null;
 
-    const isModuleUnlocked = activeModule.status === 'active' || activeModule.status === 'completed';
+    // Permite o acesso ao conteúdo do submódulo se o curso principal estiver desbloqueado.
+    const isModuleContentUnlocked = isCourseUnlocked;
 
     const handleMarkAsCompleted = async (moduleId: string) => {
         const user = auth.currentUser;
@@ -128,12 +157,10 @@ export default function GrafismoFoneticoPage() {
         const updates: { [key: string]: any } = {};
         updates[`progress.grafismo-fonetico.submodules.${moduleId}.status`] = 'completed';
 
+        // Ativa o próximo módulo da trilha se ele existir
         if (currentModuleIndex + 1 < orderedProgress.length) {
             const nextModuleId = orderedProgress[currentModuleIndex + 1].id;
-            // Only update next module to active if it's currently locked
-            if (progress[nextModuleId]?.status === 'locked') {
-              updates[`progress.grafismo-fonetico.submodules.${nextModuleId}.status`] = 'active';
-            }
+             updates[`progress.grafismo-fonetico.submodules.${nextModuleId}.status`] = 'active';
         }
 
         try {
@@ -149,13 +176,13 @@ export default function GrafismoFoneticoPage() {
                 ),
                 description: `Você concluiu "${activeModule.title}"!`,
             });
-
+            
+             // Muda o módulo ativo para o próximo na UI
              if (currentModuleIndex + 1 < orderedProgress.length) {
-                const nextModule = orderedProgress.find(m => m.id === orderedProgress[currentModuleIndex + 1].id);
-                if (nextModule && nextModule.status === 'locked') {
-                    setActiveModuleId(nextModule.id);
-                }
+                const nextModuleId = orderedProgress[currentModuleIndex + 1].id;
+                setActiveModuleId(nextModuleId);
             }
+
 
         } catch (error) {
             console.error("Erro ao atualizar o progresso:", error);
@@ -192,7 +219,7 @@ export default function GrafismoFoneticoPage() {
                                         <TooltipTrigger asChild>
                                             <button 
                                                 onClick={() => setActiveModuleId(submodule.id)}
-                                                disabled={submodule.status === 'locked'}
+                                                disabled={!isCourseUnlocked}
                                                 data-module-id={submodule.id}
                                                 className="flex flex-col items-center gap-2 group focus:outline-none"
                                             >
@@ -237,11 +264,11 @@ export default function GrafismoFoneticoPage() {
                 <CardTitle className="text-2xl font-bold font-headline">
                 {activeModule.title}
                 </CardTitle>
-                {!isModuleUnlocked && <CardDescription className="text-destructive font-semibold">Conteúdo bloqueado — conclua a etapa anterior para liberar.</CardDescription>}
+                {!isCourseUnlocked && <CardDescription className="text-destructive font-semibold">Conteúdo bloqueado — libere o acesso a este curso para começar.</CardDescription>}
             </CardHeader>
           <CardContent>
             <Tabs defaultValue="aula" className="relative">
-             {!isModuleUnlocked && <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 rounded-lg flex items-center justify-center">
+             {!isModuleContentUnlocked && <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 rounded-lg flex items-center justify-center">
                  <div className="flex flex-col items-center gap-2 text-muted-foreground font-bold">
                     <Lock size={32}/>
                     <span>Conteúdo bloqueado</span>
@@ -269,7 +296,7 @@ export default function GrafismoFoneticoPage() {
                         </div>
                     )}
                 </div>
-                 {isModuleUnlocked && activeModule.status !== 'completed' && (
+                 {isModuleContentUnlocked && activeModule.status !== 'completed' && (
                     <div className="mt-6 flex justify-center">
                         <Button 
                             onClick={() => handleMarkAsCompleted(activeModule.id)}
@@ -308,7 +335,7 @@ export default function GrafismoFoneticoPage() {
                              <p className="text-sm text-muted-foreground capitalize">{material.type}</p>
                           </CardContent>
                           <CardFooter>
-                            <Button className="w-full" size="sm" disabled={!isModuleUnlocked}>
+                            <Button className="w-full" size="sm" disabled={!isModuleContentUnlocked}>
                                {actionText}
                             </Button>
                           </CardFooter>

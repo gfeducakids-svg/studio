@@ -30,7 +30,7 @@ interface UserData {
 }
 
 const initialGrafismoFoneticoProgress: ModuleProgress = {
-    status: 'locked', // O módulo principal começa bloqueado
+    status: 'locked', 
     submodules: {
         'intro': { status: 'locked' },
         'pre-alf': { status: 'locked' },
@@ -65,15 +65,39 @@ async function initializeUserProgress(user: User) {
             updates['progress'] = initialProgress;
             needsUpdate = true;
         } else {
-            // Verifica cada módulo secundário e o inicializa se não existir
+            // Verifica cada módulo e o inicializa se não existir
             Object.keys(initialProgress).forEach(moduleId => {
                 if (!userData.progress?.[moduleId]) {
-                    updates[`progress.${moduleId}`] = initialProgress[moduleId];
+                    updates[`progress.${moduleId}`] = initialProgress[moduleId as keyof typeof initialProgress];
+                    needsUpdate = true;
+                }
+            });
+             // Garante que todos os submódulos do grafismo fonético existam
+            const grafismoSubmodules = initialProgress['grafismo-fonetico'].submodules;
+            Object.keys(grafismoSubmodules).forEach(submoduleId => {
+                 if (!userData.progress?.['grafismo-fonetico']?.submodules?.[submoduleId]) {
+                    updates[`progress.grafismo-fonetico.submodules.${submoduleId}`] = grafismoSubmodules[submoduleId as keyof typeof grafismoSubmodules];
                     needsUpdate = true;
                 }
             });
         }
         
+        // Lógica de ativação do primeiro submódulo se o curso principal for liberado
+        const grafismoProgress = userData.progress?.['grafismo-fonetico'];
+        if (grafismoProgress && grafismoProgress.status !== 'locked') {
+            const submodules = grafismoProgress.submodules;
+            const firstLockedSubmodule = Object.keys(initialGrafismoFoneticoProgress.submodules).find(
+                key => submodules[key]?.status === 'locked'
+            );
+
+            // Se existe um submódulo bloqueado e o curso está ativo, ativa o primeiro da lista de bloqueados.
+            if (firstLockedSubmodule && submodules[firstLockedSubmodule].status === 'locked') {
+                 updates[`progress.grafismo-fonetico.submodules.${firstLockedSubmodule}.status`] = 'active';
+                 needsUpdate = true;
+            }
+        }
+
+
         if (needsUpdate) {
             await setDoc(userDocRef, updates, { merge: true });
         }
@@ -89,7 +113,7 @@ export function useUserData() {
     useEffect(() => {
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Initialize progress if it doesn't exist
+                // Roda a verificação e possível inicialização de progresso
                 initializeUserProgress(user);
 
                 const userDocRef = doc(db, 'users', user.uid);
