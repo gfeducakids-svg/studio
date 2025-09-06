@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -32,6 +33,27 @@ const formSchema = z.object({
     path: ["confirmPassword"],
 });
 
+// Estrutura de progresso inicial para um novo usuário
+const initialProgress = {
+    'grafismo-fonetico': {
+        status: 'active',
+        submodules: {
+            'intro': { status: 'active' },
+            'pre-alf': { status: 'locked' },
+            'alfabeto': { status: 'locked' },
+            'silabas': { status: 'locked' },
+            'fonico': { status: 'locked' },
+            'palavras': { status: 'locked' },
+            'escrita': { status: 'locked' },
+            'bonus': { status: 'locked' },
+        }
+    },
+    'desafio-21-dias': { status: 'active', submodules: {} },
+    'checklist-alfabetizacao': { status: 'active', submodules: {} },
+    'historias-curtas': { status: 'active', submodules: {} },
+};
+
+
 export default function RegisterForm() {
   const router = useRouter();
   const { toast } = useToast();
@@ -53,10 +75,11 @@ export default function RegisterForm() {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
 
+      // Cria o documento do usuário com a estrutura de progresso inicial correta.
       await setDoc(doc(db, "users", user.uid), {
         name: values.name,
         email: values.email,
-        modules: []
+        progress: initialProgress 
       });
 
       router.push('/dashboard');
