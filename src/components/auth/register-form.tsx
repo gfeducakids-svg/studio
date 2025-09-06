@@ -48,9 +48,9 @@ const initialProgress = {
             'bonus': { status: 'locked' },
         }
     },
-    'desafio-21-dias': { status: 'active', submodules: {} },
-    'checklist-alfabetizacao': { status: 'active', submodules: {} },
-    'historias-curtas': { status: 'active', submodules: {} },
+    'desafio-21-dias': { status: 'locked', submodules: {} },
+    'checklist-alfabetizacao': { status: 'locked', submodules: {} },
+    'historias-curtas': { status: 'locked', submodules: {} },
 };
 
 

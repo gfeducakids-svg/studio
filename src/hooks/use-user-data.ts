@@ -45,9 +45,9 @@ const initialGrafismoFoneticoProgress: ModuleProgress = {
 
 const initialProgress: UserProgress = {
     'grafismo-fonetico': initialGrafismoFoneticoProgress,
-    'desafio-21-dias': { status: 'active', submodules: {} },
-    'checklist-alfabetizacao': { status: 'active', submodules: {} },
-    'historias-curtas': { status: 'active', submodules: {} },
+    'desafio-21-dias': { status: 'locked', submodules: {} },
+    'checklist-alfabetizacao': { status: 'locked', submodules: {} },
+    'historias-curtas': { status: 'locked', submodules: {} },
 };
 
 async function initializeUserProgress(user: User) {
