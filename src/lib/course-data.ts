@@ -26,14 +26,14 @@ const grafismoFoneticoData: Course = {
     id: 'grafismo-fonetico',
     title: 'Método de Grafismo Fonético',
     submodules: [
-        { id: 'intro', title: 'Introdução', imageUrl: 'https://i.imgur.com/ddFiaYV.jpeg', materials: [{ id: 1, type: 'video', title: 'Boas-vindas'}] },
-        { id: 'pre-alf', title: 'Pré-Alfabetização', imageUrl: 'https://i.imgur.com/bf7bsC6.jpeg', materials: [{ id: 1, type: 'video', title: 'Aula 1'}, {id: 2, type: 'pdf', title: 'Exercício de Traços'}] },
-        { id: 'alfabeto', title: 'Apresentando o Alfabeto', imageUrl: 'https://i.imgur.com/CK4iI9s.png', materials: [{ id: 1, type: 'video', title: 'As Vogais'}, {id: 2, type: 'pdf', title: 'Cartilha do Alfabeto'}, {id: 3, type: 'download', title: 'Áudios das Letras'}] },
-        { id: 'silabas', title: 'Sílabas Simples', imageUrl: 'https://i.imgur.com/qhAfaY6.png', materials: [{ id: 1, type: 'video', title: 'BA-BE-BI-BO-BU'}, {id: 2, type: 'pdf', title: 'Tabela de Sílabas'}] },
-        { id: 'fonico', title: 'Método Fônico', imageUrl: 'https://i.imgur.com/ANDkcA9.png', materials: [] },
-        { id: 'palavras', title: 'Formação de Palavras e Frases', imageUrl: 'https://i.imgur.com/ovE1zBu.png', materials: [] },
+        { id: 'intro', title: 'Introdução', imageUrl: 'https://drive.google.com/file/d/10id_hmbKbH0yqi623ylopyjR2cOeWI1D/preview', materials: [{ id: 1, type: 'video', title: 'Boas-vindas'}] },
+        { id: 'pre-alf', title: 'Pré-Alfabetização', imageUrl: 'https://drive.google.com/file/d/1Uxs4yPT9NuDHMRkAMfL85ZnCHZU-NbNQ/preview', materials: [{ id: 1, type: 'video', title: 'Aula 1'}, {id: 2, type: 'pdf', title: 'Exercício de Traços'}] },
+        { id: 'alfabeto', title: 'Apresentando o Alfabeto', imageUrl: 'https://drive.google.com/file/d/1k-s5EoRwlWloBICD7uWV-PbMsJNA27GB/preview', materials: [{ id: 1, type: 'video', title: 'As Vogais'}, {id: 2, type: 'pdf', title: 'Cartilha do Alfabeto'}, {id: 3, type: 'download', title: 'Áudios das Letras'}] },
+        { id: 'silabas', title: 'Sílabas Simples', imageUrl: 'https://drive.google.com/file/d/1jYvC01jsIArCRVa8Tc78JA7V8wbslkbT/preview', materials: [{ id: 1, type: 'video', title: 'BA-BE-BI-BO-BU'}, {id: 2, type: 'pdf', title: 'Tabela de Sílabas'}] },
+        { id: 'fonico', title: 'Método Fônico', imageUrl: 'https://drive.google.com/file/d/1fUa0seaOrUeyRu-uHk4hTCMDXiMcl5kq/preview', materials: [] },
+        { id: 'palavras', title: 'Formação de Palavras e Frases', imageUrl: 'https://drive.google.com/file/d/1-SnD4rkpr-6RMj_l-S-m1x1GAIhjAyCb/preview', materials: [] },
         { id: 'escrita', title: 'Escrita e Compreensão Leitora', imageUrl: 'https://i.imgur.com/oIYeTTT.jpeg', materials: [] },
-        { id: 'bonus', title: 'Bônus', imageUrl: 'https://i.imgur.com/07KphCZ.png', materials: [] },
+        { id: 'bonus', title: 'Bônus', imageUrl: 'https://drive.google.com/file/d/1NbCn_smFEi98h-gYKtBwNftmoIXVebJ5/preview', materials: [] },
     ],
 };
 

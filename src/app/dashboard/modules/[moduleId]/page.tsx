@@ -22,6 +22,13 @@ function formatModuleId(id: string) {
     .join(' ');
 }
 
+// Map of module IDs to their content (iframe URLs)
+const moduleContent: { [key: string]: string } = {
+  'historias-curtas': "https://drive.google.com/file/d/1eRB_Bk2rVkplhPngdUcDM-eayILMGBXn/preview",
+  'desafio-21-dias': "https://drive.google.com/file/d/1mfScqwbe6I92z5K9tMs1NAN4vFaqoXQe/preview",
+};
+
+
 export default function ModulePage() {
   const params = useParams();
   const moduleId = Array.isArray(params.moduleId) ? params.moduleId[0] : params.moduleId;
@@ -39,6 +46,7 @@ export default function ModulePage() {
   }
 
   const moduleTitle = formatModuleId(moduleId);
+  const contentUrl = moduleContent[moduleId];
   
   if (userLoading) {
       return (
@@ -118,12 +126,21 @@ export default function ModulePage() {
                     </TabsList>
                     
                     <TabsContent value="aula" className="mt-6">
-                        <div className="bg-muted rounded-lg w-full min-h-[50vh] flex flex-col items-center justify-center text-center text-muted-foreground p-4">
+                       {contentUrl ? (
+                         <div className="bg-muted rounded-lg w-full min-h-[70vh] flex flex-col items-center justify-center text-center text-muted-foreground p-0 md:p-4">
+                            <iframe 
+                                src={contentUrl} 
+                                className="w-full h-full aspect-video min-h-[70vh]" 
+                                allow="autoplay"
+                            ></iframe>
+                        </div>
+                       ) : (
+                         <div className="bg-muted rounded-lg w-full min-h-[50vh] flex flex-col items-center justify-center text-center text-muted-foreground p-4">
                             <FileText size={48} className="mx-auto mb-4"/>
                             <h3 className="text-lg font-semibold text-foreground mb-2">Aula em Preparação</h3>
                             <p>O conteúdo principal para este módulo ainda não está disponível.</p>
-                            <Button className="mt-4 font-bold" disabled>Acessar Conteúdo</Button>
                         </div>
+                       )}
                     </TabsContent>
 
                     <TabsContent value="atividades" className="mt-6">
