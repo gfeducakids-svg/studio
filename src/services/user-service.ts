@@ -2,12 +2,11 @@
 'use server'
 
 import admin from 'firebase-admin';
-import { getApps, getApp, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
 // Inicializa o Firebase Admin SDK. Ele verifica se já existe uma instância
 // para evitar inicializações múltiplas que causariam erros.
-if (!getApps().length) {
+if (!admin.apps.length) {
     // A chave privada precisa de um tratamento especial para substituir `\\n` por `\n`
     const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
@@ -15,7 +14,7 @@ if (!getApps().length) {
         console.error("Firebase Admin environment variables are not set.");
     } else {
         try {
-             initializeApp({
+             admin.initializeApp({
                 credential: admin.credential.cert({
                     projectId: process.env.FIREBASE_PROJECT_ID,
                     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
