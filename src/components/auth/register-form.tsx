@@ -20,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import React from 'react';
 import { auth, db } from '@/lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 
 
 const formSchema = z.object({
@@ -69,18 +69,53 @@ export default function RegisterForm() {
     },
   });
 
+  // Função para verificar e aplicar compras pendentes
+  async function applyPendingPurchases(userId: string, userEmail: string) {
+    const pendingDocRef = doc(db, "pending_purchases", userEmail.toLowerCase());
+    const pendingDoc = await getDoc(pendingDocRef);
+
+    if (pendingDoc.exists()) {
+      const pendingData = pendingDoc.data();
+      const modulesToUnlock: string[] = pendingData.modules || [];
+      const userDocRef = doc(db, "users", userId);
+      
+      const updates: { [key: string]: any } = {};
+      modulesToUnlock.forEach(moduleId => {
+        updates[`progress.${moduleId}.status`] = 'active';
+         // Caso especial para o módulo principal, desbloqueia também o primeiro submódulo.
+        if (moduleId === 'grafismo-fonetico') {
+            updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'active';
+        }
+      });
+
+      if (Object.keys(updates).length > 0) {
+        await updateDoc(userDocRef, updates);
+        console.log(`Módulos pendentes ${modulesToUnlock.join(', ')} aplicados ao usuário ${userId}.`);
+      }
+      
+      // Remove o documento de compras pendentes após a aplicação
+      await deleteDoc(pendingDocRef);
+    }
+  }
+
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+    const normalizedEmail = values.email.toLowerCase();
+
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, values.password);
       const user = userCredential.user;
 
-      // Cria o documento do usuário com a estrutura de progresso inicial correta.
+      // Cria o documento do usuário com a estrutura de progresso inicial.
       await setDoc(doc(db, "users", user.uid), {
         name: values.name,
-        email: values.email,
+        email: normalizedEmail,
         progress: initialProgress 
       });
+
+      // Verifica e aplica quaisquer compras pendentes feitas antes do cadastro.
+      await applyPendingPurchases(user.uid, normalizedEmail);
 
       router.push('/dashboard');
     } catch (error: any) {

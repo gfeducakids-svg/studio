@@ -16,7 +16,7 @@ const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
 function initializeAdmin() {
     // Garante que a inicialização só aconteça uma vez.
     if (admin.apps.length > 0) {
-        return;
+        return admin.app();
     }
 
     // A Vercel pode não interpretar corretamente as quebras de linha nas variáveis de ambiente.
@@ -28,7 +28,7 @@ function initializeAdmin() {
         throw new Error("Erro de configuração do servidor: Faltam credenciais do Firebase Admin.");
     }
     
-    admin.initializeApp({
+    return admin.initializeApp({
         credential: admin.credential.cert({
             projectId: process.env.FIREBASE_PROJECT_ID,
             clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
@@ -66,11 +66,14 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        // A função de verificação agora retorna o payload, evitando a leitura dupla do corpo.
+        // Inicializa o Firebase Admin de forma segura.
+        initializeAdmin();
+        const db = getFirestore();
+
         const payload = await verifySignatureAndGetPayload(request, secret);
         
         if (payload.order_status === 'paid') {
-            const customerEmail = payload.Customer?.email;
+            const customerEmail = payload.Customer?.email?.toLowerCase();
             const productId = payload.Product?.product_id;
 
             if (!customerEmail || !productId) {
@@ -81,21 +84,34 @@ export async function POST(request: NextRequest) {
 
             if (!moduleId) {
                 console.warn(`Webhook recebido para um ID de produto não mapeado: ${productId}`);
-                return NextResponse.json({ success: true, message: `Produto '${payload.Product?.product_name}' não mapeado para ${customerEmail}.` });
+                return NextResponse.json({ success: true, message: `Produto '${payload.Product?.product_name}' não mapeado.` });
             }
             
-            // Inicializa o Firebase Admin de forma segura.
-            initializeAdmin();
-            const db = getFirestore();
             const usersRef = db.collection('users');
             const q = usersRef.where('email', '==', customerEmail);
             const querySnapshot = await q.get();
 
             if (querySnapshot.empty) {
-                console.warn(`Usuário com email ${customerEmail} não encontrado. A compra não pode ser atribuída.`);
-                return NextResponse.json({ success: true, message: `Usuário com email ${customerEmail} não encontrado.` });
+                // Usuário não encontrado, salva a compra como pendente
+                const pendingRef = db.collection('pending_purchases').doc(customerEmail);
+                const pendingDoc = await pendingRef.get();
+                
+                const newModules = pendingDoc.exists ? pendingDoc.data()?.modules || [] : [];
+                if (!newModules.includes(moduleId)) {
+                    newModules.push(moduleId);
+                }
+
+                await pendingRef.set({
+                    email: customerEmail,
+                    modules: newModules,
+                    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                }, { merge: true });
+                
+                console.log(`Compra pendente para o email ${customerEmail} salva com sucesso.`);
+                return NextResponse.json({ success: true, message: `Compra pendente para ${customerEmail} registrada.` });
             }
 
+            // Usuário encontrado, atualiza o progresso
             for (const userDoc of querySnapshot.docs) {
                 const userDocRef = db.collection('users').doc(userDoc.id);
                 const userData = userDoc.data();
@@ -104,12 +120,8 @@ export async function POST(request: NextRequest) {
                 updates[`progress.${moduleId}.status`] = 'active';
 
                 // Caso especial para o módulo principal, desbloqueia também o primeiro submódulo.
-                if (moduleId === 'grafismo-fonetico' && userData.progress?.[moduleId]?.submodules) {
-                    const submodules = userData.progress[moduleId].submodules;
-                    const firstSubmoduleId = Object.keys(submodules).find(key => key === 'intro') || Object.keys(submodules)[0];
-                    if (firstSubmoduleId && submodules[firstSubmoduleId]?.status === 'locked') {
-                       updates[`progress.grafismo-fonetico.submodules.${firstSubmoduleId}.status`] = 'active';
-                    }
+                if (moduleId === 'grafismo-fonetico') {
+                    updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'active';
                 }
                 
                 await userDocRef.update(updates);
