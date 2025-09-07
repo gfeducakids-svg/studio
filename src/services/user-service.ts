@@ -4,15 +4,18 @@
 import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 
-// Inicializa o Firebase Admin SDK. Ele verifica se já existe uma instância
-// para evitar inicializações múltiplas que causariam erros.
-if (!admin.apps.length) {
-    // A chave privada precisa de um tratamento especial para substituir `\\n` por `\n`
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+// Função para garantir que o Firebase Admin seja inicializado apenas uma vez.
+const initializeAdmin = () => {
+    if (admin.apps.length === 0) {
+        // A chave privada precisa de um tratamento especial para substituir `\\n` por `\n`
+        const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
-    if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
-        console.error("Firebase Admin environment variables are not set.");
-    } else {
+        if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
+            console.error("Firebase Admin environment variables are not set.");
+            // Lança um erro para interromper a execução se as variáveis não estiverem definidas.
+            throw new Error("Server configuration error: Firebase Admin environment variables are not set.");
+        }
+
         try {
              admin.initializeApp({
                 credential: admin.credential.cert({
@@ -21,13 +24,16 @@ if (!admin.apps.length) {
                     privateKey: privateKey,
                 }),
             });
+             console.log("Firebase Admin SDK initialized successfully.");
         } catch (error) {
             console.error("Firebase Admin initialization error:", error);
+            // Lança o erro para que o problema de inicialização seja visível.
+            throw new Error("Failed to initialize Firebase Admin SDK.");
         }
     }
-}
+    return getFirestore();
+};
 
-const db = getFirestore();
 
 /**
  * Encontra um usuário pelo e-mail e desbloqueia um módulo específico para ele.
@@ -40,6 +46,9 @@ export async function unlockModuleForUserByEmail(email: string, moduleId: string
   if (!email || !moduleId) {
     throw new Error('Email and module ID are required.');
   }
+
+  // Garante que o SDK admin esteja inicializado e obtém a instância do DB.
+  const db = initializeAdmin();
 
   const usersRef = db.collection('users');
   const q = usersRef.where('email', '==', email);
