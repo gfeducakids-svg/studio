@@ -4,8 +4,6 @@ import crypto from 'crypto';
 import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 
-export const runtime = 'edge';
-
 // Mapeia o ID do produto da Kiwify para o ID do módulo no nosso sistema.
 const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
   'aece0e10-590a-11f0-a691-c7c31a23c521': 'grafismo-fonetico',
