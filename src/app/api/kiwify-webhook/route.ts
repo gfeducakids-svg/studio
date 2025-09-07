@@ -12,20 +12,16 @@ const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
   'cde90d10-5dbd-11f0-8dec-3b93c26e3853': 'checklist-alfabetizacao',
 };
 
-// --- Firebase Admin Initialization ---
-// A inicialização agora ocorre de forma "lazy" dentro da própria função.
-
 function initializeAdmin() {
-    // Evita reinicializações se já houver uma instância
     if (admin.apps.length > 0) {
         return;
     }
 
-    // A chave privada precisa de um tratamento especial para substituir `\\n` por `\n`
     const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
     if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
-        throw new Error("Firebase Admin environment variables are not set.");
+        console.error("Firebase Admin environment variables are not set.");
+        throw new Error("Server configuration error: Missing Firebase Admin credentials.");
     }
     
     admin.initializeApp({
@@ -36,7 +32,6 @@ function initializeAdmin() {
         }),
     });
 }
-
 
 async function verifySignature(request: NextRequest, secret: string) {
     const signature = request.headers.get('X-Signature');
@@ -81,7 +76,6 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ success: true, message: `Product '${payload.Product?.product_name}' not mapped for ${customerEmail}.` });
             }
             
-            // --- Unlock Logic moved here ---
             initializeAdmin();
             const db = getFirestore();
             const usersRef = db.collection('users');
@@ -97,21 +91,20 @@ export async function POST(request: NextRequest) {
                 const userDocRef = db.collection('users').doc(userDoc.id);
                 const userData = userDoc.data();
                 
-                const updates: { [key: string]: string } = {};
+                const updates: { [key: string]: any } = {};
                 updates[`progress.${moduleId}.status`] = 'active';
 
                 if (moduleId === 'grafismo-fonetico' && userData.progress?.[moduleId]?.submodules) {
                     const submodules = userData.progress[moduleId].submodules;
                     const firstSubmoduleId = Object.keys(submodules).find(key => key === 'intro') || Object.keys(submodules)[0];
                     if (firstSubmoduleId && submodules[firstSubmoduleId]?.status === 'locked') {
-                       updates[`progress.${moduleId}.submodules.${firstSubmoduleId}.status`] = 'active';
+                       updates[`progress.grafismo-fonetico.submodules.${firstSubmoduleId}.status`] = 'active';
                     }
                 }
                 
                 await userDocRef.update(updates);
                 console.log(`Module '${moduleId}' unlocked successfully for user ${userDoc.id} (${customerEmail}).`);
             }
-            // --- End of Unlock Logic ---
 
             return NextResponse.json({ success: true, message: `Module ${moduleId} unlocked for ${customerEmail}.` });
         }
