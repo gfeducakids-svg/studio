@@ -109,6 +109,13 @@ const AchievementSkeleton = () => (
     </div>
 );
 
+// Definição externa para ser usada na lógica de conquistas
+const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
+  'aece0e10-590a-11f0-a691-c7c31a23c521': 'grafismo-fonetico',
+  'ef805df0-83b2-11f0-b76f-c30ef01f8da7': 'desafio-21-dias',
+  'ecb5d950-5dc0-11f0-a549-539ae1cd3c85': 'historias-curtas',
+  'cde90d10-5dbd-11f0-8dec-3b93c26e3853': 'checklist-alfabetizacao',
+};
 
 export default function AchievementsPage() {
   const { userData, loading } = useUserData();
@@ -118,8 +125,10 @@ export default function AchievementsPage() {
 
     // Lógica para a conquista 'mestre-total'
     if (progressKey === 'mestre-total') {
-      if (!userData.progress) return false;
       const modulesToCheck = Object.keys(KIWIFY_PRODUCT_TO_MODULE_ID);
+      // Garante que a propriedade progress exista antes de tentar acessá-la
+      if (!userData.progress) return false;
+      
       return modulesToCheck.every(
         (moduleId) => userData.progress?.[moduleId]?.status === 'completed'
       );
@@ -178,11 +187,3 @@ export default function AchievementsPage() {
     </div>
   );
 }
-
-// Definição externa para ser usada na lógica de conquistas
-const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
-  'aece0e10-590a-11f0-a691-c7c31a23c521': 'grafismo-fonetico',
-  'ef805df0-83b2-11f0-b76f-c30ef01f8da7': 'desafio-21-dias',
-  'ecb5d950-5dc0-11f0-a549-539ae1cd3c85': 'historias-curtas',
-  'cde90d10-5dbd-11f0-8dec-3b93c26e3853': 'checklist-alfabetizacao',
-};

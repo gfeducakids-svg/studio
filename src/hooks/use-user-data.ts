@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
 interface SubmoduleProgress {
@@ -24,7 +24,6 @@ interface UserProgress {
 interface UserData {
     name: string;
     email: string;
-    modules: string[];
     progress?: UserProgress;
 }
 
@@ -55,16 +54,15 @@ async function initializeUserProgress(user: User) {
         const updates: { [key: string]: any } = {};
         let needsUpdate = false;
 
-        const allModules = Object.keys(initialProgress);
-        
-        allModules.forEach(moduleId => {
+        // Garante que todos os módulos principais existam no progresso.
+        Object.keys(initialProgress).forEach(moduleId => {
             if (!userData.progress?.[moduleId]) {
                 updates[`progress.${moduleId}`] = initialProgress[moduleId as keyof typeof initialProgress];
                 needsUpdate = true;
             }
         });
 
-        // Garantir que todos os submódulos do grafismo fonético existam
+        // Garante que todos os submódulos do grafismo fonético existam
         const grafismoSubmodules = initialProgress['grafismo-fonetico'].submodules;
         Object.keys(grafismoSubmodules).forEach(submoduleId => {
              if (!userData.progress?.['grafismo-fonetico']?.submodules?.[submoduleId]) {
@@ -74,7 +72,7 @@ async function initializeUserProgress(user: User) {
         });
 
         if (needsUpdate) {
-            await setDoc(userDocRef, updates, { merge: true });
+            await updateDoc(userDocRef, updates);
         }
     }
 }
@@ -85,29 +83,15 @@ export function useUserData() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
             if (user) {
                 const userDocRef = doc(db, 'users', user.uid);
-
-                const unsubSnapshot = onSnapshot(userDocRef, async (doc) => {
+                
+                const unsubscribeSnapshot = onSnapshot(userDocRef, async (doc) => {
                     if (doc.exists()) {
-                        let currentData = doc.data() as UserData;
-                        
-                        // Checa se o progresso precisa ser inicializado/migrado
-                        const allModules = Object.keys(initialProgress);
-                        const needsMigration = allModules.some(moduleId => !currentData.progress?.[moduleId]);
-
-                        if(needsMigration) {
-                            await initializeUserProgress(user);
-                            // Após a migração, o onSnapshot será acionado novamente com os dados atualizados,
-                            // então podemos apenas aguardar a próxima chamada.
-                        } else {
-                           setUserData(currentData);
-                        }
-                    } else {
-                        // Caso o documento não exista, mas o usuário esteja autenticado
-                        // (cenário raro, mas possível), podemos definir como nulo.
-                        setUserData(null);
+                        // Garante que o progresso do usuário seja inicializado ou atualizado se necessário
+                        await initializeUserProgress(user);
+                        setUserData(doc.data() as UserData);
                     }
                     setLoading(false);
                 }, (error) => {
@@ -115,18 +99,15 @@ export function useUserData() {
                     setUserData(null);
                     setLoading(false);
                 });
-                
-                // Retorna a função de limpeza do snapshot
-                return () => unsubSnapshot();
 
+                return () => unsubscribeSnapshot();
             } else {
                 setUserData(null);
                 setLoading(false);
             }
         });
 
-        // Retorna a função de limpeza do listener de autenticação
-        return () => unsubscribe();
+        return () => unsubscribeAuth();
     }, []);
 
     return { userData, loading };
