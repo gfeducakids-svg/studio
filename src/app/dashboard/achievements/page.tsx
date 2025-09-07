@@ -98,7 +98,7 @@ const staticAchievements = [
     rarity: 'legendary',
     progressKey: 'mestre-total', // Um placeholder, a lógica pode ser mais complexa
   },
-];
+] as const;
 
 const AchievementSkeleton = () => (
     <div className="flex flex-col text-center items-center gap-2 p-4 rounded-lg bg-card border border-border">
@@ -118,7 +118,9 @@ export default function AchievementsPage() {
 
     // Caso especial para o mestre total
     if(progressKey === 'mestre-total') {
-        return Object.values(userData.progress).every((m: any) => m.status === 'completed');
+        const progressValues = userData.progress ? Object.values(userData.progress) : [];
+        if(progressValues.length === 0) return false;
+        return progressValues.every((m: any) => m.status === 'completed');
     }
 
     const keys = progressKey.split('.');
