@@ -1,7 +1,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { unlockModuleForUserByEmail } from '@/services/user-service';
+import admin from 'firebase-admin';
+import { getFirestore } from 'firebase-admin/firestore';
+
+export const runtime = 'edge';
 
 // Mapeia o ID do produto da Kiwify para o ID do módulo no nosso sistema.
 const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
@@ -10,6 +13,32 @@ const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
   'ecb5d950-5dc0-11f0-a549-539ae1cd3c85': 'historias-curtas',
   'cde90d10-5dbd-11f0-8dec-3b93c26e3853': 'checklist-alfabetizacao',
 };
+
+// --- Firebase Admin Initialization ---
+// A inicialização agora ocorre de forma "lazy" dentro da própria função.
+
+function initializeAdmin() {
+    // Evita reinicializações se já houver uma instância
+    if (admin.apps.length > 0) {
+        return;
+    }
+
+    // A chave privada precisa de um tratamento especial para substituir `\\n` por `\n`
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+    if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
+        throw new Error("Firebase Admin environment variables are not set.");
+    }
+    
+    admin.initializeApp({
+        credential: admin.credential.cert({
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            privateKey: privateKey,
+        }),
+    });
+}
+
 
 async function verifySignature(request: NextRequest, secret: string) {
     const signature = request.headers.get('X-Signature');
@@ -53,10 +82,39 @@ export async function POST(request: NextRequest) {
                 console.warn(`Webhook received for an unmapped product ID: ${productId}`);
                 return NextResponse.json({ success: true, message: `Product '${payload.Product?.product_name}' not mapped for ${customerEmail}.` });
             }
-
-            console.log(`Unlocking module '${moduleId}' for user '${customerEmail}'...`);
-            await unlockModuleForUserByEmail(customerEmail, moduleId);
             
+            // --- Unlock Logic moved here ---
+            initializeAdmin();
+            const db = getFirestore();
+            const usersRef = db.collection('users');
+            const q = usersRef.where('email', '==', customerEmail);
+            const querySnapshot = await q.get();
+
+            if (querySnapshot.empty) {
+                console.warn(`User with email ${customerEmail} not found. Purchase cannot be assigned.`);
+                return NextResponse.json({ success: true, message: `User with email ${customerEmail} not found.` });
+            }
+
+            for (const userDoc of querySnapshot.docs) {
+                const userDocRef = db.collection('users').doc(userDoc.id);
+                const userData = userDoc.data();
+                
+                const updates: { [key: string]: string } = {};
+                updates[`progress.${moduleId}.status`] = 'active';
+
+                if (moduleId === 'grafismo-fonetico' && userData.progress?.[moduleId]?.submodules) {
+                    const submodules = userData.progress[moduleId].submodules;
+                    const firstSubmoduleId = Object.keys(submodules).find(key => key === 'intro') || Object.keys(submodules)[0];
+                    if (firstSubmoduleId && submodules[firstSubmoduleId]?.status === 'locked') {
+                       updates[`progress.${moduleId}.submodules.${firstSubmoduleId}.status`] = 'active';
+                    }
+                }
+                
+                await userDocRef.update(updates);
+                console.log(`Module '${moduleId}' unlocked successfully for user ${userDoc.id} (${customerEmail}).`);
+            }
+            // --- End of Unlock Logic ---
+
             return NextResponse.json({ success: true, message: `Module ${moduleId} unlocked for ${customerEmail}.` });
         }
 
