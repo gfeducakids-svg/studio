@@ -1,7 +1,6 @@
 
 'use server'
 
-import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 
 /**
@@ -12,6 +11,9 @@ import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/fire
  * @param moduleId - O ID do módulo a ser desbloqueado.
  */
 export async function unlockModuleForUserByEmail(email: string, moduleId: string): Promise<void> {
+  // Importa o db dinamicamente para evitar problemas de build
+  const { db } = await import('@/lib/firebase');
+
   if (!email || !moduleId) {
     throw new Error('Email and module ID are required.');
   }
