@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { unlockModuleForUserByEmail } from '@/services/user-service';
 
 // Mapeia o ID do produto da Kiwify para o ID do módulo no nosso sistema.
 const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
@@ -37,11 +38,7 @@ export async function POST(request: NextRequest) {
 
     try {
         const payload = await verifySignature(request, secret);
-        // Importa o serviço dinamicamente apenas quando a função é executada
-        const { unlockModuleForUserByEmail } = await import('@/services/user-service');
-
-
-        // A lógica agora usa a estrutura de payload correta
+        
         if (payload.order_status === 'paid') {
             const customerEmail = payload.Customer?.email;
             const productId = payload.Product?.product_id;

@@ -1,7 +1,34 @@
 
 'use server'
 
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import admin from 'firebase-admin';
+import { getApps, getApp, initializeApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+
+// Inicializa o Firebase Admin SDK. Ele verifica se já existe uma instância
+// para evitar inicializações múltiplas que causariam erros.
+if (!getApps().length) {
+    // A chave privada precisa de um tratamento especial para substituir `\\n` por `\n`
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+    if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
+        console.error("Firebase Admin environment variables are not set.");
+    } else {
+        try {
+             initializeApp({
+                credential: admin.credential.cert({
+                    projectId: process.env.FIREBASE_PROJECT_ID,
+                    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+                    privateKey: privateKey,
+                }),
+            });
+        } catch (error) {
+            console.error("Firebase Admin initialization error:", error);
+        }
+    }
+}
+
+const db = getFirestore();
 
 /**
  * Encontra um usuário pelo e-mail e desbloqueia um módulo específico para ele.
@@ -11,17 +38,14 @@ import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/fire
  * @param moduleId - O ID do módulo a ser desbloqueado.
  */
 export async function unlockModuleForUserByEmail(email: string, moduleId: string): Promise<void> {
-  // Importa o db dinamicamente para evitar problemas de build
-  const { db } = await import('@/lib/firebase');
-
   if (!email || !moduleId) {
     throw new Error('Email and module ID are required.');
   }
 
-  const usersRef = collection(db, 'users');
-  const q = query(usersRef, where('email', '==', email));
+  const usersRef = db.collection('users');
+  const q = usersRef.where('email', '==', email);
 
-  const querySnapshot = await getDocs(q);
+  const querySnapshot = await q.get();
 
   if (querySnapshot.empty) {
     console.warn(`User with email ${email} not found. Purchase cannot be assigned.`);
@@ -32,7 +56,7 @@ export async function unlockModuleForUserByEmail(email: string, moduleId: string
 
   // Normalmente haverá apenas um, mas o snapshot retorna uma lista.
   for (const userDoc of querySnapshot.docs) {
-    const userDocRef = doc(db, 'users', userDoc.id);
+    const userDocRef = db.collection('users').doc(userDoc.id);
     const userData = userDoc.data();
     
     const updates: { [key: string]: string } = {};
@@ -52,7 +76,7 @@ export async function unlockModuleForUserByEmail(email: string, moduleId: string
     }
 
     try {
-      await updateDoc(userDocRef, updates);
+      await userDocRef.update(updates);
       console.log(`Module '${moduleId}' unlocked successfully for user ${userDoc.id} (${email}).`);
     } catch (error) {
       console.error(`Failed to unlock module for user ${email}:`, error);
