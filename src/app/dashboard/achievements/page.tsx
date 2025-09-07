@@ -116,6 +116,11 @@ export default function AchievementsPage() {
   const getProgressStatus = (progressKey: string) => {
     if (!userData?.progress || !progressKey) return false;
 
+    // Caso especial para o mestre total
+    if(progressKey === 'mestre-total') {
+        return Object.values(userData.progress).every((m: any) => m.status === 'completed');
+    }
+
     const keys = progressKey.split('.');
     let currentProgress: any = userData.progress;
 
@@ -131,11 +136,6 @@ export default function AchievementsPage() {
     // Se for um submódulo, também verificamos.
     if (typeof currentProgress === 'object' && currentProgress !== null && 'status' in currentProgress) {
         return currentProgress.status === 'completed';
-    }
-
-    // Caso especial para o mestre total
-    if(progressKey === 'mestre-total') {
-        return Object.values(userData.progress).every((m: any) => m.status === 'completed');
     }
 
     return false;
