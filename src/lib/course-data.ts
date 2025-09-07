@@ -11,7 +11,7 @@ interface Material {
 interface Submodule {
     id: string;
     title: string;
-    pdfUrl: string; // Changed back to pdfUrl
+    pdfUrl: string;
     materials: Material[];
 }
 
@@ -26,13 +26,13 @@ const grafismoFoneticoData: Course = {
     id: 'grafismo-fonetico',
     title: 'Método de Grafismo Fonético',
     submodules: [
+        { id: 'pre-alf', title: 'MÓDULO 01 PRÉ-ALFABETIZAÇÃO CONSTRUINDO AS BASES', pdfUrl: 'https://drive.google.com/file/d/1Uxs4yPT9NuDHMRkAMfL85ZnCHZU-NbNQ/preview', materials: [{ id: 1, type: 'video', title: 'Aula 1'}, {id: 2, type: 'pdf', title: 'Exercício de Traços'}] },
+        { id: 'alfabeto', title: 'MÓDULO 02 APRESENTANDO O ALFABETO FORMA E SOM', pdfUrl: 'https://drive.google.com/file/d/1k-s5EoRwlWloBICD7uWV-PbMsJNA27GB/preview', materials: [{ id: 1, type: 'video', title: 'As Vogais'}, {id: 2, type: 'pdf', title: 'Cartilha do Alfabeto'}, {id: 3, type: 'download', title: 'Áudios das Letras'}] },
+        { id: 'silabas', title: 'MÓDULO 03 SÍLABAS SIMPLES COMBINANDO SONS', pdfUrl: 'https://drive.google.com/file/d/1jYvC01jsIArCRVa8Tc78JA7V8wbslkbT/preview', materials: [{ id: 1, type: 'video', title: 'BA-BE-BI-BO-BU'}, {id: 2, type: 'pdf', title: 'Tabela de Sílabas'}] },
+        { id: 'fonico', title: 'MÓDULO 04 MÉTODO FÔNICO PRONÚNCIA CORRETA', pdfUrl: 'https://drive.google.com/file/d/1fUa0seaOrUeyRu-uHk4hTCMDXiMcl5kq/preview', materials: [] },
+        { id: 'palavras', title: 'MÓDULO 05 FORMAÇÃO DE PALAVRAS E FRASES', pdfUrl: 'https://drive.google.com/file/d/1-SnD4rkpr-6RMj_l-S-m1x1GAIhjAyCb/preview', materials: [] },
+        { id: 'escrita', title: 'MÓDULO 06 ESCRITA E COMPREENSÃO LEITORA', pdfUrl: 'https://drive.google.com/file/d/1kS3Lp7g2_N5y9ZJg2Kj8X3fVwE5R9Q3p/preview', materials: [] },
         { id: 'intro', title: 'Introdução', pdfUrl: 'https://drive.google.com/file/d/10id_hmbKbH0yqi623ylopyjR2cOeWI1D/preview', materials: [{ id: 1, type: 'video', title: 'Boas-vindas'}] },
-        { id: 'pre-alf', title: 'Pré-Alfabetização', pdfUrl: 'https://drive.google.com/file/d/1Uxs4yPT9NuDHMRkAMfL85ZnCHZU-NbNQ/preview', materials: [{ id: 1, type: 'video', title: 'Aula 1'}, {id: 2, type: 'pdf', title: 'Exercício de Traços'}] },
-        { id: 'alfabeto', title: 'Apresentando o Alfabeto', pdfUrl: 'https://drive.google.com/file/d/1k-s5EoRwlWloBICD7uWV-PbMsJNA27GB/preview', materials: [{ id: 1, type: 'video', title: 'As Vogais'}, {id: 2, type: 'pdf', title: 'Cartilha do Alfabeto'}, {id: 3, type: 'download', title: 'Áudios das Letras'}] },
-        { id: 'silabas', title: 'Sílabas Simples', pdfUrl: 'https://drive.google.com/file/d/1jYvC01jsIArCRVa8Tc78JA7V8wbslkbT/preview', materials: [{ id: 1, type: 'video', title: 'BA-BE-BI-BO-BU'}, {id: 2, type: 'pdf', title: 'Tabela de Sílabas'}] },
-        { id: 'fonico', title: 'Método Fônico', pdfUrl: 'https://drive.google.com/file/d/1fUa0seaOrUeyRu-uHk4hTCMDXiMcl5kq/preview', materials: [] },
-        { id: 'palavras', title: 'Formação de Palavras e Frases', pdfUrl: 'https://drive.google.com/file/d/1-SnD4rkpr-6RMj_l-S-m1x1GAIhjAyCb/preview', materials: [] },
-        { id: 'escrita', title: 'Escrita e Compreensão Leitora', pdfUrl: 'https://drive.google.com/file/d/1kS3Lp7g2_N5y9ZJg2Kj8X3fVwE5R9Q3p/preview', materials: [] },
         { id: 'bonus', title: 'Bônus', pdfUrl: 'https://drive.google.com/file/d/1NbCn_smFEi98h-gYKtBwNftmoIXVebJ5/preview', materials: [] },
     ],
 };
