@@ -52,7 +52,7 @@ async function initializeUserProgress(user: User) {
     
     if (userDoc.exists()) {
         const userData = userDoc.data() as UserData;
-        let updates: { [key: string]: any } = {};
+        const updates: { [key: string]: any } = {};
         let needsUpdate = false;
 
         const allModules = Object.keys(initialProgress);
@@ -85,33 +85,48 @@ export function useUserData() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Roda a verificação e possível inicialização de progresso
-                initializeUserProgress(user).then(() => {
-                    const userDocRef = doc(db, 'users', user.uid);
-                    const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
-                        if (doc.exists()) {
-                            setUserData(doc.data() as UserData);
-                        } else {
-                            setUserData(null);
-                        }
-                        setLoading(false);
-                    }, (error) => {
-                        console.error("Erro ao buscar dados do usuário:", error);
-                        setUserData(null);
-                        setLoading(false);
-                    });
+                const userDocRef = doc(db, 'users', user.uid);
 
-                    return () => unsubscribeSnapshot();
+                const unsubSnapshot = onSnapshot(userDocRef, async (doc) => {
+                    if (doc.exists()) {
+                        let currentData = doc.data() as UserData;
+                        
+                        // Checa se o progresso precisa ser inicializado/migrado
+                        const allModules = Object.keys(initialProgress);
+                        const needsMigration = allModules.some(moduleId => !currentData.progress?.[moduleId]);
+
+                        if(needsMigration) {
+                            await initializeUserProgress(user);
+                            // Após a migração, o onSnapshot será acionado novamente com os dados atualizados,
+                            // então podemos apenas aguardar a próxima chamada.
+                        } else {
+                           setUserData(currentData);
+                        }
+                    } else {
+                        // Caso o documento não exista, mas o usuário esteja autenticado
+                        // (cenário raro, mas possível), podemos definir como nulo.
+                        setUserData(null);
+                    }
+                    setLoading(false);
+                }, (error) => {
+                    console.error("Erro ao buscar dados do usuário:", error);
+                    setUserData(null);
+                    setLoading(false);
                 });
+                
+                // Retorna a função de limpeza do snapshot
+                return () => unsubSnapshot();
+
             } else {
                 setUserData(null);
                 setLoading(false);
             }
         });
 
-        return () => unsubscribeAuth();
+        // Retorna a função de limpeza do listener de autenticação
+        return () => unsubscribe();
     }, []);
 
     return { userData, loading };
