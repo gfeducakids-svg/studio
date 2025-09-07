@@ -2,12 +2,12 @@
 'use server'
 
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, doc, updateDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 
 /**
  * Encontra um usuário pelo e-mail e desbloqueia um módulo específico para ele.
  * O status do módulo principal é definido como 'active'.
- * O primeiro submódulo (se houver) também é definido como 'active'.
+ * O primeiro submódulo do 'grafismo-fonetico' (se houver) também é definido como 'active'.
  * @param email - O e-mail do usuário.
  * @param moduleId - O ID do módulo a ser desbloqueado.
  */
@@ -22,7 +22,7 @@ export async function unlockModuleForUserByEmail(email: string, moduleId: string
   const querySnapshot = await getDocs(q);
 
   if (querySnapshot.empty) {
-    console.warn(`User with email ${email} not found.`);
+    console.warn(`User with email ${email} not found. Purchase cannot be assigned.`);
     // Não lançamos um erro para não fazer a Kiwify reenviar o webhook.
     // Simplesmente registramos que o usuário não foi encontrado.
     return;
@@ -38,11 +38,15 @@ export async function unlockModuleForUserByEmail(email: string, moduleId: string
 
     // Se for o módulo de grafismo e houver submódulos, ativa o primeiro.
     if (moduleId === 'grafismo-fonetico' && userData.progress?.[moduleId]?.submodules) {
-      const submodules = userData.progress[moduleId].submodules;
-      const firstSubmoduleId = Object.keys(submodules)[0];
-      if (firstSubmoduleId) {
-          updates[`progress.${moduleId}.submodules.${firstSubmoduleId}.status`] = 'active';
-      }
+        const submodules = userData.progress[moduleId].submodules;
+        // Encontra o primeiro submódulo (geralmente 'intro')
+        const firstSubmoduleId = Object.keys(submodules).find(key => key === 'intro') || Object.keys(submodules)[0];
+        if (firstSubmoduleId) {
+            // Apenas ativa o primeiro submódulo se ele estiver 'locked'
+            if (submodules[firstSubmoduleId]?.status === 'locked') {
+               updates[`progress.${moduleId}.submodules.${firstSubmoduleId}.status`] = 'active';
+            }
+        }
     }
 
     try {
