@@ -98,7 +98,7 @@ const staticAchievements = [
     rarity: 'legendary',
     progressKey: 'mestre-total', // Um placeholder, a lógica pode ser mais complexa
   },
-] as const;
+] as const; // Adicionar 'as const' para garantir a tipagem correta de 'rarity'
 
 const AchievementSkeleton = () => (
     <div className="flex flex-col text-center items-center gap-2 p-4 rounded-lg bg-card border border-border">
@@ -113,16 +113,19 @@ const AchievementSkeleton = () => (
 export default function AchievementsPage() {
   const { userData, loading } = useUserData();
 
-  const getProgressStatus = (progressKey: string) => {
+  const getProgressStatus = (progressKey: string): boolean => {
     if (!userData?.progress || !progressKey) return false;
 
-    // Caso especial para o mestre total
-    if(progressKey === 'mestre-total') {
-        const progressValues = userData.progress ? Object.values(userData.progress) : [];
-        if(progressValues.length === 0) return false;
-        return progressValues.every((m: any) => m.status === 'completed');
+    // Lógica para a conquista 'mestre-total'
+    if (progressKey === 'mestre-total') {
+      if (!userData.progress) return false;
+      const modulesToCheck = Object.keys(KIWIFY_PRODUCT_TO_MODULE_ID);
+      return modulesToCheck.every(
+        (moduleId) => userData.progress?.[moduleId]?.status === 'completed'
+      );
     }
-
+    
+    // Lógica para conquistas normais e de submódulos
     const keys = progressKey.split('.');
     let currentProgress: any = userData.progress;
 
@@ -134,8 +137,7 @@ export default function AchievementsPage() {
       }
     }
     
-    // Se a chave final for um módulo, verificamos o status dele.
-    // Se for um submódulo, também verificamos.
+    // Verifica se o objeto final (módulo ou submódulo) tem o status 'completed'
     if (typeof currentProgress === 'object' && currentProgress !== null && 'status' in currentProgress) {
         return currentProgress.status === 'completed';
     }
@@ -176,3 +178,11 @@ export default function AchievementsPage() {
     </div>
   );
 }
+
+// Definição externa para ser usada na lógica de conquistas
+const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
+  'aece0e10-590a-11f0-a691-c7c31a23c521': 'grafismo-fonetico',
+  'ef805df0-83b2-11f0-b76f-c30ef01f8da7': 'desafio-21-dias',
+  'ecb5d950-5dc0-11f0-a549-539ae1cd3c85': 'historias-curtas',
+  'cde90d10-5dbd-11f0-8dec-3b93c26e3853': 'checklist-alfabetizacao',
+};
