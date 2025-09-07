@@ -37,6 +37,12 @@ export default function ModulePage() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Type guard to ensure moduleId is a string
+  if (!moduleId || typeof moduleId !== 'string') {
+    // Or redirect to a 404 page
+    return null; 
+  }
+
   // Redirect to the specific page if it exists
   if (moduleId === 'grafismo-fonetico') {
     redirect('/dashboard/modules/grafismo-fonetico');
