@@ -24,22 +24,20 @@ interface Course {
     submodules: Submodule[];
 }
 
-// Define os submódulos com o status inicial correto.
-// Tudo começa bloqueado até a compra.
-const initialGrafismoFoneticoSubmodules: Record<string, SubmoduleProgress> = {
-  intro: { status: 'locked' },
-  'pre-alf': { status: 'locked' },
-  alfabeto: { status: 'locked' },
-  silabas: { status: 'locked' },
-  fonico: { status: 'locked' },
-  palavras: { status: 'locked' },
-  escrita: { status: 'locked' },
-  bonus: { status: 'locked' },
-};
-
-
 export const getInitialProgress = (): UserProgress => ({
-    'grafismo-fonetico': { status: 'locked', submodules: { 'intro': { status: 'locked' } } },
+    'grafismo-fonetico': { 
+        status: 'locked', 
+        submodules: { 
+            'intro': { status: 'locked' },
+            'pre-alf': { status: 'locked' },
+            'alfabeto': { status: 'locked' },
+            'silabas': { status: 'locked' },
+            'fonico': { status: 'locked' },
+            'palavras': { status: 'locked' },
+            'escrita': { status: 'locked' },
+            'bonus': { status: 'locked' },
+        } 
+    },
     'desafio-21-dias': { status: 'locked', submodules: {} },
     'checklist-alfabetizacao': { status: 'locked', submodules: {} },
     'historias-curtas': { status: 'locked', submodules: {} },
@@ -74,7 +72,3 @@ export const getCourseStructure = async (courseId: string): Promise<Course> => {
     // Fallback for other courses or if not found
     throw new Error(`Course with id ${courseId} not found.`);
 };
-
-
-
-
