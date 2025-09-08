@@ -1,125 +1,122 @@
+// NOTA: Este arquivo pertence às Cloud Functions e não deve ser incluído no processo de build do Next.js.
+// Certifique-se de que o diretório 'functions' está no 'exclude' do tsconfig.json principal.
 
-import {initializeApp} from "firebase-admin/app";
-import {getFirestore, FieldPath} from "firebase-admin/firestore";
-import {getAuth} from "firebase-admin/auth";
-import {https, HttpsError} from "firebase-functions/v2";
+import * as functions from "firebase-functions";
+import { initializeApp } from "firebase-admin/app";
+import { getFirestore, FieldPath } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
 
-// Inicializa o app Firebase Admin
+// Inicializa o Firebase Admin SDK.
 initializeApp();
 const db = getFirestore();
 const auth = getAuth();
 
 /**
- * Normaliza um endereço de e-mail para consulta, especialmente para o Gmail.
- * - Converte para minúsculas.
- * - Remove pontos (.) do nome do usuário.
- * - Remove a parte do alias (+...) do nome do usuário.
+ * Normaliza um endereço de e-mail para consulta, especialmente para Gmail.
+ * Converte para minúsculas, remove alias (+...) e pontos (.) do nome de usuário.
  * @param {string} email O e-mail a ser normalizado.
  * @return {string} O e-mail normalizado.
  */
-function normalizeGmail(email: string): string {
-  const lowerCaseEmail = email.toLowerCase().trim();
-  const emailParts = lowerCaseEmail.split("@");
+function normalizeEmail(email: string): string {
+  let e = (email || "").trim().toLowerCase();
+  const [local, domain] = e.split("@");
+  if (!local || !domain) return e;
 
-  if (emailParts.length !== 2 || emailParts[1] !== "gmail.com") {
-    return lowerCaseEmail;
+  if (domain === "gmail.com" || domain === "googlemail.com") {
+    const noPlus = local.split("+")[0];
+    const noDots = noPlus.replace(/\./g, "");
+    e = `${noDots}@gmail.com`;
+  } else {
+    e = `${local}@${domain}`;
   }
-
-  const username = emailParts[0].split("+")[0].replace(/\./g, "");
-  return `${username}@gmail.com`;
+  return e;
 }
 
 
-export const applyPendingPurchases = https.onCall(
-  {region: "us-central1"},
-  async (request) => {
-    if (!request.auth) {
-      throw new HttpsError(
-        "unauthenticated",
-        "O usuário precisa estar autenticado para chamar esta função.",
+exports.applyPendingPurchases = functions.https.onCall(async (data, context) => {
+  // 1. Validação de Autenticação
+  if (!context.auth?.uid) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "A função precisa ser chamada por um usuário autenticado."
+    );
+  }
+  const uid = context.auth.uid;
+  functions.logger.info(`Iniciando applyPendingPurchases para UID: ${uid}`);
+
+  try {
+    // 2. Obter e-mail real do usuário e normalizá-lo
+    const userRecord = await auth.getUser(uid);
+    const email = userRecord.email;
+    if (!email) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "O usuário autenticado não possui um endereço de e-mail."
       );
     }
+    const emailNorm = normalizeEmail(email);
+    functions.logger.info(`UID: ${uid}, Email normalizado: ${emailNorm}`);
 
-    const uid = request.auth.uid;
-    let userEmail: string;
+    // 3. Referências aos documentos do Firestore
+    const pendingRef = db.collection("pending_purchases").doc(emailNorm);
+    const userRef = db.collection("users").doc(uid);
 
-    try {
-      const userRecord = await auth.getUser(uid);
-      if (!userRecord.email) {
-        throw new HttpsError(
-          "failed-precondition",
-          "O usuário autenticado não possui um e-mail.",
-        );
-      }
-      userEmail = userRecord.email;
-    } catch (error) {
-      console.error(`Erro ao buscar o usuário ${uid}:`, error);
-      throw new HttpsError("internal", "Não foi possível buscar os dados do usuário.");
-    }
-
-    const normalizedEmail = normalizeGmail(userEmail);
-    const pendingDocRef = db.collection("pending_purchases").doc(normalizedEmail);
-    const userDocRef = db.collection("users").doc(uid);
-
-    try {
-      const pendingDoc = await pendingDocRef.get();
+    // 4. Executar a lógica de forma transacional e idempotente
+    await db.runTransaction(async (tx) => {
+      const pendingDoc = await tx.get(pendingRef);
 
       if (!pendingDoc.exists) {
-        return {ok: true, applied: false};
+        functions.logger.info(`Nenhuma compra pendente encontrada para ${emailNorm}.`);
+        // Não é necessário retornar explicitamente aqui, a transação apenas será concluída.
+        return;
       }
 
-      const pendingData = pendingDoc.data();
-      const modulesToUnlock: string[] = pendingData?.modules || [];
+      functions.logger.info(`Compra pendente encontrada para ${emailNorm}.`, pendingDoc.data());
+      
+      const pendingData = pendingDoc.data() || {};
+      // Sanear os módulos para garantir que é um array de strings
+      const modules: string[] = (pendingData.modules || []).map(String).filter(Boolean);
 
-      if (modulesToUnlock.length === 0) {
-        // Limpa o documento pendente se estiver vazio
-        await pendingDocRef.delete();
-        return {ok: true, applied: false, reason: "No modules to unlock"};
+      if (modules.length === 0) {
+        functions.logger.warn(`Documento pendente para ${emailNorm} existe, mas não contém módulos válidos. Removendo...`);
+        tx.delete(pendingRef);
+        return;
+      }
+      
+      const userDoc = await tx.get(userRef);
+      if (!userDoc.exists) {
+        // Se o documento do usuário não existe, cria um com a estrutura básica.
+        // A lógica de progresso inicial detalhada fica no lado do cliente no registro.
+        functions.logger.info(`Documento para UID ${uid} não existe. Criando um novo.`);
+        tx.set(userRef, { email, progress: {} }, { merge: true });
       }
 
-      await db.runTransaction(async (transaction) => {
-        // Lê o documento do usuário dentro da transação para consistência
-        const userDoc = await transaction.get(userDocRef);
+      // Aplica o desbloqueio para cada módulo pendente
+      modules.forEach(moduleId => {
+        functions.logger.info(`Desbloqueando módulo '${moduleId}' para UID: ${uid}`);
+        // Usa FieldPath para segurança e para lidar com nomes de campos que contêm caracteres especiais.
+        const field = new FieldPath("progress", moduleId, "status");
+        tx.update(userRef, field, "unlocked");
 
-        if (!userDoc.exists) {
-          // Se o documento do usuário não existe, a transação falhará.
-          // O cliente deve garantir a criação do doc antes de chamar a função.
-          throw new Error(`Documento do usuário ${uid} não encontrado.`);
+        // Regra especial para o primeiro submódulo do grafismo
+        if (moduleId === 'grafismo-fonetico') {
+            const introField = new FieldPath("progress", moduleId, "submodules", "intro", "status");
+            tx.update(userRef, introField, "unlocked");
         }
-
-        modulesToUnlock.forEach((moduleId) => {
-          // Usa FieldPath para segurança e clareza
-          const field = new FieldPath("progress", moduleId, "status");
-          transaction.update(userDocRef, field, "unlocked");
-
-          // Regra especial para o primeiro submódulo do grafismo
-          if (moduleId === "grafismo-fonetico") {
-            const introField = new FieldPath(
-              "progress",
-              moduleId,
-              "submodules",
-              "intro",
-              "status",
-            );
-            transaction.update(userDocRef, introField, "unlocked");
-          }
-        });
-
-        // Apaga o documento de compras pendentes na mesma transação
-        transaction.delete(pendingDocRef);
       });
 
-      return {ok: true, applied: true, modules: modulesToUnlock};
-    } catch (error) {
-      console.error(
-        `Falha na transação para o usuário ${uid} (email: ${userEmail}):`,
-        error,
-      );
-      throw new HttpsError(
-        "internal",
-        "Erro ao aplicar compras pendentes. Por favor, tente novamente.",
-        error,
-      );
-    }
-  },
-);
+      // Remove o documento de compras pendentes para que não seja processado novamente
+      functions.logger.info(`Removendo documento pendente para ${emailNorm}.`);
+      tx.delete(pendingRef);
+    });
+
+    return { ok: true, applied: true, modules };
+
+  } catch (err) {
+    functions.logger.error(`Erro em applyPendingPurchases para UID: ${uid}`, err);
+    throw new functions.https.HttpsError(
+      "internal",
+      "Ocorreu um erro ao tentar aplicar suas compras pendentes."
+    );
+  }
+});
