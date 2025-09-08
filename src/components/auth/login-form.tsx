@@ -62,7 +62,7 @@ async function applyPendingPurchases(userId: string, email: string, name: string
             });
 
             // Usa setDoc com merge: true. Isso irá:
-            // 1. CRIAR o documento do usuário se ele não existir (usando o progresso inicial).
+            // 1. CRIAR o documento do usuário se ele não existir.
             // 2. ATUALIZAR (mesclar) o documento com os novos status se ele já existir.
             // É a forma mais segura de garantir a aplicação das compras.
             await setDoc(userDocRef, updates, { merge: true });
