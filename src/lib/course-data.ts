@@ -39,7 +39,7 @@ const initialGrafismoFoneticoSubmodules: Record<string, SubmoduleProgress> = {
 
 
 export const getInitialProgress = (): UserProgress => ({
-    'grafismo-fonetico': { status: 'locked', submodules: initialGrafismoFoneticoSubmodules },
+    'grafismo-fonetico': { status: 'locked', submodules: { 'intro': { status: 'locked' } } },
     'desafio-21-dias': { status: 'locked', submodules: {} },
     'checklist-alfabetizacao': { status: 'locked', submodules: {} },
     'historias-curtas': { status: 'locked', submodules: {} },
@@ -74,5 +74,6 @@ export const getCourseStructure = async (courseId: string): Promise<Course> => {
     // Fallback for other courses or if not found
     throw new Error(`Course with id ${courseId} not found.`);
 };
+
 
 
