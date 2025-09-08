@@ -1,70 +1,62 @@
 
 import "server-only"
-import admin, { initializeApp, getApps, cert, type ServiceAccount } from "firebase-admin/app"
-import { getAuth } from "firebase-admin/auth"
-import { getFirestore } from "firebase-admin/firestore"
+import admin, { initializeApp, getApps, cert, type App } from "firebase-admin/app"
+import { getAuth, type Auth } from "firebase-admin/auth"
+import { getFirestore, type Firestore } from "firebase-admin/firestore"
 
-/**
- * Analisa a chave privada do Firebase, tratando quebras de linha escapadas.
- * @returns A chave privada formatada corretamente.
- */
-function getPrivateKey(): string {
-  const raw = process.env.FIREBASE_PRIVATE_KEY
-  if (!raw) {
-      // Se a chave completa estiver na nova variável, usamos essa.
-      if(process.env.FIREBASE_SERVICE_ACCOUNT) {
-          try {
-              const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-              return sa.private_key;
-          } catch(e) {
-               throw new Error("FIREBASE_SERVICE_ACCOUNT é um JSON inválido.")
-          }
-      }
-      throw new Error("Nenhuma variável de ambiente de chave privada do Firebase (FIREBASE_PRIVATE_KEY ou FIREBASE_SERVICE_ACCOUNT) foi definida.")
-  }
-  // Suporta a chave com quebras de linha escapadas (comum em Vercel)
-  return raw.replace(/\\n/g, "\n")
+interface FirebaseAdminSDK {
+    app: App;
+    auth: Auth;
+    db: Firestore;
 }
 
+// Padrão Singleton para garantir uma única inicialização
+let adminSDKInstance: FirebaseAdminSDK | null = null;
 
-/**
- * Obtém as credenciais da Service Account a partir de variáveis de ambiente individuais
- * ou da variável de ambiente `FIREBASE_SERVICE_ACCOUNT` que contém o JSON completo.
- * @returns O objeto da Service Account.
- */
-function getServiceAccount(): ServiceAccount {
-    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-        try {
-            return JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-        } catch (e) {
-            console.error("FIREBASE_SERVICE_ACCOUNT contém um JSON inválido.");
-            throw new Error("FIREBASE_SERVICE_ACCOUNT contém um JSON inválido.");
-        }
+function initializeAdminSDK(): FirebaseAdminSDK {
+    if (adminSDKInstance) {
+        return adminSDKInstance;
     }
-    // Fallback para variáveis individuais se a principal não estiver definida
-    return {
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: getPrivateKey(),
-    };
-}
 
-// Inicializa o app admin apenas uma vez (padrão singleton)
-function initializeAdminApp() {
-    if (!getApps().length) {
-        try {
-            const serviceAccount = getServiceAccount();
-            initializeApp({ credential: cert(serviceAccount) });
-            console.log("Firebase Admin SDK initialized successfully.");
-        } catch (e: any) {
-            console.error("Firebase Admin SDK initialization error", e);
-            throw new Error("Failed to initialize Firebase Admin SDK: " + e.message);
-        }
+    if (getApps().length > 0) {
+        const defaultApp = admin.app();
+        adminSDKInstance = {
+            app: defaultApp,
+            auth: getAuth(defaultApp),
+            db: getFirestore(defaultApp),
+        };
+        return adminSDKInstance;
     }
-    return admin.app();
+
+    try {
+        const serviceAccountRaw = process.env.FIREBASE_SERVICE_ACCOUNT;
+        if (!serviceAccountRaw) {
+            throw new Error("A variável de ambiente FIREBASE_SERVICE_ACCOUNT não está definida.");
+        }
+        
+        const serviceAccount = JSON.parse(serviceAccountRaw);
+        
+        const newApp = initializeApp({
+            credential: cert(serviceAccount),
+        });
+        
+        console.log("Firebase Admin SDK inicializado com sucesso.");
+        
+        adminSDKInstance = {
+            app: newApp,
+            auth: getAuth(newApp),
+            db: getFirestore(newApp),
+        };
+        return adminSDKInstance;
+
+    } catch (e: any) {
+        console.error("Falha na inicialização do Firebase Admin SDK:", e.message);
+        // Lança o erro para que a Server Action possa capturá-lo e reportá-lo.
+        throw new Error(`Falha ao inicializar o Firebase Admin SDK: ${e.message}`);
+    }
 }
 
-initializeAdminApp();
+// Inicializa e exporta as instâncias
+const { auth: adminAuth, db } = initializeAdminSDK();
 
-export const adminAuth = getAuth();
-export const db = getFirestore();
+export { adminAuth, db };
