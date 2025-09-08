@@ -8,76 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { FieldValue } from "firebase-admin/firestore";
 import React, { useState } from "react";
-import { adminAuth, adminDb } from '@/lib/firebaseAdmin';
-
-
-// --- Lógica do Servidor (Server Action) ---
-// Esta função roda apenas no servidor, garantindo a segurança.
-async function simulateWebhook(formData: FormData) {
-    'use server';
-
-    const customerEmail = formData.get('email') as string;
-    const customerName = formData.get('name') as string;
-    const moduleId = formData.get('moduleId') as string;
-
-    if (!customerEmail || !customerName || !moduleId) {
-        return { success: false, message: 'Todos os campos são obrigatórios.' };
-    }
-
-    try {
-        let userRecord;
-        try {
-            userRecord = await adminAuth.getUserByEmail(customerEmail);
-        } catch (error: any) {
-            if (error.code === 'auth/user-not-found') {
-                // Cenário 1: Usuário NÃO existe - Salva a compra como pendente
-                const pendingDocRef = adminDb.collection('pending_purchases').doc(customerEmail);
-                await pendingDocRef.set({
-                    email: customerEmail,
-                    modules: FieldValue.arrayUnion(moduleId)
-                }, { merge: true });
-                
-                return { success: true, message: `Usuário não encontrado. Compra pendente do módulo '${moduleId}' salva para ${customerEmail}.` };
-            }
-            throw error;
-        }
-
-        // Cenário 2: Usuário JÁ EXISTE - Libera o acesso diretamente
-        const userDocRef = adminDb.collection('users').doc(userRecord.uid);
-        const userDoc = await userDocRef.get();
-
-        const updates: { [key: string]: any } = {
-            [`progress.${moduleId}.status`]: 'active',
-        };
-
-        if (moduleId === 'grafismo-fonetico') {
-            updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'active';
-        }
-
-        if (!userDoc.exists) {
-            // Caso de borda: usuário na Auth mas não no Firestore.
-            await userDocRef.set({
-               name: customerName,
-               email: customerEmail,
-               progress: {
-                    'grafismo-fonetico': { status: 'locked', submodules: { 'intro': { status: 'locked' } } },
-                    'desafio-21-dias': { status: 'locked', submodules: {} },
-                    'checklist-alfabetizacao': { status: 'locked', submodules: {} },
-                    'historias-curtas': { status: 'locked', submodules: {} },
-               },
-            });
-        }
-        
-        await userDocRef.update(updates);
-        return { success: true, message: `Módulo '${moduleId}' liberado com sucesso para o usuário existente ${customerEmail}.` };
-
-    } catch (error: any) {
-        console.error("Erro ao simular o webhook:", error);
-        return { success: false, message: `Erro do servidor: ${error.message}` };
-    }
-}
+import { simulateWebhook } from "./actions";
 
 
 // --- Componente do Cliente (UI) ---
@@ -90,21 +22,32 @@ export default function TestWebhookPage() {
         setIsLoading(true);
 
         const formData = new FormData(event.currentTarget);
-        const result = await simulateWebhook(formData);
+        
+        try {
+            const result = await simulateWebhook(formData);
 
-        if (result.success) {
-            toast({
-                title: "Simulação Concluída",
-                description: result.message,
-                variant: "default",
-            });
-        } else {
-            toast({
-                title: "Erro na Simulação",
-                description: result.message,
+            if (result.success) {
+                toast({
+                    title: "Simulação Concluída",
+                    description: result.message,
+                    variant: "default",
+                });
+            } else {
+                toast({
+                    title: "Erro na Simulação",
+                    description: result.message,
+                    variant: "destructive",
+                });
+            }
+        } catch (error) {
+             toast({
+                title: "Erro Inesperado",
+                description: "Ocorreu um erro ao processar a simulação.",
                 variant: "destructive",
             });
         }
+
+
         setIsLoading(false);
     };
 
