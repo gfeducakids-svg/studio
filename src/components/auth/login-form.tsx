@@ -20,64 +20,12 @@ import { useToast } from "@/hooks/use-toast";
 import React from 'react';
 import { auth, db } from '@/lib/firebase';
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
-import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
-import { getInitialProgress } from '@/hooks/use-user-data';
 
 
 const formSchema = z.object({
   email: z.string().email({ message: "Por favor, insira um e-mail válido." }),
   password: z.string().min(1, { message: "A senha é obrigatória." }),
 });
-
-/**
- * Aplica compras pendentes a um usuário recém-logado.
- * Esta função é chamada após um login bem-sucedido.
- * Usa setDoc com merge: true para garantir que o documento do usuário seja criado se não existir,
- * e atualizado se existir, de forma atômica e segura.
- */
-async function applyPendingPurchases(userId: string, email: string, name: string) {
-    const normalizedEmail = email.toLowerCase();
-    const pendingDocRef = doc(db, "pending_purchases", normalizedEmail);
-    
-    try {
-        const pendingDoc = await getDoc(pendingDocRef);
-
-        if (!pendingDoc.exists()) {
-            return; // Nenhuma compra pendente, nada a fazer.
-        }
-
-        console.log(`Compras pendentes encontradas para ${email}. Aplicando...`);
-        const pendingData = pendingDoc.data();
-        const modulesToUnlock: string[] = pendingData.modules || [];
-        
-        if (modulesToUnlock.length > 0) {
-            const userDocRef = doc(db, "users", userId);
-            
-            const updates: { [key: string]: any } = {};
-            modulesToUnlock.forEach(moduleId => {
-                updates[`progress.${moduleId}.status`] = 'unlocked';
-                if (moduleId === 'grafismo-fonetico') {
-                    updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'unlocked';
-                }
-            });
-
-            // Usa setDoc com merge: true. Isso irá:
-            // 1. CRIAR o documento do usuário se ele não existir.
-            // 2. ATUALIZAR (mesclar) o documento com os novos status se ele já existir.
-            // É a forma mais segura de garantir a aplicação das compras.
-            await setDoc(userDocRef, updates, { merge: true });
-            
-            console.log(`Módulos pendentes aplicados com sucesso para o usuário ${userId}.`);
-            
-            // Após a aplicação bem-sucedida, remove o registro pendente.
-            await deleteDoc(pendingDocRef);
-            console.log(`Registro de compra pendente removido para ${email}.`);
-        }
-    } catch (error) {
-        console.error("Erro ao aplicar compras pendentes. Elas serão aplicadas no próximo login.", error);
-    }
-}
-
 
 export default function LoginForm() {
   const router = useRouter();
@@ -96,13 +44,9 @@ export default function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
-      const user = userCredential.user;
-
-      // Após o login bem-sucedido, verifique e aplique as compras pendentes
-      // Passamos o displayName do usuário caso precisemos criar o documento dele.
-      await applyPendingPurchases(user.uid, user.email!, user.displayName || 'Novo Usuário');
-
+      // A lógica de aplicar compras pendentes foi movida para o formulário de registro.
+      // O login agora tem a única responsabilidade de autenticar o usuário.
+      await signInWithEmailAndPassword(auth, values.email, values.password);
       router.push('/dashboard');
     } catch (error: any) {
        if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
