@@ -21,7 +21,7 @@ import React from 'react';
 import { auth, db } from '@/lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { getInitialProgress } from '@/hooks/use-user-data';
+import { getInitialProgress } from '@/lib/course-data';
 
 
 const formSchema = z.object({

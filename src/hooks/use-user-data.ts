@@ -20,27 +20,6 @@ interface UserData {
     progress?: UserProgress;
 }
 
-// Defina os submódulos com literal estreito e validados
-const initialGrafismoFoneticoSubmodules = {
-  intro: { status: 'unlocked' },
-  'pre-alf': { status: 'unlocked' },
-  alfabeto: { status: 'unlocked' },
-  silabas: { status: 'unlocked' },
-  fonico: { status: 'unlocked' },
-  palavras: { status: 'unlocked' },
-  escrita: { status: 'unlocked' },
-  bonus: { status: 'unlocked' },
-} as const satisfies Record<string, SubmoduleProgress>
-
-
-export const getInitialProgress = (): UserProgress => ({
-    'grafismo-fonetico': { status: 'locked', submodules: initialGrafismoFoneticoSubmodules },
-    'desafio-21-dias': { status: 'locked', submodules: {} },
-    'checklist-alfabetizacao': { status: 'locked', submodules: {} },
-    'historias-curtas': { status: 'locked', submodules: {} },
-});
-
-
 export function useUserData() {
     const [userData, setUserData] = useState<UserData | null>(null);
     const [loading, setLoading] = useState(true);

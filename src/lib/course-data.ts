@@ -2,6 +2,8 @@
 // This file would ideally fetch data from a database like Firestore
 // For now, it returns static data to simulate that.
 
+import type { UserProgress, SubmoduleProgress } from "@/hooks/use-user-data";
+
 // Mocks the structure we'd expect from Firestore
 interface Material {
     id: number;
@@ -21,6 +23,26 @@ interface Course {
     title: string;
     submodules: Submodule[];
 }
+
+// Defina os submódulos com literal estreito e validados
+const initialGrafismoFoneticoSubmodules = {
+  intro: { status: 'unlocked' },
+  'pre-alf': { status: 'unlocked' },
+  alfabeto: { status: 'unlocked' },
+  silabas: { status: 'unlocked' },
+  fonico: { status: 'unlocked' },
+  palavras: { status: 'unlocked' },
+  escrita: { status: 'unlocked' },
+  bonus: { status: 'unlocked' },
+} as const satisfies Record<string, SubmoduleProgress>
+
+
+export const getInitialProgress = (): UserProgress => ({
+    'grafismo-fonetico': { status: 'locked', submodules: initialGrafismoFoneticoSubmodules },
+    'desafio-21-dias': { status: 'locked', submodules: {} },
+    'checklist-alfabetizacao': { status: 'locked', submodules: {} },
+    'historias-curtas': { status: 'locked', submodules: {} },
+});
 
 
 const grafismoFoneticoData: Course = {
