@@ -20,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import React from 'react';
 import { auth, db } from '@/lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 
 
 const formSchema = z.object({
@@ -34,7 +34,7 @@ const formSchema = z.object({
 });
 
 // Estrutura de progresso inicial para um novo usuário
-const initialProgress = {
+const getInitialProgress = () => ({
     'grafismo-fonetico': {
         status: 'locked',
         submodules: {
@@ -51,7 +51,7 @@ const initialProgress = {
     'desafio-21-dias': { status: 'locked', submodules: {} },
     'checklist-alfabetizacao': { status: 'locked', submodules: {} },
     'historias-curtas': { status: 'locked', submodules: {} },
-};
+});
 
 
 export default function RegisterForm() {
@@ -69,53 +69,49 @@ export default function RegisterForm() {
     },
   });
 
-  // Função para verificar e aplicar compras pendentes
-  async function applyPendingPurchases(userId: string, userEmail: string) {
-    const pendingDocRef = doc(db, "pending_purchases", userEmail.toLowerCase());
-    const pendingDoc = await getDoc(pendingDocRef);
-
-    if (pendingDoc.exists()) {
-      const pendingData = pendingDoc.data();
-      const modulesToUnlock: string[] = pendingData.modules || [];
-      const userDocRef = doc(db, "users", userId);
-      
-      const updates: { [key: string]: any } = {};
-      modulesToUnlock.forEach(moduleId => {
-        updates[`progress.${moduleId}.status`] = 'active';
-         // Caso especial para o módulo principal, desbloqueia também o primeiro submódulo.
-        if (moduleId === 'grafismo-fonetico') {
-            updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'active';
-        }
-      });
-
-      if (Object.keys(updates).length > 0) {
-        await updateDoc(userDocRef, updates);
-        console.log(`Módulos pendentes ${modulesToUnlock.join(', ')} aplicados ao usuário ${userId}.`);
-      }
-      
-      // Remove o documento de compras pendentes após a aplicação
-      await deleteDoc(pendingDocRef);
-    }
-  }
-
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     const normalizedEmail = values.email.toLowerCase();
 
     try {
+      // 1. Verifica se há compras pendentes ANTES de criar o usuário
+      const pendingDocRef = doc(db, "pending_purchases", normalizedEmail);
+      const pendingDoc = await getDoc(pendingDocRef);
+      
+      const progressData = getInitialProgress();
+
+      if (pendingDoc.exists()) {
+        const pendingData = pendingDoc.data();
+        const modulesToUnlock: string[] = pendingData.modules || [];
+        
+        // 2. Modifica o objeto de progresso inicial na memória
+        modulesToUnlock.forEach(moduleId => {
+          if (progressData[moduleId as keyof typeof progressData]) {
+            progressData[moduleId as keyof typeof progressData].status = 'active';
+            // Caso especial para o módulo principal
+            if (moduleId === 'grafismo-fonetico') {
+              progressData[moduleId].submodules.intro.status = 'active';
+            }
+          }
+        });
+      }
+
+      // 3. Cria o usuário no Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, values.password);
       const user = userCredential.user;
 
-      // Cria o documento do usuário com a estrutura de progresso inicial.
+      // 4. Cria o documento do usuário no Firestore com o progresso JÁ CORRETO
       await setDoc(doc(db, "users", user.uid), {
         name: values.name,
         email: normalizedEmail,
-        progress: initialProgress 
+        progress: progressData // Usa o objeto de progresso modificado
       });
-
-      // Verifica e aplica quaisquer compras pendentes feitas antes do cadastro.
-      await applyPendingPurchases(user.uid, normalizedEmail);
+      
+      // 5. Se havia uma compra pendente, remove o documento
+      if (pendingDoc.exists()) {
+        await deleteDoc(pendingDocRef);
+        console.log(`Módulos pendentes aplicados e registro removido para ${normalizedEmail}.`);
+      }
 
       router.push('/dashboard');
     } catch (error: any) {
