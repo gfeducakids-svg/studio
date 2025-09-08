@@ -3,13 +3,13 @@ import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuth } from 'firebase-admin/auth';
 import nodemailer from 'nodemailer';
-import { adminApp } from '@/lib/firebaseAdmin'; // Importa a app inicializada
+import { adminAuth } from '@/lib/firebaseAdmin'; // Importa a auth inicializada
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // O Admin SDK é inicializado em @/lib/firebaseAdmin.ts, aqui apenas usamos a instância.
-const auth = getAuth(adminApp);
+const auth = adminAuth;
 
 // Configura o transporter do Nodemailer
 const transporter = nodemailer.createTransport({
