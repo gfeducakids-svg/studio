@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import React from 'react';
 import { auth } from '@/lib/firebase';
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Por favor, insira um e-mail válido." }),
@@ -30,6 +30,7 @@ export default function LoginForm() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isSendingReset, setIsSendingReset] = React.useState(false);
   const emailInputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -40,18 +41,10 @@ export default function LoginForm() {
     },
   });
 
-  // O formulário de login agora tem a única responsabilidade de autenticar o usuário.
-  // A lógica de desbloqueio foi movida para uma Cloud Function segura,
-  // que é chamada pelo hook useUserData após uma autenticação bem-sucedida.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      // 1. Autentica o usuário
       await signInWithEmailAndPassword(auth, values.email, values.password);
-      
-      // 2. Redireciona para o dashboard
-      // O hook useUserData, que é ativado em todas as páginas do dashboard,
-      // cuidará de chamar a Cloud Function para aplicar compras pendentes.
       router.push('/dashboard');
 
     } catch (error: any) {
@@ -80,27 +73,45 @@ export default function LoginForm() {
   }
 
   const handlePasswordReset = async () => {
+    // Valida apenas o campo de e-mail
     const email = form.getValues("email");
-    if (!email || !z.string().email().safeParse(email).success) {
+    const emailValidation = z.string().email({ message: "Por favor, insira um e-mail válido para redefinir a senha." }).safeParse(email);
+
+    if (!emailValidation.success) {
       form.setError("email", {
         type: "manual",
-        message: "Por favor, insira um e-mail válido para redefinir a senha."
+        message: emailValidation.error.errors[0].message
       });
       return;
     }
+    
+    setIsSendingReset(true);
     try {
-      await sendPasswordResetEmail(auth, email);
+        const response = await fetch('/api/auth/send-reset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: emailValidation.data }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || "Não foi possível enviar o e-mail.");
+        }
+      
       toast({
         title: "E-mail de redefinição enviado!",
-        description: "Verifique sua caixa de entrada para criar uma nova senha.",
+        description: "Verifique sua caixa de entrada (e a pasta de spam) para criar uma nova senha.",
       });
     } catch (error: any) {
       console.error("Erro ao redefinir senha:", error);
       toast({
-        title: "Erro",
-        description: "Não foi possível enviar o e-mail. Verifique se o e-mail está correto e tente novamente.",
+        title: "Erro ao Enviar",
+        description: error.message || "Não foi possível enviar o e-mail. Verifique se o e-mail está correto e tente novamente.",
         variant: "destructive",
       });
+    } finally {
+        setIsSendingReset(false);
     }
   };
 
@@ -132,8 +143,13 @@ export default function LoginForm() {
             <FormItem>
               <div className="flex items-center justify-between">
                 <FormLabel className="text-muted-foreground">Sua senha secreta</FormLabel>
-                <button type="button" onClick={handlePasswordReset} className="text-sm text-primary hover:underline focus:outline-none">
-                  Esqueceu a senha?
+                <button 
+                    type="button" 
+                    onClick={handlePasswordReset} 
+                    className="text-sm text-primary hover:underline focus:outline-none disabled:opacity-50"
+                    disabled={isSendingReset}
+                >
+                  {isSendingReset ? "Enviando..." : "Esqueceu a senha?"}
                 </button>
               </div>
               <FormControl>
@@ -143,7 +159,7 @@ export default function LoginForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full bg-gradient-to-r from-primary to-blue-400 text-primary-foreground font-bold text-lg shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-full py-6" disabled={isLoading}>
+        <Button type="submit" className="w-full bg-gradient-to-r from-primary to-blue-400 text-primary-foreground font-bold text-lg shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-full py-6" disabled={isLoading || isSendingReset}>
           {isLoading ? 'Entrando...' : 'Entrar na Trilha'}
         </Button>
       </form>
