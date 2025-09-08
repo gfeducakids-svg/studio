@@ -6,20 +6,12 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, onSnapshot, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
-interface SubmoduleProgress {
-    status: 'locked' | 'active' | 'completed';
-}
+// Tipos base (ajuste o import/local conforme seu projeto)
+export type SubmoduleStatus = 'active' | 'locked' | 'completed'
+export type SubmoduleProgress = { status: SubmoduleStatus }
+export type ModuleProgress = { status: SubmoduleStatus; submodules: { [k: string]: SubmoduleProgress } }
+export type UserProgress = { [moduleId: string]: ModuleProgress }
 
-interface ModuleProgress {
-    status: 'locked' | 'active' | 'completed';
-    submodules: {
-        [key: string]: SubmoduleProgress;
-    };
-}
-
-interface UserProgress {
-    [key: string]: ModuleProgress;
-}
 
 interface UserData {
     name: string;
@@ -27,16 +19,18 @@ interface UserData {
     progress?: UserProgress;
 }
 
+// Defina os submódulos com literal estreito e validados
 const initialGrafismoFoneticoSubmodules = {
-    'intro': { status: 'locked' },
-    'pre-alf': { status: 'locked' },
-    'alfabeto': { status: 'locked' },
-    'silabas': { status: 'locked' },
-    'fonico': { status: 'locked' },
-    'palavras': { status: 'locked' },
-    'escrita': { status: 'locked' },
-    'bonus': { status: 'locked' },
-};
+  intro: { status: 'locked' },
+  'pre-alf': { status: 'locked' },
+  alfabeto: { status: 'locked' },
+  silabas: { status: 'locked' },
+  fonico: { status: 'locked' },
+  palavras: { status: 'locked' },
+  escrita: { status: 'locked' },
+  bonus: { status: 'locked' },
+} as const satisfies Record<string, SubmoduleProgress>
+
 
 const initialProgress: UserProgress = {
     'grafismo-fonetico': { status: 'locked', submodules: initialGrafismoFoneticoSubmodules },
