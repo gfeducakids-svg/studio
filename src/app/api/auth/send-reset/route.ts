@@ -21,13 +21,13 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function POST(req: NextRequest) {
-  try {
     const { email } = await req.json();
 
     if (!email || typeof email !== 'string') {
       return NextResponse.json({ error: 'Email inválido fornecido.' }, { status: 400 });
     }
 
+  try {
     // Busca o nome do usuário no Firebase Auth para personalizar o e-mail
     let userName = '';
     try {
