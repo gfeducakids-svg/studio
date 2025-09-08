@@ -1,28 +1,12 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Regra para a coleção 'users':
-    // Permite que um usuário leia e escreva apenas em seu próprio documento.
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Regra para a coleção 'feedback':
-    // Permite que qualquer usuário autenticado leia os comentários.
-    // A escrita é bloqueada no lado do cliente para segurança (ela é feita via Server Action).
-    match /feedback/{feedbackId} {
-      allow read: if request.auth != null;
-      allow write: if false; // Bloqueia a escrita direta pelo cliente.
-    }
-
-    // Regra para a coleção 'pending_purchases':
-    // Ninguém deve conseguir ler ou escrever diretamente nesta coleção a partir do cliente.
-    // Ela é gerenciada apenas pelo servidor (webhooks, server actions).
-    match /pending_purchases/{email} {
-        allow read, write: if false;
+    // Regra de desenvolvimento: permite leitura e escrita para todos.
+    // ATENÇÃO: Para produção, restrinja estas regras!
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }
