@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -75,7 +76,7 @@ export default function DashboardPage() {
                     {...module}
                     isUnlocked={
                       !!userData?.progress?.[module.id] &&
-                      userData.progress[module.id].status !== 'locked'
+                      (userData.progress[module.id].status === 'unlocked' || userData.progress[module.id].status === 'completed')
                     }
                   />
                 </div>

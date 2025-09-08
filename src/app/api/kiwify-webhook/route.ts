@@ -78,20 +78,20 @@ export async function POST(req: Request) {
           const userDoc = await userDocRef.get();
 
           const updates: { [key: string]: any } = {
-              [`progress.${moduleId}.status`]: 'active',
+              [`progress.${moduleId}.status`]: 'unlocked',
           };
 
           // Libera o primeiro submódulo do curso principal, se for o caso
           if (moduleId === 'grafismo-fonetico') {
-              updates[`progress.${moduleId}.submodules.intro.status`] = 'active';
+              updates[`progress.${moduleId}.submodules.intro.status`] = 'unlocked';
           }
 
           if (!userDoc.exists) {
               // Caso de borda: usuário existe na Auth mas não no Firestore. Cria o documento.
               const newUserProgress = { ...initialProgress };
-              newUserProgress[moduleId as keyof typeof newUserProgress].status = 'active';
+              newUserProgress[moduleId as keyof typeof newUserProgress].status = 'unlocked';
                if (moduleId === 'grafismo-fonetico') {
-                    newUserProgress[moduleId].submodules['intro' as keyof typeof newUserProgress['grafismo-fonetico']['submodules']] = { status: 'active' };
+                    newUserProgress[moduleId].submodules['intro' as keyof typeof newUserProgress['grafismo-fonetico']['submodules']] = { status: 'unlocked' };
                }
                await userDocRef.set({
                    name: order.Customer.full_name,

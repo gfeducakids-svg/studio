@@ -7,7 +7,7 @@ import { doc, onSnapshot, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
 // Tipos base (ajuste o import/local conforme seu projeto)
-export type SubmoduleStatus = 'active' | 'locked' | 'completed'
+export type SubmoduleStatus = 'unlocked' | 'active' | 'locked' | 'completed'
 export type SubmoduleProgress = { status: SubmoduleStatus }
 export type ModuleProgress = { status: SubmoduleStatus; submodules: { [k: string]: SubmoduleProgress } }
 export type UserProgress = { [moduleId: string]: ModuleProgress }

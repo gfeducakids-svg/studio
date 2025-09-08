@@ -87,10 +87,10 @@ export default function RegisterForm() {
         // 2. Modifica o objeto de progresso inicial na memória
         modulesToUnlock.forEach(moduleId => {
           if (progressData[moduleId as keyof typeof progressData]) {
-            progressData[moduleId as keyof typeof progressData].status = 'active';
+            progressData[moduleId as keyof typeof progressData].status = 'unlocked';
             // Caso especial para o módulo principal
             if (moduleId === 'grafismo-fonetico') {
-              progressData[moduleId].submodules.intro.status = 'active';
+              progressData[moduleId].submodules.intro.status = 'unlocked';
             }
           }
         });

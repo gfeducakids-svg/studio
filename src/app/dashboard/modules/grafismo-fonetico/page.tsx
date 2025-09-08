@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -45,6 +46,12 @@ const statusConfig = {
         line: 'bg-border',
         icon: BookOpen,
     },
+    unlocked: {
+        label: 'Desbloqueado',
+        node: 'bg-primary border-blue-200 text-white ring-4 ring-primary/20 scale-110',
+        line: 'bg-border',
+        icon: BookOpen,
+    },
     locked: {
         label: 'Bloqueado',
         node: 'bg-muted border-gray-200 text-muted-foreground cursor-not-allowed',
@@ -81,9 +88,15 @@ export default function GrafismoFoneticoPage() {
     const getSubmoduleStatus = (submoduleId: string) => {
         const status = progress?.[submoduleId]?.status ?? 'locked';
         if (isCourseUnlocked) {
-            return status === 'locked' ? 'active' : status;
+             if (status === 'locked' && (progress?.[submoduleId]?.status === 'unlocked' || progress?.[submoduleId]?.status === 'active')) {
+                return progress?.[submoduleId]?.status;
+            }
+            if (status === 'locked') {
+                return 'active'; // Fallback for modules after an unlocked one
+            }
+            return status;
         }
-        return status;
+        return 'locked';
     };
     
     const orderedProgress = courseStructure ? courseStructure.submodules.map(s => {
@@ -94,7 +107,7 @@ export default function GrafismoFoneticoPage() {
     const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
     useEffect(() => {
         if (orderedProgress.length > 0) {
-             const firstActive = orderedProgress.find(s => s.status === 'active');
+             const firstActive = orderedProgress.find(s => s.status === 'active' || s.status === 'unlocked');
              if (firstActive) {
                 setActiveModuleId(firstActive.id);
              } else {

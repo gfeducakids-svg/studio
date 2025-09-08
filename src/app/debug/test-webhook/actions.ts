@@ -44,11 +44,11 @@ export async function simulateWebhook(formData: FormData) {
         const userDoc = await userDocRef.get();
 
         const updates: { [key: string]: any } = {
-            [`progress.${moduleId}.status`]: 'active',
+            [`progress.${moduleId}.status`]: 'unlocked',
         };
 
         if (moduleId === 'grafismo-fonetico') {
-            updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'active';
+            updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'unlocked';
         }
 
         if (!userDoc.exists) {
