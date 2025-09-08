@@ -97,9 +97,9 @@ export async function POST(req: Request) {
                   
                   // Cria o documento no Firestore
                   const newUserProgress = { ...initialProgress };
-                  newUserProgress[moduleId as keyof typeof newUserProgress] = { status: 'active', submodules: {} };
+                  newUserProgress[moduleId as keyof typeof newUserProgress].status = 'active';
                    if (moduleId === 'grafismo-fonetico') {
-                        newUserProgress[moduleId].submodules['intro' as keyof typeof newUserProgress.submodules] = { status: 'active' };
+                        newUserProgress[moduleId].submodules['intro' as keyof typeof newUserProgress['grafismo-fonetico']['submodules']] = { status: 'active' };
                    }
 
                   // Sintaxe correta do Admin SDK
@@ -123,9 +123,9 @@ export async function POST(req: Request) {
               // Caso de borda: usuário existe na Auth mas não no Firestore.
               // Criar documento no Firestore para ele.
                const newUserProgress = { ...initialProgress };
-              newUserProgress[moduleId as keyof typeof newUserProgress] = { status: 'active', submodules: {} };
+              newUserProgress[moduleId as keyof typeof newUserProgress].status = 'active';
                if (moduleId === 'grafismo-fonetico') {
-                    newUserProgress[moduleId].submodules['intro' as keyof typeof newUserProgress.submodules] = { status: 'active' };
+                    newUserProgress[moduleId].submodules['intro' as keyof typeof newUserProgress['grafismo-fonetico']['submodules']] = { status: 'active' };
                }
                await userDocRef.set({
                    name: event.customer.name,
