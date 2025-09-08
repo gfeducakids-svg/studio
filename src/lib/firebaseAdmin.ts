@@ -1,6 +1,6 @@
 
 import "server-only"
-import { initializeApp, getApps, cert, type ServiceAccount } from "firebase-admin/app"
+import admin, { initializeApp, getApps, cert, type ServiceAccount } from "firebase-admin/app"
 import { getAuth } from "firebase-admin/auth"
 import { getFirestore } from "firebase-admin/firestore"
 
@@ -49,17 +49,22 @@ function getServiceAccount(): ServiceAccount {
     };
 }
 
-
 // Inicializa o app admin apenas uma vez (padrão singleton)
-if (!getApps().length) {
-  try {
-    const serviceAccount = getServiceAccount();
-    initializeApp({ credential: cert(serviceAccount) });
-    console.log("Firebase Admin SDK initialized successfully.");
-  } catch (e: any) {
-    console.error("Firebase Admin SDK initialization error", e.stack);
-  }
+function initializeAdminApp() {
+    if (!getApps().length) {
+        try {
+            const serviceAccount = getServiceAccount();
+            initializeApp({ credential: cert(serviceAccount) });
+            console.log("Firebase Admin SDK initialized successfully.");
+        } catch (e: any) {
+            console.error("Firebase Admin SDK initialization error", e);
+            throw new Error("Failed to initialize Firebase Admin SDK: " + e.message);
+        }
+    }
+    return admin.app();
 }
+
+initializeAdminApp();
 
 export const adminAuth = getAuth();
 export const db = getFirestore();
