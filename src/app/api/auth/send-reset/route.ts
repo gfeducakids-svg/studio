@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     if (e.code === 'auth/user-not-found') {
       // Por segurança, não informamos que o e-mail não existe.
       // A função retorna sucesso para não permitir que alguém descubra quais e-mails estão cadastrados.
-      console.log(`E-mail de reset solicitado para usuário não existente: ${e.email}`);
+      console.log(`E-mail de reset solicitado para usuário não existente: ${email}`);
       return NextResponse.json({ ok: true, message: 'Se o e-mail estiver cadastrado, um link será enviado.' }, { status: 200 });
     }
 
