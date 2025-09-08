@@ -647,6 +647,7 @@ const checklistHtml = `
     <div class="celebration" id="celebration"></div>
 
     <script>
+        const STORAGE_KEY = 'educakids-checklist-progress';
         let progress = {
             completed: 0,
             total: 48
@@ -707,6 +708,7 @@ const checklistHtml = `
             
             updateProgress();
             updateModuleProgress(item);
+            saveProgress(); // <-- Salva o progresso a cada clique
         }
 
         function updateProgress() {
@@ -758,7 +760,7 @@ const checklistHtml = `
         }
 
         function resetAll() {
-            if (confirm('Tem certeza que deseja resetar todo o progresso?')) {
+            if (confirm('Tem certeza que deseja resetar todo o progresso? Esta ação não pode ser desfeita.')) {
                 const checkboxes = document.querySelectorAll('.checkbox');
                 const items = document.querySelectorAll('.checklist-item');
                 
@@ -774,6 +776,9 @@ const checklistHtml = `
                 
                 moduleProgressTexts.forEach(text => text.textContent = '0%');
                 moduleProgressFills.forEach(fill => fill.style.width = '0%');
+                
+                // Limpa o progresso salvo
+                localStorage.removeItem(STORAGE_KEY);
             }
         }
 
@@ -781,28 +786,54 @@ const checklistHtml = `
             window.print();
         }
 
-        // Salvar progresso no localStorage (se disponível)
+        // Salvar progresso no localStorage (AutoSave)
         function saveProgress() {
-            const checkboxes = document.querySelectorAll('.checkbox.checked');
-            const completedItems = [];
+            const checkboxes = document.querySelectorAll('.checkbox');
+            const completedIndices = [];
             
             checkboxes.forEach((checkbox, index) => {
-                const item = checkbox.closest('.checklist-item');
-                const text = item.querySelector('.checklist-text').textContent;
-                completedItems.push(text);
+                if (checkbox.classList.contains('checked')) {
+                    completedIndices.push(index);
+                }
             });
-            
-            // Em um ambiente real, isso seria salvo no localStorage
-            // localStorage.setItem('alfabetizacao-progress', JSON.stringify(completedItems));
+
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(completedIndices));
+            } catch (e) {
+                console.error("Não foi possível salvar o progresso no localStorage.", e);
+            }
         }
 
+        // Carregar progresso do localStorage
         function loadProgress() {
-            // Em um ambiente real, isso carregaria do localStorage
-            // const saved = localStorage.getItem('alfabetizacao-progress');
-            // if (saved) {
-            //     const completedItems = JSON.parse(saved);
-            //     // Restaurar itens marcados...
-            // }
+             try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const completedIndices = JSON.parse(saved);
+                    const allItems = document.querySelectorAll('.checklist-item');
+                    
+                    completedIndices.forEach(index => {
+                        const item = allItems[index];
+                        if (item) {
+                            const checkbox = item.querySelector('.checkbox');
+                            if (!checkbox.classList.contains('checked')) {
+                                checkbox.classList.add('checked');
+                                item.classList.add('completed');
+                                progress.completed++;
+                            }
+                        }
+                    });
+                    
+                    // Atualizar todas as barras de progresso após o carregamento
+                    updateProgress();
+                    document.querySelectorAll('.module').forEach(module => {
+                        const firstItem = module.querySelector('.checklist-item');
+                        if (firstItem) updateModuleProgress(firstItem);
+                    });
+                }
+            } catch (e) {
+                console.error("Não foi possível carregar o progresso do localStorage.", e);
+            }
         }
 
         // Adicionar animações CSS dinâmicas
@@ -875,7 +906,7 @@ const checklistHtml = `
         // Inicializar aplicação
         document.addEventListener('DOMContentLoaded', function() {
             createFloatingShapes();
-            loadProgress();
+            loadProgress(); // <-- Carrega o progresso salvo
             
             // Adicionar eventos de teclado para acessibilidade
             document.addEventListener('keydown', function(e) {
@@ -900,9 +931,6 @@ const checklistHtml = `
                     }
                 });
             });
-            
-            // Auto-salvar progresso
-            setInterval(saveProgress, 30000); // Salva a cada 30 segundos
         });
 
         // Adicionar tooltips informativos
