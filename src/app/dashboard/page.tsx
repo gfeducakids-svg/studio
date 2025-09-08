@@ -56,7 +56,7 @@ export default function DashboardPage() {
             grid w-full items-stretch
             grid-cols-[repeat(auto-fit,minmax(240px,1fr))]
             gap-3 sm:gap-4 lg:gap-5
-            justify-items-start md:justify-items-stretch
+            justify-items-center sm:justify-items-stretch
             [grid-auto-rows:1fr]
           "
         >
@@ -69,7 +69,7 @@ export default function DashboardPage() {
             : modules.map((module, index) => (
                 <div
                   key={module.id}
-                  className="h-full min-w-0 w-full animate-in justify-self-start"
+                  className="h-full min-w-0 w-full animate-in"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <ModuleCard

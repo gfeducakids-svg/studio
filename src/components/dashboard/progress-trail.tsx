@@ -150,7 +150,7 @@ export default function ProgressTrail() {
           opts={{
             align: 'start',
             dragFree: true,
-            containScroll: 'keepSnaps',
+            containScroll: 'trimSnaps',
             skipSnaps: false,
           }}
           className="w-full overflow-hidden"

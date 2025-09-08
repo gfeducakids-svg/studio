@@ -45,6 +45,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
       <CardHeader className="
         relative w-full overflow-hidden p-0
         aspect-video md:aspect-[4/3]
+        max-h-[clamp(140px,38vh,260px)] md:max-h-[clamp(180px,32vh,340px)]
       ">
         <Link
           href={isUnlocked ? `/dashboard/modules/${id}` : '#'}
@@ -77,7 +78,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
                 {title}
             </CardTitle>
             {!isUnlocked && microHeadline && (
-            <p className="mt-2 text-xs text-muted-foreground font-semibold leading-snug">{microHeadline}</p>
+            <p className="mt-2 text-xs text-center text-muted-foreground font-semibold leading-snug sm:text-left">{microHeadline}</p>
             )}
         </div>
       </CardContent>
