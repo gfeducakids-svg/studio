@@ -72,12 +72,14 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
       </CardHeader>
 
       <CardContent className="flex grow min-w-0 flex-col p-3 sm:p-4">
-        <CardTitle className="min-w-0 flex-grow font-headline text-[15px] leading-tight line-clamp-2 sm:text-base md:text-lg">
-          {title}
-        </CardTitle>
-        {!isUnlocked && microHeadline && (
-          <p className="mt-2 text-xs text-muted-foreground font-semibold leading-snug">{microHeadline}</p>
-        )}
+        <div className="flex-grow">
+            <CardTitle className="min-w-0 font-headline text-[15px] leading-tight sm:text-base md:text-lg">
+                {title}
+            </CardTitle>
+            {!isUnlocked && microHeadline && (
+            <p className="mt-2 text-xs text-muted-foreground font-semibold leading-snug">{microHeadline}</p>
+            )}
+        </div>
       </CardContent>
 
       <CardFooter className="p-3 pt-0 sm:p-4">
