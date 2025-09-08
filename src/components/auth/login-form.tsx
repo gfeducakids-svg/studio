@@ -18,13 +18,51 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import React from 'react';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Por favor, insira um e-mail válido." }),
   password: z.string().min(1, { message: "A senha é obrigatória." }),
 });
+
+/**
+ * Aplica compras pendentes a um usuário recém-logado.
+ */
+async function applyPendingPurchases(userId: string, email: string) {
+    const normalizedEmail = email.toLowerCase();
+    const pendingDocRef = doc(db, "pending_purchases", normalizedEmail);
+    const pendingDoc = await getDoc(pendingDocRef);
+
+    if (pendingDoc.exists()) {
+        console.log(`Compras pendentes encontradas para ${email}. Aplicando...`);
+        const pendingData = pendingDoc.data();
+        const modulesToUnlock: string[] = pendingData.modules || [];
+        
+        if (modulesToUnlock.length > 0) {
+            const userDocRef = doc(db, "users", userId);
+            const updates: { [key: string]: any } = {};
+
+            modulesToUnlock.forEach(moduleId => {
+                updates[`progress.${moduleId}.status`] = 'unlocked';
+                if (moduleId === 'grafismo-fonetico') {
+                    updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'unlocked';
+                }
+            });
+
+            try {
+                await updateDoc(userDocRef, updates);
+                console.log(`Módulos pendentes aplicados com sucesso para o usuário ${userId}.`);
+                await deleteDoc(pendingDocRef);
+                console.log(`Registro de compra pendente removido para ${email}.`);
+            } catch (error) {
+                console.error("Erro ao aplicar compras pendentes:", error);
+            }
+        }
+    }
+}
+
 
 export default function LoginForm() {
   const router = useRouter();
@@ -43,7 +81,12 @@ export default function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+      const user = userCredential.user;
+
+      // Após o login bem-sucedido, verifique e aplique as compras pendentes
+      await applyPendingPurchases(user.uid, user.email!);
+
       router.push('/dashboard');
     } catch (error: any) {
        if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {

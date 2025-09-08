@@ -20,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import React from 'react';
 import { auth, db } from '@/lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { getInitialProgress } from '@/hooks/use-user-data';
 
 
@@ -54,50 +54,25 @@ export default function RegisterForm() {
     const normalizedEmail = values.email.toLowerCase();
 
     try {
-      // 1. Pega a estrutura de progresso inicial
-      const progressData = getInitialProgress();
+      // O formulário de registro agora é simples:
+      // 1. Cria o usuário no Auth.
+      // 2. Cria o documento do usuário no Firestore com progresso inicial bloqueado.
+      // A lógica de aplicar compras pendentes foi movida para o formulário de LOGIN.
       
-      // 2. Verifica se há compras pendentes ANTES de criar o usuário
-      const pendingDocRef = doc(db, "pending_purchases", normalizedEmail);
-      const pendingDoc = await getDoc(pendingDocRef);
-
-      if (pendingDoc.exists()) {
-        const pendingData = pendingDoc.data();
-        const modulesToUnlock: string[] = pendingData.modules || [];
-        
-        // 3. Modifica o objeto de progresso inicial na memória (de forma segura)
-        modulesToUnlock.forEach(moduleId => {
-          if (Object.prototype.hasOwnProperty.call(progressData, moduleId)) {
-            progressData[moduleId].status = 'unlocked';
-            
-            // Caso especial para o módulo principal, desbloqueia o primeiro submódulo
-            if (moduleId === 'grafismo-fonetico') {
-               if (progressData[moduleId]?.submodules?.['intro']) {
-                    progressData[moduleId].submodules['intro'].status = 'unlocked';
-               }
-            }
-          }
-        });
-      }
-
-      // 4. Cria o usuário no Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, values.password);
       const user = userCredential.user;
 
-      // 5. Cria o documento do usuário no Firestore com o progresso JÁ CORRETO
       await setDoc(doc(db, "users", user.uid), {
         name: values.name,
         email: normalizedEmail,
-        progress: progressData,
+        progress: getInitialProgress(), // Sempre começa bloqueado
       });
-      
-      // 6. Se havia uma compra pendente, remove o documento
-      if (pendingDoc.exists()) {
-        await deleteDoc(pendingDocRef);
-        console.log(`Módulos pendentes aplicados e registro removido para ${normalizedEmail}.`);
-      }
 
+      // Não é preciso fazer mais nada aqui. A verificação de compras pendentes
+      // ocorrerá automaticamente quando o Firebase redirecionar e o usuário for logado.
+      
       router.push('/dashboard');
+
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
         form.setError("email", {
