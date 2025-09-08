@@ -54,40 +54,44 @@ export default function RegisterForm() {
     const normalizedEmail = values.email.toLowerCase();
 
     try {
-      // 1. Verifica se há compras pendentes ANTES de criar o usuário
+      // 1. Pega a estrutura de progresso inicial
+      const progressData = getInitialProgress();
+      
+      // 2. Verifica se há compras pendentes ANTES de criar o usuário
       const pendingDocRef = doc(db, "pending_purchases", normalizedEmail);
       const pendingDoc = await getDoc(pendingDocRef);
-      
-      const progressData = getInitialProgress();
 
       if (pendingDoc.exists()) {
         const pendingData = pendingDoc.data();
         const modulesToUnlock: string[] = pendingData.modules || [];
         
-        // 2. Modifica o objeto de progresso inicial na memória
+        // 3. Modifica o objeto de progresso inicial na memória (de forma segura)
         modulesToUnlock.forEach(moduleId => {
-          if (progressData[moduleId as keyof typeof progressData]) {
-            progressData[moduleId as keyof typeof progressData].status = 'unlocked';
-            // Caso especial para o módulo principal
-            if (moduleId === 'grafismo-fonetico' && progressData[moduleId].submodules.intro) {
-              progressData[moduleId].submodules.intro.status = 'unlocked';
+          if (Object.prototype.hasOwnProperty.call(progressData, moduleId)) {
+            progressData[moduleId].status = 'unlocked';
+            
+            // Caso especial para o módulo principal, desbloqueia o primeiro submódulo
+            if (moduleId === 'grafismo-fonetico') {
+               if (progressData[moduleId]?.submodules?.['intro']) {
+                    progressData[moduleId].submodules['intro'].status = 'unlocked';
+               }
             }
           }
         });
       }
 
-      // 3. Cria o usuário no Firebase Auth
+      // 4. Cria o usuário no Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, values.password);
       const user = userCredential.user;
 
-      // 4. Cria o documento do usuário no Firestore com o progresso JÁ CORRETO
+      // 5. Cria o documento do usuário no Firestore com o progresso JÁ CORRETO
       await setDoc(doc(db, "users", user.uid), {
         name: values.name,
         email: normalizedEmail,
-        progress: progressData // Usa o objeto de progresso modificado
+        progress: progressData,
       });
       
-      // 5. Se havia uma compra pendente, remove o documento
+      // 6. Se havia uma compra pendente, remove o documento
       if (pendingDoc.exists()) {
         await deleteDoc(pendingDocRef);
         console.log(`Módulos pendentes aplicados e registro removido para ${normalizedEmail}.`);
