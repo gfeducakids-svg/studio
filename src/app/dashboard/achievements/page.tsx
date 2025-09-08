@@ -111,9 +111,9 @@ const AchievementSkeleton = () => (
 
 // Definição externa para ser usada na lógica de conquistas
 const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
-  'aece0e10-590a-11f0-a691-c7c31a23c521': 'grafismo-fonetico',
-  'ef805df0-83b2-11f0-b76f-c30ef01f8da7': 'desafio-21-dias',
-  'ecb5d950-5dc0-11f0-a549-539ae1cd3c85': 'historias-curtas',
+  '4337283': 'grafismo-fonetico',
+  '4344400': 'desafio-21-dias',
+  '4344404': 'historias-curtas',
   'cde90d10-5dbd-11f0-8dec-3b93c26e3853': 'checklist-alfabetizacao',
 };
 
@@ -125,7 +125,7 @@ export default function AchievementsPage() {
 
     // Lógica para a conquista 'mestre-total'
     if (progressKey === 'mestre-total') {
-      const modulesToCheck = Object.keys(KIWIFY_PRODUCT_TO_MODULE_ID);
+      const modulesToCheck = Object.values(KIWIFY_PRODUCT_TO_MODULE_ID);
       // Garante que a propriedade progress exista antes de tentar acessá-la
       if (!userData.progress) return false;
       
@@ -150,6 +150,12 @@ export default function AchievementsPage() {
     if (typeof currentProgress === 'object' && currentProgress !== null && 'status' in currentProgress) {
         return currentProgress.status === 'completed';
     }
+    
+    // Para chaves de módulo que não têm um objeto de status (apenas o módulo de nível superior)
+    if (typeof currentProgress === 'string') {
+        return currentProgress === 'completed';
+    }
+
 
     return false;
   };

@@ -13,7 +13,7 @@ const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
   '4337283': 'grafismo-fonetico',
   '4344400': 'desafio-21-dias',
   '4344404': 'historias-curtas',
-  '4344402': 'checklist-alfabetizacao',
+  'cde90d10-5dbd-11f0-8dec-3b93c26e3853': 'checklist-alfabetizacao',
 };
 
 const initialProgress = {
@@ -54,17 +54,19 @@ export async function POST(req: Request) {
   }
 
   // 2. Processamento do Evento
-  let event: any;
+  let eventPayload: any;
   try {
-    event = JSON.parse(body); // Agora parseamos o corpo que já foi validado
+    eventPayload = JSON.parse(body); // Agora parseamos o corpo que já foi validado
   } catch (e) {
     console.error('Body do webhook inválido (JSON parse falhou)', e);
     return new NextResponse('Bad Request: Invalid JSON body.', { status: 400 });
   }
   
-  if (event.event === 'order.paid') {
-      const customerEmail = event.customer.email.toLowerCase();
-      const kiwifyProductId = event.product.id.toString();
+  // Ajuste para o evento correto: "order_approved" e estrutura de payload
+  const order = eventPayload.order;
+  if (order && order.webhook_event_type === 'order_approved' && order.order_status === 'paid') {
+      const customerEmail = order.Customer.email.toLowerCase();
+      const kiwifyProductId = order.Product.product_id;
       const moduleId = KIWIFY_PRODUCT_TO_MODULE_ID[kiwifyProductId];
 
       if (!moduleId) {
@@ -84,7 +86,7 @@ export async function POST(req: Request) {
                   userRecord = await adminAuth.createUser({
                       email: customerEmail,
                       password: '123456', // Senha padrão
-                      displayName: event.customer.name,
+                      displayName: order.Customer.full_name,
                   });
                   
                   // Cria o documento no Firestore
@@ -94,9 +96,8 @@ export async function POST(req: Request) {
                         newUserProgress[moduleId].submodules['intro' as keyof typeof newUserProgress['grafismo-fonetico']['submodules']] = { status: 'active' };
                    }
 
-                  // Sintaxe correta do Admin SDK
                   await adminDb.collection('users').doc(userRecord.uid).set({
-                      name: event.customer.name,
+                      name: order.Customer.full_name,
                       email: customerEmail,
                       progress: newUserProgress,
                   });
@@ -120,7 +121,7 @@ export async function POST(req: Request) {
                     newUserProgress[moduleId].submodules['intro' as keyof typeof newUserProgress['grafismo-fonetico']['submodules']] = { status: 'active' };
                }
                await userDocRef.set({
-                   name: event.customer.name,
+                   name: order.Customer.full_name,
                    email: customerEmail,
                    progress: newUserProgress,
                });
@@ -146,7 +147,8 @@ export async function POST(req: Request) {
           return new NextResponse('Internal Server Error while processing purchase', { status: 500 });
       }
   } else {
-    console.log(`Evento recebido: ${event.event}. Ignorando.`);
+    const eventType = order ? order.webhook_event_type : 'Evento desconhecido';
+    console.log(`Evento recebido: ${eventType}. Ignorando.`);
   }
 
   return new NextResponse('OK', { status: 200 });
