@@ -10,7 +10,7 @@ export default function Home() {
         
         {/* Seção de Texto */}
         <div className="flex flex-col gap-6 text-center lg:text-left lg:w-1/2">
-          <h1 className="text-5xl md:text-7xl font-black text-foreground leading-tight">
+          <h1 className="text-4xl md:text-6xl font-black text-foreground leading-tight">
             Alfabetização com Diversão!
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground">
