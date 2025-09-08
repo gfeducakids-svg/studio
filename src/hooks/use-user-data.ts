@@ -21,14 +21,14 @@ interface UserData {
 
 // Defina os submódulos com literal estreito e validados
 const initialGrafismoFoneticoSubmodules = {
-  intro: { status: 'locked' },
-  'pre-alf': { status: 'locked' },
-  alfabeto: { status: 'locked' },
-  silabas: { status: 'locked' },
-  fonico: { status: 'locked' },
-  palavras: { status: 'locked' },
-  escrita: { status: 'locked' },
-  bonus: { status: 'locked' },
+  intro: { status: 'unlocked' },
+  'pre-alf': { status: 'unlocked' },
+  alfabeto: { status: 'unlocked' },
+  silabas: { status: 'unlocked' },
+  fonico: { status: 'unlocked' },
+  palavras: { status: 'unlocked' },
+  escrita: { status: 'unlocked' },
+  bonus: { status: 'unlocked' },
 } as const satisfies Record<string, SubmoduleProgress>
 
 
