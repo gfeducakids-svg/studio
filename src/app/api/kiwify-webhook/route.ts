@@ -10,7 +10,7 @@ export const revalidate = 0;
 
 // Mapeamento CORRETO de produtos Kiwify para IDs de módulos no Firestore
 const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
-  'aece0e10-590a-11f0-a691-c7c31a23c521': 'grafismo-fonetico', // Grafismo Fonético
+  'aa0ddef0-8a83-11f0-99b6-fd7db9e425f5': 'grafismo-fonetico', // Grafismo Fonético
   'ef805df0-83b2-11f0-b76f-c30ef01f8da7': 'desafio-21-dias',   // Desafio 21 Dias de Pronúncia
   'ecb5d950-5dc0-11f0-a549-539ae1cd3c85': 'historias-curtas',  // Histórias Curtas
   'cde90d10-5dbd-11f0-8dec-3b93c26e3853': 'checklist-alfabetizacao', // Checklist de Alfabetização
