@@ -9,17 +9,18 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
+  const {email} = await req.json();
+
+  if (!email || typeof email !== 'string') {
+    return NextResponse.json({
+      ok: false,
+      error: {message: 'E-mail inválido fornecido.'},
+    }, {status: 400});
+  }
+
   try {
     // Inicializa o Admin SDK (seguro, só executa uma vez)
     initAdmin();
-
-    const {email} = await req.json();
-    if (!email || typeof email !== 'string') {
-      return NextResponse.json({
-        ok: false,
-        error: {message: 'E-mail inválido fornecido.'},
-      }, {status: 400});
-    }
 
     // Tenta buscar o usuário primeiro para fornecer um erro claro se ele não existir
     try {
@@ -53,20 +54,25 @@ export async function POST(req: Request) {
       to: email,
       subject: 'Redefina sua senha na plataforma EducaKids',
       html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-          <h2 style="color: #04123C;">Redefinição de Senha</h2>
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+          <h2 style="color: #04123C; text-align: center;">Redefinição de Senha</h2>
           <p>Olá!</p>
-          <p>Recebemos uma solicitação para redefinir a senha da sua conta. Se foi você, clique no botão abaixo para criar uma nova senha:</p>
+          <p>Recebemos uma solicitação para redefinir a senha da sua conta na plataforma EducaKids. Se foi você, clique no botão abaixo para criar uma nova senha:</p>
           <p style="text-align: center; margin: 20px 0;">
-            <a href="${link}" style="background-color: #24A9F4; color: white; padding: 12px 20px; text-decoration: none; border-radius: 25px; font-weight: bold;">Redefinir Senha</a>
+            <a href="${link}" style="background-color: #24A9F4; color: white; padding: 12px 25px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">Redefinir Senha</a>
           </p>
-          <p>Se você não solicitou a redefinição, pode ignorar este e-mail.</p>
+          <p>Se você não solicitou a redefinição de senha, pode ignorar este e-mail com segurança. Ninguém mais terá acesso à sua conta.</p>
           <p>Atenciosamente,<br>Equipe EducaKids</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #777;">Se estiver com problemas para clicar no botão, copie e cole o seguinte URL no seu navegador:<br>
+            <a href="${link}" style="color: #24A9F4; word-break: break-all;">${link}</a>
+          </p>
         </div>
       `,
     });
 
     return NextResponse.json({ok: true, messageId: info.messageId}, {status: 200});
+
   } catch (e: any) {
     console.error('SEND-RESET ERROR:', e);
     const source = e.code?.startsWith('auth/') ? 'admin' : e.code ? 'smtp' : 'unknown';
