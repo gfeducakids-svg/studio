@@ -2,8 +2,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
+import { getAuth } from 'firebase-admin/auth';
 
-// Mapeia o ID do produto da Kiwify para o ID do módulo no nosso sistema.
+// --- Mapeamento e Estrutura de Progresso ---
+
 const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
   'aece0e10-590a-11f0-a691-c7c31a23c521': 'grafismo-fonetico',
   'ef805df0-83b2-11f0-b76f-c30ef01f8da7': 'desafio-21-dias',
@@ -11,19 +13,25 @@ const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
   'cde90d10-5dbd-11f0-8dec-3b93c26e3853': 'checklist-alfabetizacao',
 };
 
+const initialProgress = {
+    'grafismo-fonetico': { status: 'locked', submodules: { 'intro': { status: 'locked' }, 'pre-alf': { status: 'locked' }, 'alfabeto': { status: 'locked' }, 'silabas': { status: 'locked' }, 'fonico': { status: 'locked' }, 'palavras': { status: 'locked' }, 'escrita': { status: 'locked' }, 'bonus': { status: 'locked' }}},
+    'desafio-21-dias': { status: 'locked', submodules: {} },
+    'checklist-alfabetizacao': { status: 'locked', submodules: {} },
+    'historias-curtas': { status: 'locked', submodules: {} },
+};
+
+
 // --- Inicialização segura do Firebase Admin ---
+
 function initializeAdmin() {
     if (admin.apps.length > 0) {
         return admin.app();
     }
-
     const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
-
     if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
         console.error("As variáveis de ambiente do Firebase Admin não estão configuradas.");
         throw new Error("Erro de configuração do servidor: Faltam credenciais do Firebase Admin.");
     }
-    
     return admin.initializeApp({
         credential: admin.credential.cert({
             projectId: process.env.FIREBASE_PROJECT_ID,
@@ -33,23 +41,18 @@ function initializeAdmin() {
     });
 }
 
+
 // --- Lógica do Webhook ---
 
-// Esta função verifica o token de autorização e retorna o payload da requisição.
 async function verifyTokenAndGetPayload(request: NextRequest, secretToken: string) {
     const payload = await request.json();
-
-    // A Kiwify envia o token que configuramos no painel.
-    // Verificamos se o token recebido é o mesmo que o nosso segredo.
     if (payload.token !== secretToken) {
         throw new Error('Token de autorização inválido.');
     }
-    
     return payload;
 }
 
 export async function POST(request: NextRequest) {
-    // Agora usamos o TOKEN que você configurou na Kiwify.
     const kiwifyToken = process.env.KIWIFY_TOKEN;
 
     if (!kiwifyToken) {
@@ -60,47 +63,63 @@ export async function POST(request: NextRequest) {
     try {
         initializeAdmin();
         const db = getFirestore();
-
-        // Usamos a nova função de verificação.
+        const auth = getAuth();
         const payload = await verifyTokenAndGetPayload(request, kiwifyToken);
         
-        if (payload.order_status === 'paid') {
-            const customerEmail = payload.Customer?.email?.toLowerCase();
-            const productId = payload.Product?.product_id;
+        if (payload.order_status !== 'paid') {
+             return NextResponse.json({ success: true, message: 'Webhook recebido, mas nenhuma ação tomada para o status: ' + payload.order_status });
+        }
 
-            if (!customerEmail || !productId) {
-                 return NextResponse.json({ success: false, message: 'Estrutura de payload inválida.' }, { status: 400 });
-            }
+        const customerEmail = payload.Customer?.email?.toLowerCase();
+        const customerName = payload.Customer?.full_name || 'Novo Aluno';
+        const productId = payload.Product?.product_id;
 
-            const moduleId = KIWIFY_PRODUCT_TO_MODULE_ID[productId];
+        if (!customerEmail || !productId) {
+            return NextResponse.json({ success: false, message: 'Estrutura de payload inválida.' }, { status: 400 });
+        }
 
-            if (!moduleId) {
-                console.warn(`Webhook recebido para um ID de produto não mapeado: ${productId}`);
-                return NextResponse.json({ success: true, message: `Produto '${payload.Product?.product_name}' não mapeado.` });
-            }
+        const moduleId = KIWIFY_PRODUCT_TO_MODULE_ID[productId];
+        if (!moduleId) {
+            console.warn(`Webhook recebido para um ID de produto não mapeado: ${productId}`);
+            return NextResponse.json({ success: true, message: `Produto '${payload.Product?.product_name}' não mapeado.` });
+        }
+        
+        const usersRef = db.collection('users');
+        const q = usersRef.where('email', '==', customerEmail);
+        const querySnapshot = await q.get();
+
+        if (querySnapshot.empty) {
+            // **Cenário 1: Novo Cliente**
+            console.log(`Novo cliente detectado: ${customerEmail}. Criando conta...`);
             
-            const usersRef = db.collection('users');
-            const q = usersRef.where('email', '==', customerEmail);
-            const querySnapshot = await q.get();
+            // 1. Criar usuário no Firebase Authentication
+            const newUserRecord = await auth.createUser({
+                email: customerEmail,
+                emailVerified: true,
+                password: '123456', // Senha padrão
+                displayName: customerName,
+            });
 
-            if (querySnapshot.empty) {
-                const pendingRef = db.collection('pending_purchases').doc(customerEmail);
-                const pendingDoc = await pendingRef.get();
-                
-                const newModules = pendingDoc.exists ? pendingDoc.data()?.modules || [] : [];
-                if (!newModules.includes(moduleId)) {
-                    newModules.push(moduleId);
-                }
-
-                await pendingRef.set({
-                    email: customerEmail,
-                    modules: newModules,
-                    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-                }, { merge: true });
-                
-                console.log(`Compra pendente para o email ${customerEmail} salva com sucesso.`);
-                return NextResponse.json({ success: true, message: `Compra pendente para ${customerEmail} registrada.` });
+            // 2. Preparar progresso e desbloquear o módulo
+            const userProgress = JSON.parse(JSON.stringify(initialProgress)); // Deep copy
+            userProgress[moduleId].status = 'active';
+            if (moduleId === 'grafismo-fonetico') {
+                userProgress[moduleId].submodules.intro.status = 'active';
             }
+
+            // 3. Criar documento no Firestore
+            await db.collection('users').doc(newUserRecord.uid).set({
+                name: customerName,
+                email: customerEmail,
+                progress: userProgress,
+            });
+            
+            console.log(`Conta criada e módulo '${moduleId}' desbloqueado para ${customerEmail}.`);
+            return NextResponse.json({ success: true, message: `Conta criada e módulo desbloqueado para ${customerEmail}.` });
+
+        } else {
+            // **Cenário 2: Cliente Existente**
+            console.log(`Cliente existente detectado: ${customerEmail}. Desbloqueando módulo...`);
 
             for (const userDoc of querySnapshot.docs) {
                 const userDocRef = db.collection('users').doc(userDoc.id);
@@ -119,13 +138,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: true, message: `Módulo ${moduleId} desbloqueado para ${customerEmail}.` });
         }
 
-        return NextResponse.json({ success: true, message: 'Webhook recebido, mas nenhuma ação tomada para o status: ' + payload.order_status });
-
     } catch (error: any) {
         if (error.message.includes('Token')) {
             return NextResponse.json({ success: false, message: error.message }, { status: 401 });
         }
-        console.error('Erro ao processar o webhook da Kiwify:', error);
+        console.error('Erro fatal ao processar o webhook da Kiwify:', error);
         return NextResponse.json({ success: false, message: 'Ocorreu um erro interno.' }, { status: 500 });
     }
 }
