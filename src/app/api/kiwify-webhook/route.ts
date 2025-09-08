@@ -1,6 +1,6 @@
 
 import 'server-only';
-import { getFirestore, doc, setDoc, updateDoc, getDoc } from 'firebase-admin/firestore';
+import { getFirestore } from 'firebase-admin/firestore';
 import { initializeApp, getApps, getApp, credential } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { NextResponse } from 'next/server';
@@ -102,7 +102,8 @@ export async function POST(req: Request) {
                         newUserProgress[moduleId].submodules['intro' as keyof typeof newUserProgress.submodules] = { status: 'active' };
                    }
 
-                  await setDoc(doc(adminDb, 'users', userRecord.uid), {
+                  // Sintaxe correta do Admin SDK
+                  await adminDb.collection('users').doc(userRecord.uid).set({
                       name: event.customer.name,
                       email: customerEmail,
                       progress: newUserProgress,
@@ -115,10 +116,10 @@ export async function POST(req: Request) {
           }
 
           // Cenário 2: Usuário já existe, apenas atualiza o progresso
-          const userDocRef = doc(adminDb, 'users', userRecord.uid);
-          const userDoc = await getDoc(userDocRef);
+          const userDocRef = adminDb.collection('users').doc(userRecord.uid);
+          const userDoc = await userDocRef.get();
 
-          if (!userDoc.exists()) {
+          if (!userDoc.exists) {
               // Caso de borda: usuário existe na Auth mas não no Firestore.
               // Criar documento no Firestore para ele.
                const newUserProgress = { ...initialProgress };
@@ -126,7 +127,7 @@ export async function POST(req: Request) {
                if (moduleId === 'grafismo-fonetico') {
                     newUserProgress[moduleId].submodules['intro' as keyof typeof newUserProgress.submodules] = { status: 'active' };
                }
-               await setDoc(userDocRef, {
+               await userDocRef.set({
                    name: event.customer.name,
                    email: customerEmail,
                    progress: newUserProgress,
@@ -144,7 +145,7 @@ export async function POST(req: Request) {
                   updates[`progress.${moduleId}.submodules.intro.status`] = 'active';
               }
               
-              await updateDoc(userDocRef, updates);
+              await userDocRef.update(updates);
               console.log(`Módulo ${moduleId} liberado para o usuário ${userRecord.uid}.`);
           }
 
