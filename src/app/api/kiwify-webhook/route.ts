@@ -1,6 +1,5 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
 import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 
@@ -14,13 +13,10 @@ const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
 
 // --- Inicialização segura do Firebase Admin ---
 function initializeAdmin() {
-    // Garante que a inicialização só aconteça uma vez.
     if (admin.apps.length > 0) {
         return admin.app();
     }
 
-    // A Vercel pode não interpretar corretamente as quebras de linha nas variáveis de ambiente.
-    // Substituir '\\n' por '\n' garante que a chave privada seja lida corretamente.
     const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
     if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
@@ -39,38 +35,34 @@ function initializeAdmin() {
 
 // --- Lógica do Webhook ---
 
-// Esta função lê o corpo da requisição UMA VEZ, verifica a assinatura, e retorna o payload já parseado.
-async function verifySignatureAndGetPayload(request: NextRequest, secret: string) {
-    const signature = request.headers.get('X-Signature');
-    if (!signature) {
-        throw new Error('Assinatura não encontrada.');
-    }
+// Esta função verifica o token de autorização e retorna o payload da requisição.
+async function verifyTokenAndGetPayload(request: NextRequest, secretToken: string) {
+    const payload = await request.json();
 
-    const body = await request.text();
-    const hmac = crypto.createHmac('sha256', secret);
-    const digest = hmac.update(body).digest('hex');
-
-    if (digest !== signature) {
-        throw new Error('Assinatura inválida.');
+    // A Kiwify envia o token que configuramos no painel.
+    // Verificamos se o token recebido é o mesmo que o nosso segredo.
+    if (payload.token !== secretToken) {
+        throw new Error('Token de autorização inválido.');
     }
     
-    return JSON.parse(body);
+    return payload;
 }
 
 export async function POST(request: NextRequest) {
-    const secret = process.env.KIWIFY_WEBHOOK_SECRET;
+    // Agora usamos o TOKEN que você configurou na Kiwify.
+    const kiwifyToken = process.env.KIWIFY_TOKEN;
 
-    if (!secret) {
-        console.error('KIWIFY_WEBHOOK_SECRET não está configurado nas variáveis de ambiente.');
+    if (!kiwifyToken) {
+        console.error('KIWIFY_TOKEN não está configurado nas variáveis de ambiente.');
         return NextResponse.json({ success: false, message: 'Erro de configuração do servidor.' }, { status: 500 });
     }
 
     try {
-        // Inicializa o Firebase Admin de forma segura.
         initializeAdmin();
         const db = getFirestore();
 
-        const payload = await verifySignatureAndGetPayload(request, secret);
+        // Usamos a nova função de verificação.
+        const payload = await verifyTokenAndGetPayload(request, kiwifyToken);
         
         if (payload.order_status === 'paid') {
             const customerEmail = payload.Customer?.email?.toLowerCase();
@@ -92,7 +84,6 @@ export async function POST(request: NextRequest) {
             const querySnapshot = await q.get();
 
             if (querySnapshot.empty) {
-                // Usuário não encontrado, salva a compra como pendente
                 const pendingRef = db.collection('pending_purchases').doc(customerEmail);
                 const pendingDoc = await pendingRef.get();
                 
@@ -111,15 +102,12 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ success: true, message: `Compra pendente para ${customerEmail} registrada.` });
             }
 
-            // Usuário encontrado, atualiza o progresso
             for (const userDoc of querySnapshot.docs) {
                 const userDocRef = db.collection('users').doc(userDoc.id);
-                const userData = userDoc.data();
                 
                 const updates: { [key: string]: any } = {};
                 updates[`progress.${moduleId}.status`] = 'active';
 
-                // Caso especial para o módulo principal, desbloqueia também o primeiro submódulo.
                 if (moduleId === 'grafismo-fonetico') {
                     updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'active';
                 }
@@ -134,7 +122,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: true, message: 'Webhook recebido, mas nenhuma ação tomada para o status: ' + payload.order_status });
 
     } catch (error: any) {
-        if (error.message.includes('Assinatura')) {
+        if (error.message.includes('Token')) {
             return NextResponse.json({ success: false, message: error.message }, { status: 401 });
         }
         console.error('Erro ao processar o webhook da Kiwify:', error);
