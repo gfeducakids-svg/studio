@@ -49,9 +49,6 @@ export default function RegisterForm() {
     },
   });
 
-  // Este formulário agora tem uma única responsabilidade: criar o usuário
-  // com o progresso inicial padrão. A lógica de aplicar compras pendentes
-  // foi movida para uma Cloud Function segura chamada pelo hook useUserData no login.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     const normalizedEmail = values.email.toLowerCase();
@@ -69,7 +66,7 @@ export default function RegisterForm() {
       });
       console.log(`Documento do usuário ${user.uid} criado no Firestore com progresso inicial.`);
       
-      // 3. Redireciona para a página de LOGIN com mensagem de sucesso
+      // 3. Exibe a mensagem de sucesso e redireciona para a página de LOGIN
       toast({
         title: "Conta criada com sucesso!",
         description: "Agora você pode fazer o login para começar sua jornada.",
