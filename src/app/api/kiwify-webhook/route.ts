@@ -1,33 +1,11 @@
 
 import 'server-only';
-import { getFirestore } from 'firebase-admin/firestore';
-import { initializeApp, getApps, getApp, credential } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
+import { adminAuth, adminDb } from '@/lib/firebaseAdmin';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-
-// Inicialização do Firebase Admin SDK
-try {
-  const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-  if (!serviceAccountString) {
-    throw new Error('A variável de ambiente FIREBASE_SERVICE_ACCOUNT_KEY não está definida.');
-  }
-  const serviceAccount = JSON.parse(serviceAccountString);
-
-  if (!getApps().length) {
-    initializeApp({
-      credential: credential.cert(serviceAccount),
-    });
-  }
-} catch (error) {
-  console.error('Falha ao inicializar o Firebase Admin SDK:', error);
-}
-
-const adminAuth = getAuth();
-const adminDb = getFirestore();
 
 // Mapeamento de produtos Kiwify para IDs de módulos no Firestore
 const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
