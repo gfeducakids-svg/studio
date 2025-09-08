@@ -29,6 +29,7 @@ const formSchema = z.object({
 
 /**
  * Aplica compras pendentes a um usuário recém-logado.
+ * Esta função é chamada após um login bem-sucedido.
  */
 async function applyPendingPurchases(userId: string, email: string) {
     const normalizedEmail = email.toLowerCase();
@@ -37,34 +38,44 @@ async function applyPendingPurchases(userId: string, email: string) {
     try {
         const pendingDoc = await getDoc(pendingDocRef);
 
-        if (pendingDoc.exists()) {
-            console.log(`Compras pendentes encontradas para ${email}. Aplicando...`);
-            const pendingData = pendingDoc.data();
-            const modulesToUnlock: string[] = pendingData.modules || [];
-            
-            if (modulesToUnlock.length > 0) {
-                const userDocRef = doc(db, "users", userId);
-                
-                // Objeto de atualização dinâmico
-                const updates: { [key: string]: any } = {};
-                modulesToUnlock.forEach(moduleId => {
-                    updates[`progress.${moduleId}.status`] = 'unlocked';
-                    // Lógica específica para o módulo principal
-                    if (moduleId === 'grafismo-fonetico') {
-                        updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'unlocked';
-                    }
-                });
+        // Se não houver documento de compra pendente, não há nada a fazer.
+        if (!pendingDoc.exists()) {
+            return;
+        }
 
-                await updateDoc(userDocRef, updates);
-                console.log(`Módulos pendentes aplicados com sucesso para o usuário ${userId}.`);
-                
-                await deleteDoc(pendingDocRef);
-                console.log(`Registro de compra pendente removido para ${email}.`);
-            }
+        console.log(`Compras pendentes encontradas para ${email}. Aplicando...`);
+        const pendingData = pendingDoc.data();
+        const modulesToUnlock: string[] = pendingData.modules || [];
+        
+        if (modulesToUnlock.length > 0) {
+            const userDocRef = doc(db, "users", userId);
+            
+            // Objeto de atualização dinâmico.
+            // Constrói um objeto como: { "progress.grafismo-fonetico.status": "unlocked" }
+            const updates: { [key: string]: any } = {};
+            modulesToUnlock.forEach(moduleId => {
+                updates[`progress.${moduleId}.status`] = 'unlocked';
+                // Lógica específica para o módulo principal para desbloquear o primeiro submódulo.
+                if (moduleId === 'grafismo-fonetico') {
+                    updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'unlocked';
+                }
+            });
+
+            // Tenta atualizar o documento do usuário.
+            // Esta operação é segura. Se o documento do usuário não existir por algum motivo,
+            // o updateDoc falhará silenciosamente sem quebrar o login, e a lógica
+            // será tentada novamente no próximo login.
+            await updateDoc(userDocRef, updates);
+            console.log(`Módulos pendentes aplicados com sucesso para o usuário ${userId}.`);
+            
+            // Após a aplicação bem-sucedida, remove o registro pendente.
+            await deleteDoc(pendingDocRef);
+            console.log(`Registro de compra pendente removido para ${email}.`);
         }
     } catch (error) {
+        // Registra o erro mas não impede o login.
+        // O usuário poderá fazer login, e a lógica será executada novamente na próxima vez.
         console.error("Erro ao aplicar compras pendentes. Elas serão aplicadas no próximo login.", error);
-        // Não relançar o erro para não quebrar o fluxo de login principal.
     }
 }
 
