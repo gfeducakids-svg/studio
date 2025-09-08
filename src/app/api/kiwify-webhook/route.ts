@@ -1,10 +1,9 @@
 
 import 'server-only';
-import { getFirestore, doc, setDoc, updateDoc } from 'firebase-admin/firestore';
+import { getFirestore, doc, setDoc, updateDoc, getDoc } from 'firebase-admin/firestore';
 import { initializeApp, getApps, getApp, credential } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -47,32 +46,25 @@ const initialProgress = {
 
 
 export async function POST(req: Request) {
-  // 1. Validação da Assinatura do Webhook
-  const secret = process.env.KIWIFY_WEBHOOK_SECRET;
-  if (!secret) {
-    console.error('KIWIFY_WEBHOOK_SECRET não está configurado.');
-    return new NextResponse('Server misconfiguration: Webhook secret is missing.', { status: 500 });
+  // 1. Validação do Token do Webhook via Parâmetro de URL
+  const webhookToken = process.env.KIWIFY_WEBHOOK_TOKEN;
+  if (!webhookToken) {
+    console.error('KIWIFY_WEBHOOK_TOKEN não está configurado nas variáveis de ambiente.');
+    return new NextResponse('Server misconfiguration: Webhook token is missing.', { status: 500 });
   }
 
-  const signature = req.headers.get('x-kiwify-signature');
-  if (!signature) {
-    console.warn('Requisição de webhook sem assinatura.');
-    return new NextResponse('Signature missing.', { status: 401 });
-  }
-  
-  const body = await req.text();
-  const hmac = crypto.createHmac('sha256', secret);
-  const computedSignature = hmac.update(body).digest('hex');
+  const url = new URL(req.url);
+  const providedToken = url.searchParams.get("token");
 
-  if (computedSignature !== signature) {
-      console.warn('Assinatura do webhook inválida.');
-      return new NextResponse('Invalid signature.', { status: 401 });
+  if (providedToken !== webhookToken) {
+    console.warn(`Tentativa de acesso não autorizado ao webhook. Token fornecido: ${providedToken}`);
+    return new NextResponse('Unauthorized.', { status: 401 });
   }
 
   // 2. Processamento do Evento
   let event: any;
   try {
-    event = JSON.parse(body);
+    event = await req.json();
   } catch (e) {
     console.error('Body do webhook inválido (JSON parse falhou)', e);
     return new NextResponse('Bad Request: Invalid JSON body.', { status: 400 });
@@ -123,39 +115,37 @@ export async function POST(req: Request) {
           }
 
           // Cenário 2: Usuário já existe, apenas atualiza o progresso
-          if (userRecord && !userRecord.disabled) { // Garante que não está atualizando um usuário recém-criado
-              const userDocRef = doc(adminDb, 'users', userRecord.uid);
-              const userDoc = await userDocRef.get();
+          const userDocRef = doc(adminDb, 'users', userRecord.uid);
+          const userDoc = await getDoc(userDocRef);
 
-              if (!userDoc.exists()) {
-                  // Caso de borda: usuário existe na Auth mas não no Firestore.
-                  // Criar documento no Firestore para ele.
-                   const newUserProgress = { ...initialProgress };
-                  newUserProgress[moduleId as keyof typeof newUserProgress] = { status: 'active', submodules: {} };
-                   if (moduleId === 'grafismo-fonetico') {
-                        newUserProgress[moduleId].submodules['intro' as keyof typeof newUserProgress.submodules] = { status: 'active' };
-                   }
-                   await setDoc(userDocRef, {
-                       name: event.customer.name,
-                       email: customerEmail,
-                       progress: newUserProgress,
-                   });
-                   console.log(`Documento do Firestore criado para usuário existente ${userRecord.uid} e módulo ${moduleId} liberado.`);
+          if (!userDoc.exists()) {
+              // Caso de borda: usuário existe na Auth mas não no Firestore.
+              // Criar documento no Firestore para ele.
+               const newUserProgress = { ...initialProgress };
+              newUserProgress[moduleId as keyof typeof newUserProgress] = { status: 'active', submodules: {} };
+               if (moduleId === 'grafismo-fonetico') {
+                    newUserProgress[moduleId].submodules['intro' as keyof typeof newUserProgress.submodules] = { status: 'active' };
+               }
+               await setDoc(userDocRef, {
+                   name: event.customer.name,
+                   email: customerEmail,
+                   progress: newUserProgress,
+               });
+               console.log(`Documento do Firestore criado para usuário existente ${userRecord.uid} e módulo ${moduleId} liberado.`);
 
-              } else {
-                  console.log(`Usuário ${userRecord.uid} já existe. Liberando módulo ${moduleId}.`);
-                  const updates: { [key: string]: any } = {
-                      [`progress.${moduleId}.status`]: 'active',
-                  };
+          } else {
+              console.log(`Usuário ${userRecord.uid} já existe. Liberando módulo ${moduleId}.`);
+              const updates: { [key: string]: any } = {
+                  [`progress.${moduleId}.status`]: 'active',
+              };
 
-                  // Libera o primeiro submódulo do curso principal
-                  if (moduleId === 'grafismo-fonetico') {
-                      updates[`progress.${moduleId}.submodules.intro.status`] = 'active';
-                  }
-                  
-                  await updateDoc(userDocRef, updates);
-                  console.log(`Módulo ${moduleId} liberado para o usuário ${userRecord.uid}.`);
+              // Libera o primeiro submódulo do curso principal
+              if (moduleId === 'grafismo-fonetico') {
+                  updates[`progress.${moduleId}.submodules.intro.status`] = 'active';
               }
+              
+              await updateDoc(userDocRef, updates);
+              console.log(`Módulo ${moduleId} liberado para o usuário ${userRecord.uid}.`);
           }
 
       } catch (error) {
