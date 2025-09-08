@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
     // Gera o link de redefinição de senha
     const actionCodeSettings = {
-        url: process.env.RESET_REDIRECT_URL || `${req.nextUrl.origin}/login`, // Fallback para a página de login
+        url: process.env.RESET_REDIRECT_URL || `${req.nextUrl.origin}/reset-password`, // URL para a página de redefinição
         handleCodeInApp: true,
     };
     const link = await auth.generatePasswordResetLink(email, actionCodeSettings);
