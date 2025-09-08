@@ -54,24 +54,24 @@ export default function RegisterForm() {
     const normalizedEmail = values.email.toLowerCase();
 
     try {
-      // O formulário de registro agora é simples:
       // 1. Cria o usuário no Auth.
-      // 2. Cria o documento do usuário no Firestore com progresso inicial bloqueado.
-      // A lógica de aplicar compras pendentes foi movida para o formulário de LOGIN.
-      
       const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, values.password);
       const user = userCredential.user;
 
+      // 2. Cria o documento do usuário no Firestore com progresso inicial (totalmente bloqueado).
+      // A lógica de desbloqueio foi movida para o formulário de LOGIN.
       await setDoc(doc(db, "users", user.uid), {
         name: values.name,
         email: normalizedEmail,
-        progress: getInitialProgress(), // Sempre começa bloqueado
+        progress: getInitialProgress(),
       });
 
-      // Não é preciso fazer mais nada aqui. A verificação de compras pendentes
-      // ocorrerá automaticamente quando o Firebase redirecionar e o usuário for logado.
-      
-      router.push('/dashboard');
+      // 3. Redireciona para a página de LOGIN, em vez de entrar automaticamente.
+      toast({
+        title: "Conta criada com sucesso!",
+        description: "Agora você pode fazer o login para começar sua jornada.",
+      });
+      router.push('/login');
 
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
