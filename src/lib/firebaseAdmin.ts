@@ -1,6 +1,6 @@
 
 import "server-only"
-import { initializeApp, getApps, cert, type App, getApp } from "firebase-admin/app"
+import { initializeApp, getApps, cert, type App, getApp as getAdminApp } from "firebase-admin/app"
 import { getAuth, type Auth } from "firebase-admin/auth"
 import { getFirestore, type Firestore } from "firebase-admin/firestore"
 
@@ -19,12 +19,13 @@ function initializeAdminSDK(): FirebaseAdminSDK {
     }
 
     if (getApps().length > 0) {
-        const defaultApp = getApp(); // CORREÇÃO: Usar getApp() em vez de admin.app()
+        const defaultApp = getAdminApp(); // Usa getAdminApp para obter a instância do admin
         adminSDKInstance = {
             app: defaultApp,
             auth: getAuth(defaultApp),
             db: getFirestore(defaultApp),
         };
+        console.log("Firebase Admin SDK já inicializado foi reutilizado.");
         return adminSDKInstance;
     }
 
