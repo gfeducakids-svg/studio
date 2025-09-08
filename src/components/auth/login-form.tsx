@@ -20,7 +20,9 @@ import { useToast } from "@/hooks/use-toast";
 import React from 'react';
 import { auth, db } from '@/lib/firebase';
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
-import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { getInitialProgress } from '@/hooks/use-user-data';
+
 
 const formSchema = z.object({
   email: z.string().email({ message: "Por favor, insira um e-mail válido." }),
@@ -30,17 +32,18 @@ const formSchema = z.object({
 /**
  * Aplica compras pendentes a um usuário recém-logado.
  * Esta função é chamada após um login bem-sucedido.
+ * Usa setDoc com merge: true para garantir que o documento do usuário seja criado se não existir,
+ * e atualizado se existir, de forma atômica e segura.
  */
-async function applyPendingPurchases(userId: string, email: string) {
+async function applyPendingPurchases(userId: string, email: string, name: string) {
     const normalizedEmail = email.toLowerCase();
     const pendingDocRef = doc(db, "pending_purchases", normalizedEmail);
     
     try {
         const pendingDoc = await getDoc(pendingDocRef);
 
-        // Se não houver documento de compra pendente, não há nada a fazer.
         if (!pendingDoc.exists()) {
-            return;
+            return; // Nenhuma compra pendente, nada a fazer.
         }
 
         console.log(`Compras pendentes encontradas para ${email}. Aplicando...`);
@@ -50,22 +53,20 @@ async function applyPendingPurchases(userId: string, email: string) {
         if (modulesToUnlock.length > 0) {
             const userDocRef = doc(db, "users", userId);
             
-            // Objeto de atualização dinâmico.
-            // Constrói um objeto como: { "progress.grafismo-fonetico.status": "unlocked" }
             const updates: { [key: string]: any } = {};
             modulesToUnlock.forEach(moduleId => {
                 updates[`progress.${moduleId}.status`] = 'unlocked';
-                // Lógica específica para o módulo principal para desbloquear o primeiro submódulo.
                 if (moduleId === 'grafismo-fonetico') {
                     updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'unlocked';
                 }
             });
 
-            // Tenta atualizar o documento do usuário.
-            // Esta operação é segura. Se o documento do usuário não existir por algum motivo,
-            // o updateDoc falhará silenciosamente sem quebrar o login, e a lógica
-            // será tentada novamente no próximo login.
-            await updateDoc(userDocRef, updates);
+            // Usa setDoc com merge: true. Isso irá:
+            // 1. CRIAR o documento do usuário se ele não existir (usando o progresso inicial).
+            // 2. ATUALIZAR (mesclar) o documento com os novos status se ele já existir.
+            // É a forma mais segura de garantir a aplicação das compras.
+            await setDoc(userDocRef, updates, { merge: true });
+            
             console.log(`Módulos pendentes aplicados com sucesso para o usuário ${userId}.`);
             
             // Após a aplicação bem-sucedida, remove o registro pendente.
@@ -73,8 +74,6 @@ async function applyPendingPurchases(userId: string, email: string) {
             console.log(`Registro de compra pendente removido para ${email}.`);
         }
     } catch (error) {
-        // Registra o erro mas não impede o login.
-        // O usuário poderá fazer login, e a lógica será executada novamente na próxima vez.
         console.error("Erro ao aplicar compras pendentes. Elas serão aplicadas no próximo login.", error);
     }
 }
@@ -101,7 +100,8 @@ export default function LoginForm() {
       const user = userCredential.user;
 
       // Após o login bem-sucedido, verifique e aplique as compras pendentes
-      await applyPendingPurchases(user.uid, user.email!);
+      // Passamos o displayName do usuário caso precisemos criar o documento dele.
+      await applyPendingPurchases(user.uid, user.email!, user.displayName || 'Novo Usuário');
 
       router.push('/dashboard');
     } catch (error: any) {
