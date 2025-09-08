@@ -1,8 +1,9 @@
+
 'use server';
 
 import { adminAuth, db } from "@/lib/firebaseAdmin";
 import { getInitialProgress } from "@/lib/course-data";
-import { AuthData } from "firebase-admin/lib/auth/auth-config";
+import type { UserRecord } from "firebase-admin/auth";
 
 type SignUpInput = {
   email: string;
@@ -13,7 +14,7 @@ type SignUpInput = {
 // Ação de servidor para registrar um usuário com um perfil no Firestore.
 // Inclui um mecanismo de rollback para deletar o usuário do Auth se a escrita no Firestore falhar.
 export async function signUpWithProfile({ email, password, name }: SignUpInput) {
-  let userRecord: AuthData;
+  let userRecord: UserRecord;
   
   // Passo 1: Criar o usuário no Firebase Authentication via Admin SDK
   try {
