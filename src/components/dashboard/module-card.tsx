@@ -21,10 +21,16 @@ const purchaseLinks: { [key: string]: string } = {
   'checklist-alfabetizacao': 'https://pay.kiwify.com.br/OoaIoIT',
 };
 
+const lockedHeadlines: { [key: string]: string } = {
+  'historias-curtas': 'Histórias viciantes de 5 minutos que fazem seu filho IMPLORAR para ler mais. Seu filho aprende até na hora de Dormir!',
+  'checklist-alfabetizacao': 'O roteiro exato para alfabetizar em casa - Checklist Ideal para Monitorar o Progresso do seu pequeno!',
+  'desafio-21-dias': 'Fim da vergonha na leitura em voz alta! Seu filho gagueja ou troca letras ao ler? Este método elimina TODOS os erros de fala em 21 dias.',
+};
 
 export default function ModuleCard({ id, title, description, imageUrl, isUnlocked }: ModuleCardProps) {
   const purchaseLink = purchaseLinks[id];
   const linkHref = isUnlocked ? `/dashboard/modules/${id}` : (purchaseLink || '#');
+  const microHeadline = lockedHeadlines[id];
 
   return (
     <Card className="group flex h-full min-w-0 flex-col overflow-hidden transition-all duration-300 ease-out">
@@ -57,7 +63,9 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
         <CardTitle className="min-w-0 flex-grow font-headline text-[15px] leading-tight line-clamp-2 sm:text-base md:text-lg">
           {title}
         </CardTitle>
-        {/* <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{description}</p> */}
+        {!isUnlocked && microHeadline && (
+          <p className="mt-2 text-xs text-muted-foreground font-semibold leading-snug">{microHeadline}</p>
+        )}
       </CardContent>
 
       <CardFooter className="p-3 pt-0 sm:p-4">
