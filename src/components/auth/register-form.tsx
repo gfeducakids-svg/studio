@@ -69,7 +69,7 @@ export default function RegisterForm() {
           if (progressData[moduleId as keyof typeof progressData]) {
             progressData[moduleId as keyof typeof progressData].status = 'unlocked';
             // Caso especial para o módulo principal
-            if (moduleId === 'grafismo-fonetico') {
+            if (moduleId === 'grafismo-fonetico' && progressData[moduleId].submodules.intro) {
               progressData[moduleId].submodules.intro.status = 'unlocked';
             }
           }
