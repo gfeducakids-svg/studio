@@ -33,41 +33,38 @@ const formSchema = z.object({
 async function applyPendingPurchases(userId: string, email: string) {
     const normalizedEmail = email.toLowerCase();
     const pendingDocRef = doc(db, "pending_purchases", normalizedEmail);
-    const pendingDoc = await getDoc(pendingDocRef);
+    
+    try {
+        const pendingDoc = await getDoc(pendingDocRef);
 
-    if (pendingDoc.exists()) {
-        console.log(`Compras pendentes encontradas para ${email}. Aplicando...`);
-        const pendingData = pendingDoc.data();
-        const modulesToUnlock: string[] = pendingData.modules || [];
-        
-        if (modulesToUnlock.length > 0) {
-            const userDocRef = doc(db, "users", userId);
-            const userDoc = await getDoc(userDocRef);
+        if (pendingDoc.exists()) {
+            console.log(`Compras pendentes encontradas para ${email}. Aplicando...`);
+            const pendingData = pendingDoc.data();
+            const modulesToUnlock: string[] = pendingData.modules || [];
+            
+            if (modulesToUnlock.length > 0) {
+                const userDocRef = doc(db, "users", userId);
+                
+                // Objeto de atualização dinâmico
+                const updates: { [key: string]: any } = {};
+                modulesToUnlock.forEach(moduleId => {
+                    updates[`progress.${moduleId}.status`] = 'unlocked';
+                    // Lógica específica para o módulo principal
+                    if (moduleId === 'grafismo-fonetico') {
+                        updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'unlocked';
+                    }
+                });
 
-            // Garante que o documento do usuário exista antes de tentar atualizar.
-            if (!userDoc.exists()) {
-                console.warn(`Documento do usuário ${userId} não encontrado ao tentar aplicar compras pendentes. Tentará novamente no próximo login.`);
-                return; 
-            }
-
-            const updates: { [key: string]: any } = {};
-            modulesToUnlock.forEach(moduleId => {
-                updates[`progress.${moduleId}.status`] = 'unlocked';
-                if (moduleId === 'grafismo-fonetico') {
-                    updates[`progress.grafismo-fonetico.submodules.intro.status`] = 'unlocked';
-                }
-            });
-
-            try {
                 await updateDoc(userDocRef, updates);
                 console.log(`Módulos pendentes aplicados com sucesso para o usuário ${userId}.`);
+                
                 await deleteDoc(pendingDocRef);
                 console.log(`Registro de compra pendente removido para ${email}.`);
-            } catch (error) {
-                console.error("Erro ao aplicar compras pendentes:", error);
-                // Não relança o erro para não quebrar o fluxo de login.
             }
         }
+    } catch (error) {
+        console.error("Erro ao aplicar compras pendentes. Elas serão aplicadas no próximo login.", error);
+        // Não relançar o erro para não quebrar o fluxo de login principal.
     }
 }
 
@@ -109,6 +106,7 @@ export default function LoginForm() {
             emailInputRef.current.select();
           }
        } else {
+         console.error("Login error:", error);
          toast({
             title: "Ops! Algo deu errado.",
             description: "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.",
