@@ -7,6 +7,7 @@
  * - ChatWithSupportOutput - O tipo de retorno para a função chatWithSupport.
  */
 
+import 'server-only';
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -158,12 +157,7 @@ export default function GrafismoFoneticoPage() {
             await updateDoc(userDocRef, updates);
 
             toast({
-                title: (
-                    <div className="flex items-center gap-2">
-                        <Sparkles className="text-yellow-400" />
-                        <span className="font-bold">Progresso Salvo!</span>
-                    </div>
-                ),
+                title: "Progresso Salvo!",
                 description: `Você concluiu "${activeModule.title}"!`,
             });
             

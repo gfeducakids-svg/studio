@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -88,12 +87,7 @@ export default function ModulePage() {
         [`progress.${moduleId}.status`]: 'completed'
       });
       toast({
-        title: (
-            <div className="flex items-center gap-2">
-                <Sparkles className="text-yellow-400" />
-                <span className="font-bold">Conquista Desbloqueada!</span>
-            </div>
-        ),
+        title: "Conquista Desbloqueada!",
         description: `Você concluiu "${moduleTitle}"! Veja sua nova conquista na área de prêmios.`,
       });
     } catch (error) {
