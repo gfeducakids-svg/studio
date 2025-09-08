@@ -20,8 +20,8 @@ import { useToast } from "@/hooks/use-toast";
 import React from 'react';
 import { auth, db } from '@/lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
-import { getInitialProgress, UserProgress } from '@/hooks/use-user-data';
+import { doc, setDoc } from 'firebase/firestore';
+import { getInitialProgress } from '@/hooks/use-user-data';
 
 
 const formSchema = z.object({
@@ -49,55 +49,28 @@ export default function RegisterForm() {
     },
   });
 
+  // Este formulário agora tem uma única responsabilidade: criar o usuário
+  // com o progresso inicial padrão. A lógica de aplicar compras pendentes
+  // foi movida para o formulário de login para ser mais robusta.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     const normalizedEmail = values.email.toLowerCase();
 
     try {
-      // 1. Pega a estrutura de progresso inicial
-      const progressData = getInitialProgress();
-      
-      // 2. Verifica se há compras pendentes para este e-mail
-      const pendingDocRef = doc(db, "pending_purchases", normalizedEmail);
-      const pendingDoc = await getDoc(pendingDocRef);
-
-      if (pendingDoc.exists()) {
-          console.log(`Compras pendentes encontradas para ${normalizedEmail}.`);
-          const pendingData = pendingDoc.data();
-          const modulesToUnlock: string[] = pendingData.modules || [];
-
-          // 3. Aplica os desbloqueios na estrutura de progresso
-          modulesToUnlock.forEach(moduleId => {
-              if (progressData[moduleId]) {
-                  progressData[moduleId].status = 'unlocked';
-                  console.log(`Módulo ${moduleId} marcado para desbloqueio.`);
-                  // Regra especial para o primeiro submódulo do grafismo
-                  if (moduleId === 'grafismo-fonetico') {
-                      progressData[moduleId].submodules['intro'].status = 'unlocked';
-                  }
-              }
-          });
-      }
-
-      // 4. Cria o usuário no Auth
+      // 1. Cria o usuário no Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, values.password);
       const user = userCredential.user;
 
-      // 5. Cria o documento do usuário no Firestore com o progresso JÁ CORRETO
+      // 2. Cria o documento do usuário no Firestore com o progresso inicial.
+      // A função getInitialProgress() já define os submódulos do grafismo como "unlocked".
       await setDoc(doc(db, "users", user.uid), {
         name: values.name,
         email: normalizedEmail,
-        progress: progressData,
+        progress: getInitialProgress(),
       });
-      console.log(`Documento do usuário ${user.uid} criado no Firestore com progresso atualizado.`);
-
-      // 6. Se havia compras pendentes, remove o registro
-      if (pendingDoc.exists()) {
-          await deleteDoc(pendingDocRef);
-          console.log(`Registro de compra pendente removido para ${normalizedEmail}.`);
-      }
-
-      // 7. Redireciona para a página de LOGIN com mensagem de sucesso
+      console.log(`Documento do usuário ${user.uid} criado no Firestore com progresso inicial.`);
+      
+      // 3. Redireciona para a página de LOGIN com mensagem de sucesso
       toast({
         title: "Conta criada com sucesso!",
         description: "Agora você pode fazer o login para começar sua jornada.",
