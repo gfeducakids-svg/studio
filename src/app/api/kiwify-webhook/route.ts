@@ -52,10 +52,8 @@ async function verifySignatureAndGetPayload(request: NextRequest, secret: string
         throw new Error('Assinatura do webhook ausente.');
     }
 
-    // A Kiwify não usa um HMAC padrão, então a verificação é mais simples:
-    // Eles parecem enviar um token de assinatura direta, não um hash.
-    // A validação é comparar o segredo com a assinatura enviada.
-    // Vamos manter a lógica original que usa a variável `KIWIFY_TOKEN` como o segredo.
+    // A Kiwify não usa um HMAC padrão. A verificação é comparar o segredo
+    // (o "Token" da Kiwify) com a "signature" enviada como parâmetro na URL.
     if (signature !== secret) {
         throw new Error('Assinatura do webhook inválida.');
     }
@@ -65,11 +63,11 @@ async function verifySignatureAndGetPayload(request: NextRequest, secret: string
 
 
 export async function POST(request: NextRequest) {
-    // Esta variável DEVE conter o "Segredo do Webhook" da Kiwify
+    // Esta variável DEVE conter o "Token" da Kiwify, que atua como o segredo.
     const kiwifySecret = process.env.KIWIFY_TOKEN;
 
     if (!kiwifySecret) {
-        console.error('KIWIFY_TOKEN (segredo do webhook) não está configurado.');
+        console.error('KIWIFY_TOKEN (o Token do webhook da Kiwify) não está configurado.');
         return NextResponse.json({ success: false, message: 'Erro de configuração do servidor.' }, { status: 500 });
     }
 
