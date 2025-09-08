@@ -17,8 +17,25 @@ interface Feedback {
     userName: string;
     userAvatar: string;
     text: string;
-    createdAt: Timestamp;
+    createdAt: Timestamp | Date;
 }
+
+const fixedFeedback: Feedback[] = [
+    {
+        id: 'fixed-1',
+        userName: 'Thaís Sousa',
+        userAvatar: 'https://i.imgur.com/vXXL4J2.jpeg',
+        text: 'Meu filho n lia nada kkk agr já junta as letras, to boba',
+        createdAt: new Date('2024-07-22T10:00:00Z'),
+    },
+    {
+        id: 'fixed-2',
+        userName: 'Isabella',
+        userAvatar: 'https://i.imgur.com/Arpa82B.jpeg',
+        text: 'Ele msm me corrige em casa 😂 fiquei chocada',
+        createdAt: new Date('2024-07-21T15:30:00Z'),
+    }
+];
 
 const FeedbackSkeleton = () => (
     <Card>
@@ -48,7 +65,13 @@ export default function FeedbackPage() {
       querySnapshot.forEach((doc) => {
         feedbacks.push({ id: doc.id, ...doc.data() } as Feedback);
       });
-      setFeedbackList(feedbacks);
+      // Combina os comentários fixos com os do Firestore
+      const allFeedback = [...fixedFeedback, ...feedbacks].sort((a, b) => {
+        const dateA = a.createdAt instanceof Timestamp ? a.createdAt.toDate() : a.createdAt;
+        const dateB = b.createdAt instanceof Timestamp ? b.createdAt.toDate() : b.createdAt;
+        return dateB.getTime() - dateA.getTime();
+      });
+      setFeedbackList(allFeedback);
       setLoadingFeedback(false);
     });
 
