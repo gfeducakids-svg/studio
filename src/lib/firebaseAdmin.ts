@@ -1,6 +1,6 @@
 
 import "server-only"
-import admin, { initializeApp, getApps, cert, type App } from "firebase-admin/app"
+import { initializeApp, getApps, cert, type App, getApp } from "firebase-admin/app"
 import { getAuth, type Auth } from "firebase-admin/auth"
 import { getFirestore, type Firestore } from "firebase-admin/firestore"
 
@@ -19,7 +19,7 @@ function initializeAdminSDK(): FirebaseAdminSDK {
     }
 
     if (getApps().length > 0) {
-        const defaultApp = admin.app();
+        const defaultApp = getApp(); // CORREÇÃO: Usar getApp() em vez de admin.app()
         adminSDKInstance = {
             app: defaultApp,
             auth: getAuth(defaultApp),
