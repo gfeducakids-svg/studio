@@ -25,9 +25,9 @@ interface Course {
 }
 
 // Define os submódulos com o status inicial correto.
-// Todos os submódulos do curso principal são desbloqueados por padrão.
+// O primeiro é ativo, os outros são desbloqueados.
 const initialGrafismoFoneticoSubmodules: Record<string, SubmoduleProgress> = {
-  intro: { status: 'unlocked' },
+  intro: { status: 'active' }, // O primeiro submódulo começa como ativo
   'pre-alf': { status: 'unlocked' },
   alfabeto: { status: 'unlocked' },
   silabas: { status: 'unlocked' },
