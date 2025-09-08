@@ -1,6 +1,6 @@
 
 import 'server-only';
-import { adminAuth, adminDb } from '@/lib/firebaseAdmin';
+import { adminAuth, db } from '@/lib/firebaseAdmin';
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
         if (error.code === 'auth/user-not-found') {
             // **Cenário 1: Usuário NÃO existe - Salva a compra como pendente**
             console.log(`Usuário com email ${customerEmail} não encontrado. Salvando compra pendente.`);
-            const pendingDocRef = adminDb.collection('pending_purchases').doc(customerEmail);
+            const pendingDocRef = db.collection('pending_purchases').doc(customerEmail);
             await pendingDocRef.set({
                 email: customerEmail,
                 modules: FieldValue.arrayUnion(moduleId)
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
 
     // **Cenário 2: Usuário JÁ EXISTE - Libera o acesso diretamente**
     console.log(`Usuário ${userRecord.uid} encontrado. Liberando módulo ${moduleId}.`);
-    const userDocRef = adminDb.collection('users').doc(userRecord.uid);
+    const userDocRef = db.collection('users').doc(userRecord.uid);
     const userDoc = await userDocRef.get();
 
     const updates: { [key: string]: any } = {

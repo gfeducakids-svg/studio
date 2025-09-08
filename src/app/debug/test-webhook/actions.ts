@@ -1,7 +1,7 @@
 
 'use server';
 
-import { adminAuth, adminDb } from '@/lib/firebaseAdmin';
+import { adminAuth, db } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 
 const initialProgress = {
@@ -28,7 +28,7 @@ export async function simulateWebhook(formData: FormData) {
         } catch (error: any) {
             if (error.code === 'auth/user-not-found') {
                 // Cenário 1: Usuário NÃO existe - Salva a compra como pendente
-                const pendingDocRef = adminDb.collection('pending_purchases').doc(customerEmail);
+                const pendingDocRef = db.collection('pending_purchases').doc(customerEmail);
                 await pendingDocRef.set({
                     email: customerEmail,
                     modules: FieldValue.arrayUnion(moduleId)
@@ -40,7 +40,7 @@ export async function simulateWebhook(formData: FormData) {
         }
 
         // Cenário 2: Usuário JÁ EXISTE - Libera o acesso diretamente
-        const userDocRef = adminDb.collection('users').doc(userRecord.uid);
+        const userDocRef = db.collection('users').doc(userRecord.uid);
         const userDoc = await userDocRef.get();
 
         const updates: { [key: string]: any } = {
