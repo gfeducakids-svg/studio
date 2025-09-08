@@ -10,7 +10,7 @@ import ProgressTrail from '@/components/dashboard/progress-trail';
 const modules = [
   { id: 'grafismo-fonetico', title: 'Método Chinês de Grafismo Fonético', description: 'A base da alfabetização com um método inovador.', imageUrl: 'https://i.imgur.com/F2cdIv3.png' },
   { id: 'desafio-21-dias', title: 'Desafio 21 Dias de Pronúncia', description: 'Aperfeiçoe a pronúncia e a fluidez em 3 semanas.', imageUrl: 'https://i.imgur.com/8AhIuQO.jpeg' },
-  { id: 'checklist-alfabetizacao', title: 'Checklist de Alfabetização', description: 'Acompanhe cada etapa do desenvolvimento da criança.', imageUrl: 'https://i.imgur.com/iX6drj2.jpeg' },
+  { id: 'checklist-alfabetizacao', title: 'Checklist de Alfabetização', description: 'Acompanhe cada etapa do desenvolvimento da criança.', imageUrl: 'https://i.imgur.com/rm9VL7V.jpeg' },
   { id: 'historias-curtas', title: 'Histórias Curtas', description: 'Pratique a leitura com histórias divertidas e envolventes.', imageUrl: 'https://i.imgur.com/Fzlyoz1.png' },
 ];
 
