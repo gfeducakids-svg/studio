@@ -34,12 +34,12 @@ export async function POST(req: NextRequest) {
         const userRecord = await auth.getUserByEmail(email);
         userName = userRecord.displayName || '';
     } catch (error: any) {
-        // Se o usuário não for encontrado, não tratamos como um erro fatal.
-        // Apenas enviamos o e-mail sem o nome.
-        if (error.code !== 'auth/user-not-found') {
-            throw error; // Lança outros erros para o catch principal
+        // Se o usuário não for encontrado, agora retornamos um erro 404 específico.
+        if (error.code === 'auth/user-not-found') {
+            console.log(`Tentativa de reset para e-mail não cadastrado: ${email}`);
+            return NextResponse.json({ error: 'Este e-mail não está cadastrado em nosso banco de dados.' }, { status: 404 });
         }
-        console.log(`Tentativa de reset para e-mail não cadastrado: ${email}`);
+        throw error; // Lança outros erros para o catch principal
     }
 
     // Gera o link de redefinição de senha
@@ -81,14 +81,7 @@ export async function POST(req: NextRequest) {
     console.error('Erro na API send-reset:', e);
     
     // Personaliza a mensagem de erro para o cliente
-    let errorMessage = 'Ocorreu um erro inesperado ao enviar o e-mail.';
-    if (e.code === 'auth/user-not-found') {
-      // Por segurança, não informamos que o e-mail não existe.
-      // A função retorna sucesso para não permitir que alguém descubra quais e-mails estão cadastrados.
-      console.log(`E-mail de reset solicitado para usuário não existente: ${email}`);
-      return NextResponse.json({ ok: true, message: 'Se o e-mail estiver cadastrado, um link será enviado.' }, { status: 200 });
-    }
-
+    const errorMessage = 'Ocorreu um erro inesperado ao enviar o e-mail.';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
