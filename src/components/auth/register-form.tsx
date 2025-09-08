@@ -39,6 +39,16 @@ export default function RegisterForm() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
 
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: ""
+    },
+  });
+
   // Este formulário agora tem uma única responsabilidade: criar o usuário
   // com o progresso inicial padrão. A lógica de aplicar compras pendentes
   // foi movida para uma Cloud Function segura chamada pelo hook useUserData no login.
