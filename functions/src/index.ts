@@ -1,3 +1,4 @@
+
 import {initializeApp} from "firebase-admin/app";
 import {getFirestore, FieldPath} from "firebase-admin/firestore";
 import {getAuth} from "firebase-admin/auth";
@@ -86,7 +87,6 @@ export const applyPendingPurchases = https.onCall(
           throw new Error(`Documento do usuário ${uid} não encontrado.`);
         }
 
-        const updates: {[key: string]: string} = {};
         modulesToUnlock.forEach((moduleId) => {
           // Usa FieldPath para segurança e clareza
           const field = new FieldPath("progress", moduleId, "status");
