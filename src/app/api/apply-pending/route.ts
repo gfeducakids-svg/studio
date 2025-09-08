@@ -3,6 +3,7 @@ import 'server-only';
 import { NextResponse } from "next/server";
 import { adminAuth, db } from "@/lib/firebaseAdmin";
 import { FieldPath } from "firebase-admin/firestore";
+import { getInitialProgress } from '@/lib/course-data';
 
 function normalizeEmail(email: string): string {
   let e = (email || "").trim().toLowerCase();
@@ -74,8 +75,12 @@ export async function POST(req: Request) {
       }
 
       if (!uSnap.exists) {
-        console.log(`Apply-pending: User document for ${uid} does not exist. Creating it.`);
-        tx.set(userRef, { email, progress: {} }, { merge: true });
+        console.log(`Apply-pending: User document for ${uid} does not exist. Creating it with initial progress.`);
+        tx.set(userRef, { 
+          email: email, 
+          name: decoded.name || 'Novo Usuário', // Fallback name
+          progress: getInitialProgress() 
+        }, { merge: true });
       }
 
       console.log(`Apply-pending: Unlocking modules [${modules.join(', ')}] for user ${uid}.`);
