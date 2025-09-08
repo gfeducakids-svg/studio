@@ -2,6 +2,7 @@
 import 'server-only';
 import { adminAuth, adminDb } from '@/lib/firebaseAdmin';
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,25 +25,38 @@ const initialProgress = {
 
 
 export async function POST(req: Request) {
-  // 1. Validação do Token do Webhook via Parâmetro de URL
-  const webhookToken = process.env.KIWIFY_WEBHOOK_TOKEN;
-  if (!webhookToken) {
-    console.error('KIWIFY_WEBHOOK_TOKEN não está configurado nas variáveis de ambiente.');
-    return new NextResponse('Server misconfiguration: Webhook token is missing.', { status: 500 });
+  // 1. Validação da Assinatura do Webhook
+  const secret = process.env.KIWIFY_WEBHOOK_SECRET;
+  if (!secret) {
+    console.error('KIWIFY_WEBHOOK_SECRET não está configurado nas variáveis de ambiente.');
+    return new NextResponse('Server misconfiguration: Webhook secret is missing.', { status: 500 });
   }
 
-  const url = new URL(req.url);
-  const providedToken = url.searchParams.get("token");
+  const signature = req.headers.get('x-kiwify-signature');
+  if (!signature) {
+    console.warn('Webhook sem assinatura recebido.');
+    return new NextResponse('Unauthorized: Missing signature.', { status: 401 });
+  }
+  
+  const body = await req.text(); // Precisamos do corpo como texto para a validação
+  
+  try {
+    const hmac = crypto.createHmac('sha256', secret);
+    const digest = hmac.update(body).digest('hex');
 
-  if (providedToken !== webhookToken) {
-    console.warn(`Tentativa de acesso não autorizado ao webhook. Token fornecido: ${providedToken}`);
-    return new NextResponse('Unauthorized.', { status: 401 });
+    if (digest !== signature) {
+      console.warn('Assinatura do webhook inválida.');
+      return new NextResponse('Unauthorized: Invalid signature.', { status: 401 });
+    }
+  } catch (error) {
+     console.error('Erro ao validar assinatura do webhook:', error);
+     return new NextResponse('Internal Server Error during signature validation.', { status: 500 });
   }
 
   // 2. Processamento do Evento
   let event: any;
   try {
-    event = await req.json();
+    event = JSON.parse(body); // Agora parseamos o corpo que já foi validado
   } catch (e) {
     console.error('Body do webhook inválido (JSON parse falhou)', e);
     return new NextResponse('Bad Request: Invalid JSON body.', { status: 400 });
