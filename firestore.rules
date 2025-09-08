@@ -1,29 +1,26 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Regra para a coleção 'users'
-    // Permite que um usuário autenticado leia e escreva apenas no seu próprio documento.
-    match /users/{userId} {
-      allow read, update: if request.auth != null && request.auth.uid == userId;
-      // Nega a criação ou exclusão direta pelos clientes para maior segurança.
-      allow create, delete: if false;
-    }
-    
-    // Regra para a coleção 'feedback'
-    // Permite que qualquer pessoa leia os comentários.
-    // A escrita é bloqueada no lado do cliente (será feita via Server Action segura).
-    match /feedback/{feedbackId} {
-        allow read: if true;
-        allow write: if false;
+
+    // Perfil do usuário: /users/{uid}
+    // Permite que usuários autenticados leiam e escrevam em seu próprio documento.
+    match /users/{uid} {
+      allow read, update: if request.auth != null && request.auth.uid == uid;
+      // Permite a criação apenas se o UID do documento corresponder ao UID do usuário autenticado.
+      allow create: if request.auth != null && request.auth.uid == uid;
     }
 
-    // Regra para a coleção 'pending_purchases'
-    // Bloqueia todo o acesso do lado do cliente por segurança.
-    // As operações são feitas via Webhook ou Server Actions.
+    // Feedback: /feedback/{docId}
+    // Permite que qualquer usuário autenticado leia os feedbacks e crie novos.
+    match /feedback/{docId} {
+      allow read, create: if request.auth != null;
+    }
+    
+    // Compras Pendentes: /pending_purchases/{email}
+    // Apenas o backend (via webhook) deve escrever aqui. Nega acesso de cliente.
     match /pending_purchases/{email} {
         allow read, write: if false;
     }
+
   }
 }

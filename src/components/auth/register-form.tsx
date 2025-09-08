@@ -18,11 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import React from 'react';
-import { auth, db } from '@/lib/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { getInitialProgress } from '@/lib/course-data';
-
+import { signUpWithProfile } from './register-actions'; // Importando a nova Server Action
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
@@ -51,42 +47,30 @@ export default function RegisterForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    const normalizedEmail = values.email.toLowerCase();
-
     try {
-      // 1. Cria o usuário no Firebase Authentication
-      const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, values.password);
-      const user = userCredential.user;
-
-      // 2. Cria o documento do usuário no Firestore com o progresso inicial padrão.
-      await setDoc(doc(db, "users", user.uid), {
+      // Chama a nova server action robusta
+      const result = await signUpWithProfile({
         name: values.name,
-        email: normalizedEmail,
-        progress: getInitialProgress(),
+        email: values.email,
+        password: values.password,
       });
-      console.log(`Documento do usuário ${user.uid} criado no Firestore com progresso inicial.`);
-      
-      // 3. Exibe a mensagem de sucesso e redireciona para a página de LOGIN
-      toast({
-        title: "Conta criada com sucesso!",
-        description: "Agora você pode fazer o login para começar sua jornada.",
-      });
-      router.push('/login');
 
-    } catch (error: any) {
-      if (error.code === 'auth/email-already-in-use') {
-        form.setError("email", {
-            type: "manual",
-            message: "Este e-mail já está em uso. Tente fazer login.",
-        });
-      } else {
-        console.error("Erro no cadastro:", error);
+      if (result.success) {
         toast({
-            title: "Erro no cadastro",
-            description: "Ocorreu um erro ao criar sua conta. Tente novamente.",
-            variant: "destructive",
+          title: "Conta criada com sucesso!",
+          description: "Agora você pode fazer o login para começar sua jornada.",
         });
+        router.push('/login');
       }
+      
+    } catch (error: any) {
+      console.error("Erro no cadastro:", error);
+      // Mostra a mensagem de erro específica vinda da server action
+      toast({
+          title: "Erro no cadastro",
+          description: error.message || "Ocorreu um erro ao criar sua conta. Tente novamente.",
+          variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
