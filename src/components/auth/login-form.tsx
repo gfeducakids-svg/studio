@@ -42,8 +42,15 @@ async function applyPendingPurchases(userId: string, email: string) {
         
         if (modulesToUnlock.length > 0) {
             const userDocRef = doc(db, "users", userId);
-            const updates: { [key: string]: any } = {};
+            const userDoc = await getDoc(userDocRef);
 
+            // Garante que o documento do usuário exista antes de tentar atualizar.
+            if (!userDoc.exists()) {
+                console.warn(`Documento do usuário ${userId} não encontrado ao tentar aplicar compras pendentes. Tentará novamente no próximo login.`);
+                return; 
+            }
+
+            const updates: { [key: string]: any } = {};
             modulesToUnlock.forEach(moduleId => {
                 updates[`progress.${moduleId}.status`] = 'unlocked';
                 if (moduleId === 'grafismo-fonetico') {
@@ -58,6 +65,7 @@ async function applyPendingPurchases(userId: string, email: string) {
                 console.log(`Registro de compra pendente removido para ${email}.`);
             } catch (error) {
                 console.error("Erro ao aplicar compras pendentes:", error);
+                // Não relança o erro para não quebrar o fluxo de login.
             }
         }
     }
