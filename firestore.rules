@@ -1,0 +1,27 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Regra geral para a coleção 'users'
+    match /users/{userId} {
+      // PERMITE: Leitura do próprio documento se autenticado
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // PERMITE: Criação do próprio documento se autenticado
+      allow create: if request.auth != null && request.auth.uid == userId;
+      
+      // NEGA: Escrita direta no campo 'progress' pelo cliente
+      // A atualização só pode acontecer se o campo 'progress' NÃO for modificado
+      allow update: if request.auth != null && request.auth.uid == userId
+                    && !( 'progress' in request.resource.data &&
+                          request.resource.data.progress != resource.data.progress );
+    }
+
+    // Regra geral para a coleção 'pending_purchases'
+    // Esta coleção só deve ser acessível pelo backend (via Firebase Admin SDK)
+    match /pending_purchases/{email} {
+      allow read, write: if false; // Nega todo acesso do cliente
+    }
+  }
+}

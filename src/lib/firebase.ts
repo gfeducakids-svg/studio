@@ -3,6 +3,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 // A configuração do Firebase agora usa consistentemente as variáveis de ambiente
 // públicas (prefixadas com NEXT_PUBLIC_). Isso garante que as chaves estejam
@@ -25,4 +26,10 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-export { app, auth, db, storage };
+// Inicializa o Firebase Functions
+const functions = getFunctions(app, 'us-central1');
+
+// Cria uma referência para a Cloud Function callable
+const applyPendingPurchases = httpsCallable(functions, 'applyPendingPurchases');
+
+export { app, auth, db, storage, functions, applyPendingPurchases };

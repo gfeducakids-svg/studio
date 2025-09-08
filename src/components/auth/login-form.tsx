@@ -18,66 +18,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import React from 'react';
-import { auth, db } from '@/lib/firebase';
-import { signInWithEmailAndPassword, sendPasswordResetEmail, User } from 'firebase/auth';
-import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
-
+import { auth } from '@/lib/firebase';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Por favor, insira um e-mail válido." }),
   password: z.string().min(1, { message: "A senha é obrigatória." }),
 });
-
-// Função para aplicar compras pendentes
-async function applyPendingPurchases(user: User) {
-  const normalizedEmail = user.email!.toLowerCase();
-  const pendingDocRef = doc(db, "pending_purchases", normalizedEmail);
-  const userDocRef = doc(db, "users", user.uid);
-
-  try {
-    const pendingDoc = await getDoc(pendingDocRef);
-    if (!pendingDoc.exists()) {
-      console.log(`Nenhuma compra pendente encontrada para ${normalizedEmail}.`);
-      return;
-    }
-
-    const pendingData = pendingDoc.data();
-    const modulesToUnlock: string[] = pendingData.modules || [];
-    
-    if (modulesToUnlock.length === 0) {
-        console.log(`Registro pendente para ${normalizedEmail} não continha módulos para desbloquear.`);
-        await deleteDoc(pendingDocRef);
-        return;
-    }
-
-    console.log(`Aplicando ${modulesToUnlock.length} módulo(s) pendente(s) para ${normalizedEmail}...`);
-
-    // Constrói o objeto de atualização
-    const updates: { [key: string]: any } = {};
-    modulesToUnlock.forEach(moduleId => {
-      updates[`progress.${moduleId}.status`] = 'unlocked';
-      // Regra especial para o primeiro submódulo do grafismo
-      if (moduleId === 'grafismo-fonetico') {
-        updates[`progress.${moduleId}.submodules.intro.status`] = 'unlocked';
-      }
-    });
-
-    // Usa setDoc com merge:true para garantir que o documento do usuário seja
-    // criado ou atualizado de forma segura, sem sobrescrever outros dados.
-    await setDoc(userDocRef, updates, { merge: true });
-    
-    // Remove o registro de compra pendente após a aplicação bem-sucedida
-    await deleteDoc(pendingDocRef);
-
-    console.log(`Módulos pendentes aplicados e registro limpo para ${normalizedEmail}.`);
-
-  } catch (error) {
-    console.error("Erro ao aplicar compras pendentes:", error);
-    // Não lançamos o erro para não quebrar o fluxo de login do usuário.
-    // A lógica será re-tentada no próximo login.
-  }
-}
-
 
 export default function LoginForm() {
   const router = useRouter();
@@ -93,16 +40,18 @@ export default function LoginForm() {
     },
   });
 
+  // O formulário de login agora tem a única responsabilidade de autenticar o usuário.
+  // A lógica de desbloqueio foi movida para uma Cloud Function segura,
+  // que é chamada pelo hook useUserData após uma autenticação bem-sucedida.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
       // 1. Autentica o usuário
-      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+      await signInWithEmailAndPassword(auth, values.email, values.password);
       
-      // 2. Após o login bem-sucedido, chama a função para verificar e aplicar compras pendentes
-      await applyPendingPurchases(userCredential.user);
-      
-      // 3. Redireciona para o dashboard
+      // 2. Redireciona para o dashboard
+      // O hook useUserData, que é ativado em todas as páginas do dashboard,
+      // cuidará de chamar a Cloud Function para aplicar compras pendentes.
       router.push('/dashboard');
 
     } catch (error: any) {

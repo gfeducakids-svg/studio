@@ -39,19 +39,9 @@ export default function RegisterForm() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-  });
-
   // Este formulário agora tem uma única responsabilidade: criar o usuário
   // com o progresso inicial padrão. A lógica de aplicar compras pendentes
-  // foi movida para o formulário de login para ser mais robusta.
+  // foi movida para uma Cloud Function segura chamada pelo hook useUserData no login.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     const normalizedEmail = values.email.toLowerCase();
@@ -61,8 +51,7 @@ export default function RegisterForm() {
       const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, values.password);
       const user = userCredential.user;
 
-      // 2. Cria o documento do usuário no Firestore com o progresso inicial.
-      // A função getInitialProgress() já define os submódulos do grafismo como "unlocked".
+      // 2. Cria o documento do usuário no Firestore com o progresso inicial padrão.
       await setDoc(doc(db, "users", user.uid), {
         name: values.name,
         email: normalizedEmail,

@@ -1,10 +1,11 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { auth, db, applyPendingPurchases } from '@/lib/firebase';
+import { useToast } from './use-toast';
 
 // Tipos base (ajuste o import/local conforme seu projeto)
 export type SubmoduleStatus = 'unlocked' | 'active' | 'locked' | 'completed'
@@ -43,10 +44,41 @@ export const getInitialProgress = (): UserProgress => ({
 export function useUserData() {
     const [userData, setUserData] = useState<UserData | null>(null);
     const [loading, setLoading] = useState(true);
+    const { toast } = useToast();
+    // Ref para garantir que a função seja chamada apenas uma vez por sessão
+    const wasPurchaseCheckCalled = useRef(false);
 
     useEffect(() => {
-        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+        const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
             if (user) {
+                // Chama a Cloud Function para aplicar compras pendentes
+                if (!wasPurchaseCheckCalled.current) {
+                    wasPurchaseCheckCalled.current = true;
+                    try {
+                        console.log('Chamando applyPendingPurchases...');
+                        const result = await applyPendingPurchases();
+                        const data = result.data as { ok: boolean; applied: boolean; modules?: string[] };
+                        
+                        if (data.ok && data.applied) {
+                            console.log(`Compras pendentes aplicadas para os módulos: ${data.modules?.join(', ')}`);
+                            toast({
+                                title: "Acesso Liberado!",
+                                description: `Seu acesso aos novos módulos foi liberado com sucesso.`,
+                            });
+                        } else {
+                             console.log('Nenhuma compra pendente encontrada para aplicar.');
+                        }
+                    } catch (error) {
+                        console.error("Erro ao chamar applyPendingPurchases:", error);
+                        // Opcional: notificar o usuário sobre o erro
+                        // toast({
+                        //     title: "Erro ao Sincronizar",
+                        //     description: "Não foi possível verificar suas compras. O acesso será liberado em breve.",
+                        //     variant: "destructive"
+                        // });
+                    }
+                }
+
                 const userDocRef = doc(db, 'users', user.uid);
                 
                 const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
@@ -64,11 +96,12 @@ export function useUserData() {
             } else {
                 setUserData(null);
                 setLoading(false);
+                wasPurchaseCheckCalled.current = false; // Reseta para a próxima sessão de login
             }
         });
 
         return () => unsubscribeAuth();
-    }, []);
+    }, [toast]);
 
     return { userData, loading };
 }
