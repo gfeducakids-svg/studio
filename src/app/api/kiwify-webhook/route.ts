@@ -1,6 +1,6 @@
 
 import 'server-only';
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from 'firebase-firestore';
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from 'firebase-admin/firestore';
 import { initializeApp, getApps, getApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { credential } from 'firebase-admin';
