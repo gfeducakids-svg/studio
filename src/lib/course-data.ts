@@ -24,7 +24,7 @@ interface Course {
     submodules: Submodule[];
 }
 
-// Defina os submódulos com o status inicial correto.
+// Define os submódulos com o status inicial correto.
 // Todos os submódulos do curso principal são desbloqueados por padrão.
 const initialGrafismoFoneticoSubmodules: Record<string, SubmoduleProgress> = {
   intro: { status: 'unlocked' },
