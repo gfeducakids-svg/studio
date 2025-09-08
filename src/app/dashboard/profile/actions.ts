@@ -1,3 +1,4 @@
+
 'use server';
 
 import { db } from '@/lib/firebaseAdmin';
@@ -21,8 +22,14 @@ export async function updateUserProfile({ uid, newName }: UpdateProfileArgs): Pr
         revalidatePath('/dashboard', 'layout');
 
         return { success: true };
-    } catch (error) {
+    } catch (error: any) {
         console.error('Erro ao atualizar o perfil do usuário:', error);
+        
+        // Verifica se o erro é de inicialização do Admin SDK
+        if (error.message.includes('FIREBASE_SERVICE_ACCOUNT')) {
+             return { success: false, message: 'Erro de configuração do servidor. A conexão com o banco de dados falhou.' };
+        }
+
         return { success: false, message: 'Ocorreu um erro no servidor ao tentar atualizar o nome.' };
     }
 }
