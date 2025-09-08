@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import React from 'react';
-import { signUpWithProfile } from './register-actions'; // Importando a nova Server Action
+import { signUpWithProfile } from './register-actions';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
@@ -48,7 +48,6 @@ export default function RegisterForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      // Chama a nova server action robusta
       const result = await signUpWithProfile({
         name: values.name,
         email: values.email,
@@ -61,11 +60,13 @@ export default function RegisterForm() {
           description: "Agora você pode fazer o login para começar sua jornada.",
         });
         router.push('/login');
+      } else {
+        // Embora a action agora lance um erro, mantemos isso como segurança.
+        throw new Error("Ocorreu um erro desconhecido durante o cadastro.");
       }
       
     } catch (error: any) {
       console.error("Erro no cadastro:", error);
-      // Mostra a mensagem de erro específica vinda da server action
       toast({
           title: "Erro no cadastro",
           description: error.message || "Ocorreu um erro ao criar sua conta. Tente novamente.",
