@@ -3,7 +3,7 @@ import { Card, CardFooter, CardHeader, CardTitle, CardContent } from '@/componen
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { Lock } from 'lucide-react';
+import { Lock, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 
 interface ModuleCardProps {
@@ -27,10 +27,17 @@ const lockedHeadlines: { [key: string]: string } = {
   'desafio-21-dias': 'Fim da vergonha na leitura em voz alta! Seu filho gagueja ou troca letras ao ler? Este método elimina TODOS os erros de fala em 21 dias.',
 };
 
+const modulePrices: { [key: string]: string } = {
+  'desafio-21-dias': 'R$ 17,90',
+  'historias-curtas': 'R$ 9,90',
+  'checklist-alfabetizacao': 'R$ 9,90',
+};
+
+
 export default function ModuleCard({ id, title, description, imageUrl, isUnlocked }: ModuleCardProps) {
   const purchaseLink = purchaseLinks[id];
-  const linkHref = isUnlocked ? `/dashboard/modules/${id}` : (purchaseLink || '#');
   const microHeadline = lockedHeadlines[id];
+  const price = modulePrices[id];
 
   return (
     <Card className="group flex h-full min-w-0 flex-col overflow-hidden transition-all duration-300 ease-out">
@@ -57,6 +64,11 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
             </div>
           )}
         </Link>
+         {!isUnlocked && price && (
+          <div className="absolute top-2 right-2 z-10 rounded-full bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground shadow-lg">
+            {price}
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="flex grow min-w-0 flex-col p-3 sm:p-4">
@@ -86,7 +98,10 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
                     'bg-yellow-400 text-yellow-950 font-bold hover:bg-yellow-500'
                 )}
             >
-                <a href={purchaseLink} target="_blank" rel="noopener noreferrer">Liberar Acesso</a>
+                <a href={purchaseLink} target="_blank" rel="noopener noreferrer">
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    Liberar Acesso
+                </a>
             </Button>
           ) : (
              <Button
