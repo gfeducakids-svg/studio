@@ -25,17 +25,17 @@ interface Course {
 }
 
 // Defina os submódulos com o status inicial correto.
-// Todos começam bloqueados, exceto a introdução.
-const initialGrafismoFoneticoSubmodules = {
+// Todos os submódulos do curso principal são desbloqueados por padrão.
+const initialGrafismoFoneticoSubmodules: Record<string, SubmoduleProgress> = {
   intro: { status: 'unlocked' },
-  'pre-alf': { status: 'locked' },
-  alfabeto: { status: 'locked' },
-  silabas: { status: 'locked' },
-  fonico: { status: 'locked' },
-  palavras: { status: 'locked' },
-  escrita: { status: 'locked' },
-  bonus: { status: 'locked' },
-} as const satisfies Record<string, SubmoduleProgress>
+  'pre-alf': { status: 'unlocked' },
+  alfabeto: { status: 'unlocked' },
+  silabas: { status: 'unlocked' },
+  fonico: { status: 'unlocked' },
+  palavras: { status: 'unlocked' },
+  escrita: { status: 'unlocked' },
+  bonus: { status: 'unlocked' },
+};
 
 
 export const getInitialProgress = (): UserProgress => ({
