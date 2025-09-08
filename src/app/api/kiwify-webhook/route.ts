@@ -10,10 +10,10 @@ export const revalidate = 0;
 
 // Mapeamento de produtos Kiwify para IDs de módulos no Firestore
 const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
-  '4337283': 'grafismo-fonetico',
-  '4344400': 'desafio-21-dias',
-  '4344404': 'historias-curtas',
-  'cde90d10-5dbd-11f0-8dec-3b93c26e3853': 'checklist-alfabetizacao',
+  '4337283': 'grafismo-fonetico', // Método Chinês de Grafismo Fonético
+  '4344400': 'desafio-21-dias',   // Desafio 21 Dias de Pronúncia
+  '4344404': 'historias-curtas',  // Histórias Curtas
+  'cde90d10-5dbd-11f0-8dec-3b93c26e3853': 'checklist-alfabetizacao', // Checklist de Alfabetização
 };
 
 const initialProgress = {
