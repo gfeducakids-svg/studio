@@ -2,9 +2,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { auth, db, applyPendingPurchases } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { useToast } from './use-toast';
 
 // Tipos base (ajuste o import/local conforme seu projeto)
@@ -51,31 +51,35 @@ export function useUserData() {
     useEffect(() => {
         const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Chama a Cloud Function para aplicar compras pendentes
+                // Chama a API para aplicar compras pendentes
                 if (!wasPurchaseCheckCalled.current) {
                     wasPurchaseCheckCalled.current = true;
                     try {
-                        console.log('Chamando applyPendingPurchases...');
-                        const result = await applyPendingPurchases();
-                        const data = result.data as { ok: boolean; applied: boolean; modules?: string[] };
+                        console.log('Calling /api/apply-pending...');
+                        const token = await user.getIdToken();
+                        const response = await fetch("/api/apply-pending", {
+                            method: "POST",
+                            headers: { Authorization: `Bearer ${token}` },
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`API responded with status ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
                         
                         if (data.ok && data.applied) {
-                            console.log(`Compras pendentes aplicadas para os módulos: ${data.modules?.join(', ')}`);
+                            console.log(`Pending purchases applied for modules: ${data.modules?.join(', ')}`);
                             toast({
                                 title: "Acesso Liberado!",
                                 description: `Seu acesso aos novos módulos foi liberado com sucesso.`,
                             });
+                            // A atualização dos dados virá pelo onSnapshot, não é necessário refetch manual.
                         } else {
-                             console.log('Nenhuma compra pendente encontrada para aplicar.');
+                             console.log('No pending purchases found to apply.');
                         }
                     } catch (error) {
-                        console.error("Erro ao chamar applyPendingPurchases:", error);
-                        // Opcional: notificar o usuário sobre o erro
-                        // toast({
-                        //     title: "Erro ao Sincronizar",
-                        //     description: "Não foi possível verificar suas compras. O acesso será liberado em breve.",
-                        //     variant: "destructive"
-                        // });
+                        console.error("Error calling /api/apply-pending:", error);
                     }
                 }
 
