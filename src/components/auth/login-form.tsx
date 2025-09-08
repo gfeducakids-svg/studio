@@ -97,7 +97,7 @@ export default function LoginForm() {
 
         if (!response.ok) {
             // Se a API retornar um erro (como 404), lança um erro com a mensagem da API
-            throw new Error(result.error || "Não foi possível enviar o e-mail.");
+            throw new Error(result.error?.message || "Não foi possível enviar o e-mail.");
         }
       
       toast({
