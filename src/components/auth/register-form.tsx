@@ -21,6 +21,7 @@ import React from 'react';
 import { auth, db } from '@/lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
+import { getInitialProgress } from '@/hooks/use-user-data';
 
 
 const formSchema = z.object({
@@ -32,27 +33,6 @@ const formSchema = z.object({
     message: "As senhas não coincidem.",
     path: ["confirmPassword"],
 });
-
-// Estrutura de progresso inicial para um novo usuário
-const getInitialProgress = () => ({
-    'grafismo-fonetico': {
-        status: 'locked',
-        submodules: {
-            'intro': { status: 'locked' },
-            'pre-alf': { status: 'locked' },
-            'alfabeto': { status: 'locked' },
-            'silabas': { status: 'locked' },
-            'fonico': { status: 'locked' },
-            'palavras': { status: 'locked' },
-            'escrita': { status: 'locked' },
-            'bonus': { status: 'locked' },
-        }
-    },
-    'desafio-21-dias': { status: 'locked', submodules: {} },
-    'checklist-alfabetizacao': { status: 'locked', submodules: {} },
-    'historias-curtas': { status: 'locked', submodules: {} },
-});
-
 
 export default function RegisterForm() {
   const router = useRouter();

@@ -32,16 +32,17 @@ const initialGrafismoFoneticoSubmodules = {
 } as const satisfies Record<string, SubmoduleProgress>
 
 
-const initialProgress: UserProgress = {
+export const getInitialProgress = (): UserProgress => ({
     'grafismo-fonetico': { status: 'locked', submodules: initialGrafismoFoneticoSubmodules },
     'desafio-21-dias': { status: 'locked', submodules: {} },
     'checklist-alfabetizacao': { status: 'locked', submodules: {} },
     'historias-curtas': { status: 'locked', submodules: {} },
-};
+});
 
 async function initializeUserProgress(user: User) {
     const userDocRef = doc(db, 'users', user.uid);
     const userDoc = await getDoc(userDocRef);
+    const initialProgress = getInitialProgress();
     
     if (userDoc.exists()) {
         const userData = userDoc.data() as UserData;
