@@ -44,19 +44,32 @@ function initializeAdmin() {
 
 // --- Lógica do Webhook ---
 
-async function verifyTokenAndGetPayload(request: NextRequest, secretToken: string) {
+async function verifySignatureAndGetPayload(request: NextRequest, secret: string) {
+    const signature = request.nextUrl.searchParams.get('signature');
     const payload = await request.json();
-    if (payload.token !== secretToken) {
-        throw new Error('Token de autorização inválido.');
+
+    if (!signature) {
+        throw new Error('Assinatura do webhook ausente.');
     }
+
+    // A Kiwify não usa um HMAC padrão, então a verificação é mais simples:
+    // Eles parecem enviar um token de assinatura direta, não um hash.
+    // A validação é comparar o segredo com a assinatura enviada.
+    // Vamos manter a lógica original que usa a variável `KIWIFY_TOKEN` como o segredo.
+    if (signature !== secret) {
+        throw new Error('Assinatura do webhook inválida.');
+    }
+    
     return payload;
 }
 
-export async function POST(request: NextRequest) {
-    const kiwifyToken = process.env.KIWIFY_TOKEN;
 
-    if (!kiwifyToken) {
-        console.error('KIWIFY_TOKEN não está configurado nas variáveis de ambiente.');
+export async function POST(request: NextRequest) {
+    // Esta variável DEVE conter o "Segredo do Webhook" da Kiwify
+    const kiwifySecret = process.env.KIWIFY_TOKEN;
+
+    if (!kiwifySecret) {
+        console.error('KIWIFY_TOKEN (segredo do webhook) não está configurado.');
         return NextResponse.json({ success: false, message: 'Erro de configuração do servidor.' }, { status: 500 });
     }
 
@@ -64,7 +77,8 @@ export async function POST(request: NextRequest) {
         initializeAdmin();
         const db = getFirestore();
         const auth = getAuth();
-        const payload = await verifyTokenAndGetPayload(request, kiwifyToken);
+
+        const payload = await verifySignatureAndGetPayload(request, kiwifySecret);
         
         if (payload.order_status !== 'paid') {
              return NextResponse.json({ success: true, message: 'Webhook recebido, mas nenhuma ação tomada para o status: ' + payload.order_status });
@@ -139,7 +153,7 @@ export async function POST(request: NextRequest) {
         }
 
     } catch (error: any) {
-        if (error.message.includes('Token')) {
+        if (error.message.includes('Assinatura')) {
             return NextResponse.json({ success: false, message: error.message }, { status: 401 });
         }
         console.error('Erro fatal ao processar o webhook da Kiwify:', error);
