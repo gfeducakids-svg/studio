@@ -41,12 +41,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
 
   return (
     <Card className="group flex h-full min-w-0 flex-col overflow-hidden transition-all duration-300 ease-out">
-      {/* MÍDIA: aspect-video no mobile, 4:3 em md+ */}
-      <CardHeader className="
-        relative w-full overflow-hidden p-0
-        aspect-video md:aspect-[4/3]
-        max-h-[clamp(140px,38vh,260px)] md:max-h-[clamp(180px,32vh,340px)]
-      ">
+      <CardHeader className="relative w-full overflow-hidden p-0 aspect-video">
         <Link
           href={isUnlocked ? `/dashboard/modules/${id}` : '#'}
           className={cn(!isUnlocked && 'pointer-events-none', 'relative block h-full w-full')}
@@ -56,7 +51,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
             alt={title}
             fill
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             priority={false}
           />
           {!isUnlocked && (
@@ -72,9 +67,9 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
         )}
       </CardHeader>
 
-      <CardContent className="flex grow min-w-0 flex-col p-3 sm:p-4">
+      <CardContent className="flex grow min-w-0 flex-col p-4">
         <div className="flex-grow">
-            <CardTitle className="min-w-0 font-headline text-[15px] leading-tight sm:text-base md:text-lg">
+            <CardTitle className="min-w-0 font-headline text-base leading-tight md:text-lg">
                 {title}
             </CardTitle>
             {!isUnlocked && microHeadline && (
@@ -83,7 +78,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
         </div>
       </CardContent>
 
-      <CardFooter className="p-3 pt-0 sm:p-4">
+      <CardFooter className="p-4 pt-0">
         {isUnlocked ? (
           <Button
             asChild

@@ -16,7 +16,6 @@ const modules = [
 
 const ModuleSkeleton = () => (
   <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
-    {/* topo: proporção + limite elástico por viewport (funciona em 320px até 4K) */}
     <div className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3] max-h-[clamp(140px,38vh,260px)] md:max-h-[clamp(180px,32vh,340px)]">
       <Skeleton className="absolute inset-0 h-full w-full" />
     </div>
@@ -37,7 +36,6 @@ export default function DashboardPage() {
 
   return (
     <div className="animate-in flex w-full flex-col gap-6 sm:gap-8 overflow-x-hidden">
-      {/* carrossel protegido contra overflow horizontal */}
       <div className="overflow-x-hidden">
         <ProgressTrail />
       </div>
@@ -47,17 +45,11 @@ export default function DashboardPage() {
           Cursos e Atividades
         </h2>
 
-        {/* GRID UNIVERSAL
-           - auto-fit + minmax cria colunas fluidas de no mínimo 240px
-           - funciona de 320px a ultra-wide sem quebrar layout
-        */}
         <div
           className="
             grid w-full items-stretch
-            grid-cols-[repeat(auto-fit,minmax(240px,1fr))]
-            gap-3 sm:gap-4 lg:gap-5
-            justify-items-center sm:justify-items-stretch
-            [grid-auto-rows:1fr]
+            grid-cols-1 sm:grid-cols-2 lg:grid-cols-4
+            gap-4
           "
         >
           {loading

@@ -153,9 +153,9 @@ export default function ProgressTrail() {
             containScroll: 'trimSnaps',
             skipSnaps: false,
           }}
-          className="w-full overflow-hidden"
+          className="w-full"
         >
-          <CarouselContent className="px-2 sm:px-3 md:px-4 py-4">
+          <CarouselContent className="-ml-2 px-2 sm:px-3 md:px-4 py-4">
             {allItems.map((item, index) => {
               const isSecondary = 'icon' in item;
               let configKey: keyof typeof statusConfig = (item as any).status || 'locked';
@@ -169,7 +169,7 @@ export default function ProgressTrail() {
               return (
                 <CarouselItem
                   key={item.id}
-                  className="basis-auto pl-2 sm:pl-3 md:pl-4"
+                  className="basis-auto pl-2"
                 >
                   <div className="flex items-start justify-center">
                     <TooltipProvider delayDuration={120}>
