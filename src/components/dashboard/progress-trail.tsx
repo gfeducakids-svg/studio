@@ -14,6 +14,8 @@ import { useUserData } from "@/hooks/use-user-data";
 import { Skeleton } from "../ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { useIsMobile } from '@/hooks/use-mobile';
+
 
 const mainTrailDetails = [
   { id: 'intro', title: 'Introdução', progressKey: 'grafismo-fonetico.submodules.intro' },
@@ -72,6 +74,7 @@ const getProgressStatus = (
   }
   if (current && typeof current === 'object' && 'status' in current) {
     const s = (current as any).status;
+    if (s === 'unlocked') return 'active'; // Trata unlocked como active na trilha
     if (s === 'locked' || s === 'active' || s === 'completed') return s;
   }
   return 'locked';
@@ -112,6 +115,7 @@ const TrailSkeleton = () => {
 
 export default function ProgressTrail() {
   const { userData, loading } = useUserData();
+  const isMobile = useIsMobile();
   
   if (loading) {
     return (
@@ -134,8 +138,26 @@ export default function ProgressTrail() {
     ...mod,
     status: getProgressStatus(userData?.progress, mod.progressKey),
   }));
-  const allItems = [...trailSubmodules, ...secondaryModules];
-  const activeIndex = trailSubmodules.findIndex(s => s.status === 'active');
+  let allItems = [...trailSubmodules, ...secondaryModules];
+  
+  if (isMobile) {
+      let activeIndex = allItems.findIndex(s => s.status === 'active');
+      if (activeIndex === -1) {
+          const firstLockedIndex = allItems.findIndex(s => s.status === 'locked');
+          activeIndex = firstLockedIndex > -1 ? firstLockedIndex : allItems.length -1;
+      }
+      
+      let startIndex = Math.max(0, activeIndex - 1);
+      let endIndex = startIndex + 3;
+
+      if (endIndex > allItems.length) {
+          startIndex = Math.max(0, allItems.length - 3);
+          endIndex = allItems.length;
+      }
+      
+      allItems = allItems.slice(startIndex, endIndex);
+  }
+
 
   return (
     <Card>
@@ -145,16 +167,16 @@ export default function ProgressTrail() {
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="p-0">
+      <CardContent className={cn("p-0", isMobile && "flex justify-center")}>
         <Carousel
           opts={{
             align: 'start',
             dragFree: true,
             containScroll: 'trimSnaps',
           }}
-          className="w-full"
+          className="w-full max-w-full"
         >
-          <CarouselContent className="-ml-2 px-2 sm:px-3 md:px-4 py-4">
+          <CarouselContent className={cn("-ml-2 px-2 sm:px-3 md:px-4 py-4", isMobile && "justify-center")}>
             {allItems.map((item, index) => {
               const isSecondary = 'icon' in item;
               let configKey: keyof typeof statusConfig = (item as any).status || 'locked';
@@ -163,6 +185,7 @@ export default function ProgressTrail() {
               const config = statusConfig[configKey];
               const Icon = isSecondary ? (item as any).icon : config.icon;
               const isLastItem = index === allItems.length - 1;
+              const activeIndex = allItems.findIndex(s => s.status === 'active');
               const isNextStep = activeIndex !== -1 && index === activeIndex + 1;
 
               return (
