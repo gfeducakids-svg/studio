@@ -81,7 +81,7 @@ const TrailSkeleton = () => {
     const allItems = [...mainTrailDetails, ...secondaryModulesDetails];
     return (
         <Carousel
-            opts={{ align: 'start', dragFree: true, containScroll: 'trimSnaps', skipSnaps: false }}
+            opts={{ align: 'start', dragFree: true, containScroll: 'trimSnaps' }}
             className="w-full overflow-hidden"
         >
             <CarouselContent className="px-2 sm:px-3 md:px-4 py-4">
@@ -151,7 +151,6 @@ export default function ProgressTrail() {
             align: 'start',
             dragFree: true,
             containScroll: 'trimSnaps',
-            skipSnaps: false,
           }}
           className="w-full"
         >

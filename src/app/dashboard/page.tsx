@@ -16,7 +16,7 @@ const modules = [
 
 const ModuleSkeleton = () => (
   <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
-    <div className="relative w-full overflow-hidden p-0 aspect-video md:aspect-[4/3] max-h-[clamp(140px,38vh,260px)] md:max-h-[clamp(180px,32vh,340px)]">
+    <div className="relative w-full overflow-hidden p-0 aspect-video">
       <Skeleton className="absolute inset-0 h-full w-full" />
     </div>
     <div className="flex grow flex-col p-3 sm:p-4">
@@ -36,7 +36,7 @@ export default function DashboardPage() {
 
   return (
     <div className="animate-in flex w-full flex-col gap-6 sm:gap-8 overflow-x-hidden">
-      <div className="overflow-x-hidden">
+      <div className="w-full">
         <ProgressTrail />
       </div>
 
@@ -48,8 +48,8 @@ export default function DashboardPage() {
         <div
           className="
             grid w-full items-stretch
-            grid-cols-1 sm:grid-cols-2 lg:grid-cols-4
-            gap-4
+            grid-cols-1 md:grid-cols-2 lg:grid-cols-4
+            gap-3 md:gap-4
           "
         >
           {loading

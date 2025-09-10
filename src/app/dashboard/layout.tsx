@@ -37,8 +37,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           className="
             mx-auto w-full max-w-screen-xl
             flex-1 overflow-y-auto overflow-x-hidden
-            px-4 pt-8 md:px-6 lg:px-8
-            pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-8
+            px-4 pt-6 sm:pt-8 md:px-6 lg:px-8
+            pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-8
           "
         >
           {children}

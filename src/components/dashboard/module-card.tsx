@@ -51,7 +51,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
             alt={title}
             fill
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
             priority={false}
           />
           {!isUnlocked && (
@@ -73,7 +73,7 @@ export default function ModuleCard({ id, title, description, imageUrl, isUnlocke
                 {title}
             </CardTitle>
             {!isUnlocked && microHeadline && (
-            <p className="mt-2 text-xs text-center text-muted-foreground font-semibold leading-snug sm:text-left">{microHeadline}</p>
+            <p className="mt-2 text-xs text-center font-semibold leading-snug sm:text-left text-muted-foreground">{microHeadline}</p>
             )}
         </div>
       </CardContent>
