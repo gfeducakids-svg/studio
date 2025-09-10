@@ -23,6 +23,8 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+        
+        {/* PWA and Mobile Meta Tags */}
         <meta name="application-name" content="Aplicativo EducaKids" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -31,10 +33,18 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#ff0000" />
 
+        {/* Apple Touch Icons */}
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon-120x120.png" sizes="120x120" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon-152x152.png" sizes="152x152" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon-167x167.png" sizes="167x167" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180x180.png" sizes="180x180" />
 
+        {/* Standard Icons */}
+        <link rel="icon" type="image/x-icon" href="/icons/favicon.ico" />
         <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png" />
+
       </head>
       <body className="font-body antialiased overflow-x-hidden">
         {children}
