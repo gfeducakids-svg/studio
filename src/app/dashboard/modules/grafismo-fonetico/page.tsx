@@ -330,7 +330,7 @@ export default function GrafismoFoneticoPage() {
                             <CardTitle className="text-base font-semibold leading-tight">{material.title}</CardTitle>
                           </CardHeader>
                           <CardContent className="flex-grow pt-2">
-                             <p className="text-sm text-muted-foreground capitalize">{material.type}</p>
+                             <p className="text-sm text-muted-foreground">{material.description}</p>
                           </CardContent>
                           <CardFooter>
                             <Button asChild className="w-full" size="sm" disabled={!isCourseUnlocked}>
