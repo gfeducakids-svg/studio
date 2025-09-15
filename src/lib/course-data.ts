@@ -49,22 +49,15 @@ const grafismoFoneticoData: Course = {
     id: 'grafismo-fonetico',
     title: 'Método de Grafismo Fonético',
     submodules: [
-        { id: 'intro', title: 'Introdução', pdfUrl: 'https://drive.google.com/file/d/1Yd3KNRMeznq8vWzCSBWrnvWyYXONo5JK/preview', materials: [{ id: 1, type: 'video', title: 'Boas-vindas'}] },
+        { id: 'intro', title: 'Introdução', pdfUrl: 'https://drive.google.com/file/d/1Yd3KNRMeznq8vWzCSBWrnvWyYXONo5JK/preview', materials: [] },
         { id: 'pre-alf', title: 'Módulo 01', pdfUrl: 'https://drive.google.com/file/d/10id_hmbKbH0yqi623ylopyjR2cOeWI1D/preview', materials: [
-            { id: 1, type: 'video', title: 'Aula 1'}, 
-            {id: 2, type: 'pdf', title: 'Exercício de Traços'},
-            { id: 3, type: 'download', title: 'Atividade PDF (Módulo 1)', url: 'https://drive.usercontent.google.com/download?id=13AX6QqVl2r7DteRYSiz7LOoS2Bf_j92N&export=download&authuser=4&confirm=t&uuid=065d9dd8-585b-45b0-9809-ef2a8f2d3d86&at=AN8xHorLiwfgkjusu3NEXx6u6m99:1757975696480' }
+            { id: 1, type: 'download', title: 'Atividade PDF (Módulo 1)', url: 'https://drive.usercontent.google.com/download?id=13AX6QqVl2r7DteRYSiz7LOoS2Bf_j92N&export=download&authuser=4&confirm=t&uuid=065d9dd8-585b-45b0-9809-ef2a8f2d3d86&at=AN8xHorLiwfgkjusu3NEXx6u6m99:1757975696480' }
         ] },
         { id: 'alfabeto', title: 'Módulo 02', pdfUrl: 'https://drive.google.com/file/d/1Uxs4yPT9NuDHMRkAMfL85ZnCHZU-NbNQ/preview', materials: [
-            { id: 1, type: 'video', title: 'As Vogais'}, 
-            {id: 2, type: 'pdf', title: 'Cartilha do Alfabeto'}, 
-            {id: 3, type: 'download', title: 'Áudios das Letras'},
-            { id: 4, type: 'download', title: 'Atividade PDF (Módulo 2)', url: 'https://drive.usercontent.google.com/download?id=10NuIU2tU-n6VwryVQnYDnT086zcP-MI_&export=download&authuser=4&confirm=t&uuid=07e8fb4a-ea83-4e22-9fd5-4161f65cac62&at=AN8xHopIJLMDyuBFgkygtyE1NgGK:1757975701688' }
+            { id: 1, type: 'download', title: 'Atividade PDF (Módulo 2)', url: 'https://drive.usercontent.google.com/download?id=10NuIU2tU-n6VwryVQnYDnT086zcP-MI_&export=download&authuser=4&confirm=t&uuid=07e8fb4a-ea83-4e22-9fd5-4161f65cac62&at=AN8xHopIJLMDyuBFgkygtyE1NgGK:1757975701688' }
         ] },
         { id: 'silabas', title: 'Módulo 03', pdfUrl: 'https://drive.google.com/file/d/1k-s5EoRwlWloBICD7uWV-PbMsJNA27GB/preview', materials: [
-            { id: 1, type: 'video', title: 'BA-BE-BI-BO-BU'}, 
-            {id: 2, type: 'pdf', title: 'Tabela de Sílabas'},
-            { id: 3, type: 'download', title: 'Atividade PDF (Módulo 3)', url: 'https://drive.usercontent.google.com/download?id=1d60nSWLlqEEf6adVWUjKht5sdMjHBwRj&export=download&authuser=4&confirm=t&uuid=0d7ede6b-b81f-41db-be8b-ee28c44d4a73&at=AN8xHop-27mVkEAE2mAqFxSKVrZE:1757975706069' }
+            { id: 1, type: 'download', title: 'Atividade PDF (Módulo 3)', url: 'https://drive.usercontent.google.com/download?id=1d60nSWLlqEEf6adVWUjKht5sdMjHBwRj&export=download&authuser=4&confirm=t&uuid=0d7ede6b-b81f-41db-be8b-ee28c44d4a73&at=AN8xHop-27mVkEAE2mAqFxSKVrZE:1757975706069' }
         ] },
         { id: 'fonico', title: 'Módulo 04', pdfUrl: 'https://drive.google.com/file/d/1jYvC01jsIArCRVa8Tc78JA7V8wbslkbT/preview', materials: [
             { id: 1, type: 'download', title: 'Atividade PDF (Módulo 4)', url: 'https://drive.usercontent.google.com/download?id=11SFCIbyiFsf3lFLaNv5nApwc999SE5rF&export=download&authuser=4&confirm=t&uuid=d31f6031-c8d7-4650-a685-899360411b55&at=AN8xHooUQtvZ1yhPHfrsxAlxGbCD:1757975709320' }
@@ -92,3 +85,4 @@ export const getCourseStructure = async (courseId: string): Promise<Course> => {
     // Fallback for other courses or if not found
     throw new Error(`Course with id ${courseId} not found.`);
 };
+
