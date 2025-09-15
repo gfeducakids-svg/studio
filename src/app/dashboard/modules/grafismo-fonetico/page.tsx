@@ -333,8 +333,8 @@ export default function GrafismoFoneticoPage() {
                              <p className="text-sm text-muted-foreground capitalize">{material.type}</p>
                           </CardContent>
                           <CardFooter>
-                            <Button className="w-full" size="sm" disabled={!isCourseUnlocked}>
-                               {actionText}
+                            <Button asChild className="w-full" size="sm" disabled={!isCourseUnlocked}>
+                               <a href={material.url} target="_blank" rel="noopener noreferrer">{actionText}</a>
                             </Button>
                           </CardFooter>
                         </Card>
