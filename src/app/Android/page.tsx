@@ -1,5 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { MoreVertical, Star } from 'lucide-react';
+import Link from 'next/link';
 
 const steps = [
   {
@@ -53,6 +56,13 @@ export default function AndroidInstallPage() {
               </div>
             ))}
           </CardContent>
+          <CardFooter className="pt-6">
+            <Button asChild size="lg" className="w-full font-bold">
+                <Link href="/register">
+                Eu Entendi! Agora quero criar minha conta
+                </Link>
+            </Button>
+         </CardFooter>
         </Card>
     </main>
   );
