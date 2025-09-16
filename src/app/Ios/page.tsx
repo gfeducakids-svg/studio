@@ -1,5 +1,6 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowUpFromBracket, SquarePlus } from 'lucide-react';
+import { Share2, SquarePlus } from 'lucide-react';
 
 const steps = [
   {
@@ -12,7 +13,7 @@ const steps = [
     step: 2,
     title: 'Toque em "Compartilhar"',
     description: 'Na parte inferior da tela, toque no ícone de compartilhamento (um quadrado com uma seta para cima).',
-    icon: <div className="bg-gray-200 rounded-lg p-3 text-gray-800"><ArrowUpFromBracket className="h-6 w-6"/></div>
+    icon: <div className="bg-gray-200 rounded-lg p-3 text-gray-800"><Share2 className="h-6 w-6"/></div>
   },
   {
     step: 3,
