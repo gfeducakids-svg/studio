@@ -3,6 +3,7 @@ import 'server-only';
 import { adminAuth, db } from '@/lib/firebaseAdmin';
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
+import { makeTransportGmail } from '@/lib/diag';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,6 +17,13 @@ const KIWIFY_PRODUCT_TO_MODULE_ID: { [key: string]: string } = {
   'cde90d10-5dbd-11f0-8dec-3b93c26e3853': 'checklist-alfabetizacao', // Checklist de Alfabetização
 };
 
+const KIWIFY_PRODUCT_NAME: { [key: string]: string } = {
+  'aa0ddef0-8a83-11f0-99b6-fd7db9e425f5': 'Grafismo Fonético',
+  'ef805df0-83b2-11f0-b76f-c30ef01f8da7': 'Desafio 21 Dias de Pronúncia',
+  'ecb5d950-5dc0-11f0-a549-539ae1cd3c85': 'Histórias Curtas',
+  'cde90d10-5dbd-11f0-8dec-3b93c26e3d853': 'Checklist de Alfabetização',
+};
+
 // Estrutura de progresso inicial para um novo usuário, caso precise ser criado
 const initialProgress = {
     'grafismo-fonetico': { status: 'locked', submodules: { 'intro': { status: 'unlocked' } } },
@@ -23,6 +31,55 @@ const initialProgress = {
     'checklist-alfabetizacao': { status: 'locked', submodules: {} },
     'historias-curtas': { status: 'locked', submodules: {} },
 };
+
+async function sendPurchaseNotificationEmail({ customerName, customerEmail, productName }: { customerName: string; customerEmail: string; productName: string; }) {
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASS) {
+        console.warn('As credenciais de e-mail (GMAIL_USER, GMAIL_APP_PASS) não estão configuradas. Pulando notificação.');
+        return;
+    }
+
+    const transporter = makeTransportGmail();
+    const notificationEmailHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+            h1 { color: #24A9F4; }
+            strong { color: #04123C; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>🎉 Nova Venda Realizada!</h1>
+            <p>Parabéns! Você acaba de receber um novo aluno na plataforma EducaKids.</p>
+            <ul>
+              <li><strong>Cliente:</strong> ${customerName}</li>
+              <li><strong>Email:</strong> ${customerEmail}</li>
+              <li><strong>Produto Comprado:</strong> ${productName}</li>
+            </ul>
+            <p>O acesso ao curso já foi liberado (ou está pendente, caso o usuário não exista).</p>
+            <p>Continue o ótimo trabalho!</p>
+            <p><em>- Seu sistema de notificação automática.</em></p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    try {
+        await transporter.sendMail({
+            from: `"Notificações EducaKids" <${process.env.GMAIL_USER}>`,
+            to: process.env.GMAIL_USER, // Envia para você mesmo
+            subject: `🎉 Nova Venda! - ${productName}`,
+            html: notificationEmailHtml,
+        });
+        console.log(`E-mail de notificação de venda enviado para ${process.env.GMAIL_USER}`);
+    } catch (error) {
+        console.error("Falha ao enviar e-mail de notificação de venda:", error);
+    }
+}
+
 
 export async function POST(req: Request) {
   let payload: any;
@@ -42,8 +99,10 @@ export async function POST(req: Request) {
   }
   
   const customerEmail = order.Customer.email.toLowerCase();
+  const customerName = order.Customer.full_name;
   const kiwifyProductId = order.Product.product_id;
   const moduleId = KIWIFY_PRODUCT_TO_MODULE_ID[kiwifyProductId];
+  const productName = KIWIFY_PRODUCT_NAME[kiwifyProductId] || 'Produto Desconhecido';
 
   if (!moduleId) {
       console.log(`Produto com ID ${kiwifyProductId} não mapeado. Ignorando.`);
@@ -51,6 +110,9 @@ export async function POST(req: Request) {
   }
 
   try {
+    // Envia o e-mail de notificação assim que a compra é confirmada
+    await sendPurchaseNotificationEmail({ customerName, customerEmail, productName });
+
     let userRecord;
     try {
         userRecord = await adminAuth.getUserByEmail(customerEmail);
