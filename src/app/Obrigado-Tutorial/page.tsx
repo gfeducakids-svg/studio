@@ -44,7 +44,7 @@ export default function ObrigadoTutorialPage() {
                             <span>iPhone / iPad</span>
                         </Link>
                     </Button>
-                    <Button asChild size="lg" variant="outline" className="h-14 border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-700 hover:-translate-y-1 transition-transform">
+                    <Button asChild size="lg" className="h-14 bg-gradient-to-br from-blue-900 to-blue-600 text-white font-bold shadow-lg shadow-blue-500/30 hover:-translate-y-1 transition-transform">
                         <Link href="/Android">
                             <Smartphone className="mr-2 h-5 w-5" />
                             <span>Android / Tablet</span>
