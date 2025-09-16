@@ -8,7 +8,11 @@ const steps = [
   {
     step: 1,
     title: 'Abra o Safari',
-    description: 'Acesse nosso site pelo navegador Safari no seu iPhone ou iPad.',
+    description: (
+        <a href="https://areademembroseducakids.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-600">
+            Acesse nosso site pelo navegador Safari no seu iPhone ou iPad.
+        </a>
+    ),
     icon: <div className="bg-blue-500 rounded-lg p-3 text-white"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12C4 8.68629 6.68629 6 10 6C13.3137 6 16 8.68629 16 12C16 15.3137 13.3137 18 10 18C6.68629 18 4 15.3137 4 12Z" /><path d="M10 12L18 12" /><path d="M14 8L20 14" /></svg></div>
   },
   {
@@ -58,8 +62,8 @@ export default function IosInstallPage() {
           </CardContent>
             <CardFooter className="pt-6">
                 <Button asChild size="lg" className="w-full font-bold">
-                    <Link href="/register">
-                    Eu Entendi! Agora quero criar minha conta
+                    <Link href="/login">
+                    Voltar para o Login
                     </Link>
                 </Button>
             </CardFooter>
