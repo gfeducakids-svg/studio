@@ -21,7 +21,7 @@ export default function ObrigadoTutorialPage() {
                 className="mx-auto mb-4"
             />
             
-            <h1 className="font-headline text-4xl font-black text-blue-900">
+            <h1 className="font-body text-4xl font-black text-blue-900">
               PARABÉNS!
             </h1>
             <p className="mt-2 text-base text-foreground/80 font-semibold">
