@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -102,6 +103,9 @@ export default function RegisterForm() {
               <FormControl>
                 <Input placeholder="seunome@email.com" {...field} className="py-6 rounded-lg"/>
               </FormControl>
+              <FormDescription className="text-xs">
+                Importante: use o mesmo e-mail da compra para liberar seu acesso.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
